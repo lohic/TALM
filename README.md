@@ -23,5 +23,10 @@ Créer 5 Sous-sites :
 - Le Mans
 - Etudiants
 
-CF :
+Wordpress MU sur MAMP CF :
+
 http://perishablepress.com/wordpress-multisite-subdomains-mamp/
+
+SUBLIME VIA TERMINAL (permet d'éditer des fichiers systeme ou via ssh) :
+
+http://www.sublimetext.com/docs/2/osx_command_line.html
