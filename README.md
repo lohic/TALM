@@ -22,3 +22,6 @@ Créer 5 Sous-sites :
 - Tours
 - Le Mans
 - Etudiants
+
+CF :
+http://perishablepress.com/wordpress-multisite-subdomains-mamp/
