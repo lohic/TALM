@@ -1,0 +1,13 @@
+/*
+Theme Name: TALM pour Plateforme étudiante
+Template: talm
+Theme URI: http://www.esba-talm.fr/
+Description: Ce thème permet de gérer la mise en forme des contenus du portail ESBA TALM et des sites enfants associés.
+Version: 1.0
+Author: FORMIDABLE (Sophie Blum, Loïc Horellou, Loïs de Cornulier, développement : Fabien Raymondaud)
+ 
+Creation Theme by Formidable || http://www.formidable-studio.net
+*/
+
+@import url("../talm/style.css");
+
