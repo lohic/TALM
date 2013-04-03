@@ -55,7 +55,8 @@ if ( ! function_exists( 'talm_setup' ) ){
 
 		if( function_exists( 'register_field' ) )
 		{
-			register_field('Tax_field', dirname(__File__) . '/fields/acf-tax.php');
+			//register_field('Tax_field', dirname(__File__) . '/fields/acf-tax.php');
+			register_field('Tax_field', dirname(__File__) . '/fields/acf-taxonomy-field/taxonomy-field.php');
 		}
 		add_action('init', 'update_newsletter_user');
 		add_action('init', 'register_my_menus' );
