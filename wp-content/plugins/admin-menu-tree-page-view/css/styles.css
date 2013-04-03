@@ -299,7 +299,7 @@ span.admin-menu-tree-page-tree_headline {
 	color: #BBBBBB;
     left: 13px;
     position: absolute;
-    top: 5px;
+    top: 4px;
     cursor: text;
 }
 
@@ -341,6 +341,7 @@ ul.admin-menu-tree-page-tree ul ul ul .admin-menu-tree-page-expand {
 ul.admin-menu-tree-page-tree ul {
 	display: none;
 }
+
 ul.admin-menu-tree-page-tree li.admin-menu-tree-page-view-opened > div + ul {
 	display: block;
 }
@@ -375,6 +376,7 @@ ul.admin-menu-tree-page-tree span.child-count {
 	background-image: -moz-linear-gradient(left , #d3dbe1, #EAF2FA 10px);
 	background-image: -webkit-linear-gradient(left , #d3dbe1, #EAF2FA 5px);
 	margin-top: -8px;
+	color: #464646;
 }
 .amtpv-editpopup-hover {
 	display: block;
@@ -602,6 +604,10 @@ ul.amtpv-editpopup-addpages-names-ul .ui-state-highlight {
 }
 
 /* fix from wordpress.org/support/topic/plugin-admin-menu-tree-page-view-flyout-menus-broken-in-wp-33 */
-#adminmenuwrap #adminmenu #menu-pages .wp-submenu {
+#adminmenuwrap #adminmenu #menu-pages .wp-submenu,
+#adminmenu .wp-submenu li {
 	overflow: visible !important;
 }
+
+
+

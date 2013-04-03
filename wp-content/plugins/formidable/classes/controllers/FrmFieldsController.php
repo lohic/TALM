@@ -15,6 +15,7 @@ class FrmFieldsController{
         add_action('wp_ajax_frm_add_field_option', array(&$this, 'add_option'));
         add_action('wp_ajax_frm_field_option_ipe', array(&$this, 'edit_option') );
         add_action('wp_ajax_frm_delete_field_option', array(&$this, 'delete_option'));
+        add_action('wp_ajax_frm_import_choices', array(&$this, 'import_choices') );
         add_action('wp_ajax_frm_import_options', array(&$this, 'import_options') );
         add_action('wp_ajax_frm_update_field_order', array(&$this, 'update_order') );
         add_filter('frm_field_type' ,array( &$this, 'change_type'));
@@ -100,9 +101,10 @@ class FrmFieldsController{
             
         $values = array();
         $values['field_key'] = FrmAppHelper::get_unique_key('', $frmdb->fields, 'field_key');
-        $values['field_options'] = maybe_unserialize($copy_field->field_options);
+        $values['options'] = maybe_serialize($copy_field->options);
+        $values['default_value'] = maybe_serialize($copy_field->default_value);
         $values['form_id'] = $copy_field->form_id;
-        foreach (array('name', 'description', 'type', 'default_value', 'options', 'required') as $col)
+        foreach (array('name', 'description', 'type', 'field_options', 'required') as $col)
             $values[$col] = $copy_field->{$col};
         $field_count = $frm_app_helper->getRecordCount("form_id='$copy_field->form_id'", $frmdb->fields);
         $values['field_order'] = $field_count + 1;
@@ -136,8 +138,15 @@ class FrmFieldsController{
             $last = max(array_keys($options));
         else
             $last = 0;
+        
         $opt_key = $last + 1;
-        $opt = 'Option '.(count($options)+1);
+        $first_opt = reset($options);
+        $next_opt = count($options);
+        if($first_opt != '')
+            $next_opt++;
+        $opt = __('Option', 'formidable') .' '. $next_opt;
+        unset($next_opt);
+        
         $field_val = $opt;
         $options[$opt_key] = $opt;
         $frm_field->update($id, array('options' => maybe_serialize($options)));
@@ -199,11 +208,19 @@ class FrmFieldsController{
         die();
     }
     
-    function import_choices($field_id){
+    function import_choices(){
         if(!current_user_can('frm_edit_forms'))
             return;
-          
-        global $frm_ajax_url;
+        
+        $field_id = $_REQUEST['field_id'];
+        	
+        global $current_screen, $hook_suffix;
+
+        // Catch plugins that include admin-header.php before admin.php completes.
+        if (empty( $current_screen ) and function_exists('set_current_screen')){
+            $hook_suffix = '';
+        	set_current_screen();
+        }
         
         if(function_exists('register_admin_color_schemes'))
             register_admin_color_schemes();
@@ -249,8 +266,6 @@ class FrmFieldsController{
         );
         
         $field = FrmField::getOne($field_id);
-        $field->options = stripslashes_deep(maybe_unserialize($field->options));
-        $field->field_options = maybe_unserialize($field->field_options);
         
         include(FRM_VIEWS_PATH.'/frm-fields/import_choices.php');
         die();
@@ -393,7 +408,7 @@ class FrmFieldsController{
                 $add_html .= ' onfocus="frmClearDefault('."'". $val ."'". ',this)" onblur="frmReplaceDefault('."'". $val ."'". ',this)"';
                 
                 if($field['value'] == $field['default_value'])
-                    $add_html .= ' style="font-style:italic;"';
+                    $class .= ' frm_default';
             }
         }
         
@@ -401,7 +416,16 @@ class FrmFieldsController{
             $class .= ' '. $field['input_class'];
         
         $class = apply_filters('frm_field_classes', $class, $field);
-        $add_html .= ' class="'.$class.'"';
+        if(!empty($class))
+            $add_html .= ' class="'. $class .'"';
+            
+        if(isset($field['shortcodes']) and !empty($field['shortcodes'])){
+            foreach($field['shortcodes'] as $k => $v){
+                $add_html .= ' '. $k .'="'. $v .'"';
+                unset($k);
+                unset($v);
+            }
+        }
         
         if($echo)
             echo $add_html;
@@ -427,4 +451,3 @@ class FrmFieldsController{
         return $opt;
     }
 }
-?>

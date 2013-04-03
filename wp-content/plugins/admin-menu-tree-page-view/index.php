@@ -3,7 +3,7 @@
 Plugin Name: Admin Menu Tree Page View
 Plugin URI: http://eskapism.se/code-playground/admin-menu-tree-page-view/
 Description: Get a tree view of all your pages directly in the admin menu. Search, edit, view and add pages - all with just one click away!
-Version: 2.5
+Version: 2.6.5
 Author: Pär Thernström
 Author URI: http://eskapism.se/
 License: GPL2
@@ -38,17 +38,35 @@ add_action('wp_ajax_admin_menu_tree_page_view_move_page', 'admin_menu_tree_page_
 
 function admin_menu_tree_page_view_admin_init() {
 
-	define( "admin_menu_tree_page_view_VERSION", "2.5" );
+	define( "admin_menu_tree_page_view_VERSION", "2.6.5" );
 	define( "admin_menu_tree_page_view_URL", WP_PLUGIN_URL . '/admin-menu-tree-page-view/' );
 	define( "admin_menu_tree_page_view_DIR", WP_PLUGIN_DIR . '/admin-menu-tree-page-view/' );
 
-	wp_enqueue_style("admin_menu_tree_page_view_styles", admin_menu_tree_page_view_URL . "css/styles.css", false, admin_menu_tree_page_view_VERSION);
-	wp_enqueue_script("jquery.highlight", admin_menu_tree_page_view_URL . "js/jquery.highlight.js", array("jquery"));
-	wp_enqueue_script("jquery-cookie", admin_menu_tree_page_view_URL . "js/jquery.biscuit.js", array("jquery")); // renamed from cookie to fix problems with mod_security
-	wp_enqueue_script("jquery.ui.nestedSortable", admin_menu_tree_page_view_URL . "js/jquery.ui.nestedSortable.js", array("jquery", "jquery-ui-sortable"));
-	wp_enqueue_script("jquery.client", admin_menu_tree_page_view_URL . "js/jquery.client.js", array("jquery"));
+	// Find the plugin directory URL
+	$aa = __FILE__;
+	if ( isset( $mu_plugin ) ) {
+		$aa = $mu_plugin;
+	}
+	if ( isset( $network_plugin ) ) {
+		$aa = $network_plugin;
+	}
+	if ( isset( $plugin ) ) {
+		$aa = $plugin;
+	}
+	$plugin_dir_url = plugin_dir_url(basename($aa)) . 'admin-menu-tree-page-view/';
+
+	define( "ADMIN_MENU_TREE_PAGE_VIEW_URL", $plugin_dir_url);
+
+	wp_enqueue_style("admin_menu_tree_page_view_styles", ADMIN_MENU_TREE_PAGE_VIEW_URL . "css/styles.css", false, admin_menu_tree_page_view_VERSION);
+	wp_enqueue_script("jquery.highlight", ADMIN_MENU_TREE_PAGE_VIEW_URL . "js/jquery.highlight.js", array("jquery"));
+	wp_enqueue_script("jquery-cookie", ADMIN_MENU_TREE_PAGE_VIEW_URL . "js/jquery.biscuit.js", array("jquery")); // renamed from cookie to fix problems with mod_security
+	wp_enqueue_script("jquery.ui.nestedSortable", ADMIN_MENU_TREE_PAGE_VIEW_URL . "js/jquery.ui.nestedSortable.js", array("jquery", "jquery-ui-sortable"));
+	wp_enqueue_script("jquery.client", ADMIN_MENU_TREE_PAGE_VIEW_URL . "js/jquery.client.js", array("jquery"));
 	wp_enqueue_script("jquery-ui-sortable");
-	wp_enqueue_script("admin_menu_tree_page_view", admin_menu_tree_page_view_URL . "js/scripts.js", array("jquery"));
+	wp_enqueue_script("admin_menu_tree_page_view", ADMIN_MENU_TREE_PAGE_VIEW_URL . "js/scripts.js", array("jquery"));
+
+	// The way CMS TPV does it:
+	// wp_enqueue_script( "jquery-cookie", CMS_TPV_URL . "scripts/jquery.biscuit.js", array("jquery"));
 
 	$oLocale = array(
 		"Edit" => __("Edit", 'admin-menu-tree-page-view'),
@@ -88,12 +106,17 @@ class admin_menu_tree_page_view {
 	}
 	
 	static function get_post_ancestors($post_to_check_parents_for) {
-		if (!isset(admin_menu_tree_page_view::$one_page_parents)) {
+	
+		if ( ! isset(admin_menu_tree_page_view::$one_page_parents) ) {
+	
 			wp_cache_delete($post_to_check_parents_for, 'posts');
 			$one_page_parents = get_post_ancestors($post_to_check_parents_for);
 			admin_menu_tree_page_view::$one_page_parents = $one_page_parents;
+	
 		}
+	
 		return admin_menu_tree_page_view::$one_page_parents;
+	
 	}
 	
 }
@@ -176,10 +199,14 @@ function admin_menu_tree_page_view_get_pages($args) {
 		$cookie_opened = explode(",", $cookie_opened);
 
 		// if we are editing a post, we should see it in the tree, right?
-		if ( isset($_GET["action"]) && "edit" == $_GET["action"] && isset($_GET["post"])) {
+		// don't use on bulk edit, then post is an array and not a single post id
+		if ( isset($_GET["action"]) && "edit" == $_GET["action"] && isset($_GET["post"]) && is_integer($_GET["post"]) ) {
+
 			// if post with id get[post] is a parent of the current post, show it
-			if ($_GET["post"] != $one_page->ID) {
+			if ( $_GET["post"] != $one_page->ID ) {
+				
 				$post_to_check_parents_for = $_GET["post"];
+
 				// seems to be a problem with get_post_ancestors (yes, it's in the trac too)
 				// Long time since I wrote this, but perhaps this is the problem (adding for future reference):
 				// http://core.trac.wordpress.org/ticket/10381
@@ -190,7 +217,9 @@ function admin_menu_tree_page_view_get_pages($args) {
 				if (in_array($one_page->ID, $one_page_parents)) {
 					$isOpened = TRUE;
 				}
+
 			}
+
 		}
 
 		if (in_array($one_page->ID, $cookie_opened) || $isOpened && $post_children_count>0) {
@@ -287,7 +316,7 @@ function admin_menu_tree_page_view_admin_menu() {
 	);
 
 	$output .= admin_menu_tree_page_view_get_pages($args);
-	
+
 	// end our ul and add the a-tag that wp automatically will close
 	$output .= "
 		</ul>

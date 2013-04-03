@@ -34,11 +34,10 @@ class FrmFieldsHelper{
             'data' => __('Data from Entries', 'formidable'),
             //'form' => __('SubForm', 'formidable'),
             'hidden' => __('Hidden Field', 'formidable'), 
-            'user_id' => __('Hidden User ID', 'formidable'),
+            'user_id' => __('User ID (hidden)', 'formidable'),
             'password'  => __('Password', 'formidable'),
             'html' => __('HTML', 'formidable'),
             'tag' => __('Tags', 'formidable')
-            //'multiple' => 'Multiple Select Box', //http://code.google.com/p/jquery-asmselect/
             //'address' => 'Address' //Address line 1, Address line 2, City, State/Providence, Postal Code, Select Country 
             //'city_selector' => 'US State/County/City selector', 
             //'full_name' => 'First and Last Name', 
@@ -84,21 +83,18 @@ class FrmFieldsHelper{
     function setup_edit_vars($record){
         global $frm_entry_meta, $frm_form;
         
-        $values = array();
-        $record->field_options = maybe_unserialize($record->field_options);
+        $values = array('id' => $record->id, 'form_id' => $record->form_id);
+        //$record->field_options = maybe_unserialize($record->field_options);
 
-        $values['id'] = $record->id;
-        $values['form_id'] = $record->form_id;
         foreach (array('name' => $record->name, 'description' => $record->description) as $var => $default)
-              $values[$var] = htmlspecialchars(stripslashes(FrmAppHelper::get_param($var, $default)));
+              $values[$var] = htmlspecialchars(FrmAppHelper::get_param($var, $default));
 
         $values['form_name'] = ($record->form_id) ? $frm_form->getName( $record->form_id ) : '';
         
         foreach (array('field_key' => $record->field_key, 'type' => $record->type, 'default_value'=> $record->default_value, 'field_order' => $record->field_order, 'required' => $record->required) as $var => $default)
             $values[$var] = FrmAppHelper::get_param($var, $default);
         
-        $values['options'] = stripslashes_deep(maybe_unserialize($record->options));
-        
+        $values['options'] = $record->options;
         $values['field_options'] = $record->field_options;
         
         $defaults = FrmFieldsHelper::get_default_field_opts($values['type'], $record, true);
@@ -111,7 +107,7 @@ class FrmFieldsHelper{
         foreach($defaults as $opt => $default)
             $values[$opt] = (isset($record->field_options[$opt])) ? $record->field_options[$opt] : $default; 
 
-        $values['custom_html'] = (isset($record->field_options['custom_html'])) ? stripslashes($record->field_options['custom_html']) : FrmFieldsHelper::get_default_html($record->type);
+        $values['custom_html'] = (isset($record->field_options['custom_html'])) ? $record->field_options['custom_html'] : FrmFieldsHelper::get_default_html($record->type);
         
         return apply_filters('frm_setup_edit_field_vars', $values, $values['field_options']);
     }
@@ -138,13 +134,13 @@ class FrmFieldsHelper{
             'name' => __('Untitled', 'formidable'), 'description' => '', 
             'field_key' => $key, 'type' => $type, 'options'=>'', 'default_value'=>'', 
             'field_order' => $field_count+1, 'required' => false, 
-            'blank' => $frm_settings->blank_msg, 
+            'blank' => $frm_settings->blank_msg, 'unique_msg' => $frm_settings->unique_msg,
             'invalid' => __('This field is invalid', 'formidable'), 'form_id' => $form_id,
             'field_options' => $field_options
         );
     }
     
-    function get_form_fields($form_id, $error=false){ 
+    function get_form_fields($form_id, $error=false){
         global $frm_field;
         $fields = apply_filters('frm_get_paged_fields', false, $form_id, $error);
         if (!$fields)
@@ -172,10 +168,15 @@ DEFAULT_HTML;
     }
     
     function replace_shortcodes($html, $field, $errors=array(), $form=false){
+        global $frm_readonly;
+        
         $html = stripslashes($html);
         $html = apply_filters('frm_before_replace_shortcodes', $html, $field, $errors, $form);
         
-        $field_name = "item_meta[". $field['id'] ."]";
+        $field_name = 'item_meta['. $field['id'] .']';
+        if(isset($field['multiple']) and $field['multiple'] and ($field['type'] == 'select' or ($field['type'] == 'data' and isset($field['data_type']) and $field['data_type'] == 'select')))
+            $field_name .= '[]';
+        
         //replace [id]
         $html = str_replace('[id]', $field['id'], $html);
         
@@ -184,7 +185,9 @@ DEFAULT_HTML;
         
         //replace [description] and [required_label] and [error]
         $required = ($field['required'] == '0') ? '' : $field['required_indicator'];
-        $error = isset($errors['field'. $field['id']]) ? stripslashes($errors['field'. $field['id']]) : false; 
+        if(!is_array($errors))
+            $errors = array();
+        $error = (isset($errors['field'. $field['id']])) ? stripslashes($errors['field'. $field['id']]) : false; 
         foreach (array('description' => $field['description'], 'required_label' => $required, 'error' => $error) as $code => $value){
             if (!$value or $value == '')
                 $html = preg_replace('/(\[if\s+'.$code.'\])(.*?)(\[\/if\s+'.$code.'\])/mis', '', $html);
@@ -243,6 +246,9 @@ DEFAULT_HTML;
             if($tag == 'input'){
                 if(isset($atts['opt'])) $atts['opt']--;
                 $field['input_class'] = isset($atts['class']) ? $atts['class'] : '';
+                if(isset($atts['class']))
+                    unset($atts['class']);
+                $field['shortcodes'] = $atts;
                 ob_start();
                 include(FRM_VIEWS_PATH.'/frm-fields/input.php');
                 $replace_with = ob_get_contents();
@@ -274,10 +280,19 @@ DEFAULT_HTML;
             require_once(FRM_PATH.'/classes/recaptchalib.php');
         
         $lang = apply_filters('frm_recaptcha_lang', $frm_settings->re_lang, $field);
-        ?>
-        <script type="text/javascript">var RecaptchaOptions={theme:'<?php echo $frm_settings->re_theme ?>',lang:'<?php echo $lang ?>'<?php echo apply_filters('frm_recaptcha_custom', '', $field) ?>};</script>
-        <?php echo recaptcha_get_html($frm_settings->pubkey .'&hl='. $lang, $error, is_ssl()) ?>
-<?php
+        
+        if(defined('DOING_AJAX')){ 
+            global $frm_recaptcha_loaded;
+            if(!$frm_recaptcha_loaded)
+                $frm_recaptcha_loaded = '';
+            
+            $frm_recaptcha_loaded .= "Recaptcha.create('". $frm_settings->pubkey ."','field_". $field['field_key'] ."',{theme:'". $frm_settings->re_theme ."',lang:'". $lang ."'". apply_filters('frm_recaptcha_custom', '', $field) ."});";
+?>
+<div id="field_<?php echo $field['field_key'] ?>"></div>
+<?php   }else{ ?>
+<script type="text/javascript">var RecaptchaOptions={theme:'<?php echo $frm_settings->re_theme ?>',lang:'<?php echo $lang ?>'<?php echo apply_filters('frm_recaptcha_custom', '', $field) ?>};</script>
+<?php       echo recaptcha_get_html($frm_settings->pubkey .'&hl='. $lang, $error, is_ssl());
+        }
     }
     
     function dropdown_categories($args){
@@ -305,8 +320,10 @@ DEFAULT_HTML;
         $args = array(
             'show_option_all' => ' ', 'hierarchical' => 1, 'name' => $name,
             'id' => $id, 'exclude' => $exclude, 'class' => $class, 'selected' => $selected, 
-            'hide_empty' => false, 'echo' => 0, 'orderby' => 'name' 
+            'hide_empty' => false, 'echo' => 0, 'orderby' => 'name'
         );
+        
+        $args = apply_filters('frm_dropdown_cat', $args, $field);
         
         if(class_exists('FrmProForm')){
             $post_type = FrmProForm::post_type($field['form_id']);
@@ -339,5 +356,3 @@ DEFAULT_HTML;
     }
     
 }
-
-?>

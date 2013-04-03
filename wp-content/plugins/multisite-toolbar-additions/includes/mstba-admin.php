@@ -5,61 +5,71 @@
  * @package    Multisite Toolbar Additions
  * @subpackage Admin
  * @author     David Decker - DECKERWEB
- * @copyright  Copyright 2012, David Decker - DECKERWEB
- * @license    http://www.opensource.org/licenses/gpl-license.php GPL v2.0 (or later)
+ * @copyright  Copyright (c) 2012-2013, David Decker - DECKERWEB
+ * @license    http://www.opensource.org/licenses/gpl-license.php GPL-2.0+
  * @link       http://genesisthemes.de/en/wp-plugins/multisite-toolbar-additions/
- * @link       http://twitter.com/deckerweb
+ * @link       http://deckerweb.de/twitter
  *
- * @since 1.0.0
+ * @since      1.0.0
  */
 
 /**
  * Setting internal plugin helper links constants.
  *
  * @since 1.0.0
+ *
+ * @uses  get_locale()
  */
 define( 'MSTBA_URL_TRANSLATE',		'http://translate.wpautobahn.com/projects/wordpress-plugins-deckerweb/multisite-toolbar-additions' );
 define( 'MSTBA_URL_WPORG_FAQ',		'http://wordpress.org/extend/plugins/multisite-toolbar-additions/faq/' );
 define( 'MSTBA_URL_WPORG_FORUM',	'http://wordpress.org/support/plugin/multisite-toolbar-additions' );
 define( 'MSTBA_URL_DDW_SERIES',		'http://wordpress.org/extend/plugins/tags/ddwtoolbar' );
 define( 'MSTBA_URL_WPORG_MORE',		'http://wordpress.org/extend/plugins/search.php?q=toolbar+multisite' );
-define( 'MSTBA_PLUGIN_LICENSE', 	'GPLv2+' );
+define( 'MSTBA_URL_SNIPPETS',		'https://gist.github.com/3498510' );
+define( 'MSTBA_PLUGIN_LICENSE', 	'GPL-2.0+' );
 if ( get_locale() == 'de_DE' || get_locale() == 'de_AT' || get_locale() == 'de_CH' || get_locale() == 'de_LU' ) {
 	define( 'MSTBA_URL_DONATE', 	'http://genesisthemes.de/spenden/' );
-	define( 'MSTBA_URL_PLUGIN',	'http://genesisthemes.de/plugins/multisite-toolbar-additions/' );
+	define( 'MSTBA_URL_PLUGIN',		'http://genesisthemes.de/plugins/multisite-toolbar-additions/' );
 } else {
 	define( 'MSTBA_URL_DONATE', 	'http://genesisthemes.de/en/donate/' );
-	define( 'MSTBA_URL_PLUGIN',	'http://genesisthemes.de/en/wp-plugins/multisite-toolbar-additions/' );
+	define( 'MSTBA_URL_PLUGIN',		'http://genesisthemes.de/en/wp-plugins/multisite-toolbar-additions/' );
 }
 
 
 /**
- * Add "Custom Menu" link to plugin page
+ * Add "Custom Menu" link to plugin page.
  *
  * @since 1.0.0
  *
- * @param  $links
+ * @param  $mstba_links
  * @param  $mstba_menu_link
+ *
+ * @return strings Menu Admin link.
  */
-function ddw_mstba_custom_menu_link( $links ) {
+function ddw_mstba_custom_menu_link( $mstba_links ) {
 
+	/** Add link only if user can edit theme options */
 	if ( current_user_can( 'edit_theme_options' ) ) {
+
+		/** Settings Page link */
 		$mstba_menu_link = sprintf( '<a href="%s" title="%s">%s</a>' , admin_url( 'nav-menus.php' ) , __( 'Setup a custom toolbar menu', 'multisite-toolbar-additions' ) , __( 'Custom Menu', 'multisite-toolbar-additions' ) );
 	
-		array_unshift( $links, $mstba_menu_link );
+		/** Set the order of the links */
+		array_unshift( $mstba_links, $mstba_menu_link );
 
-		return $links;
+		/** Display plugin settings links */
+		return apply_filters( 'mstba_filter_settings_page_link', $mstba_links );
 
-	}  // end-if
+	}  // end-if cap check
 
 }  // end of function ddw_mstba_custom_menu_link
 
 
 add_filter( 'plugin_row_meta', 'ddw_mstba_plugin_links', 10, 2 );
 /**
- * Add various support links to plugin page
+ * Add various support links to plugin page.
  *
- * @since 1.0.0
+ * @since  1.0.0
  *
  * @param  $mstba_links
  * @param  $mstba_file
@@ -73,20 +83,25 @@ function ddw_mstba_plugin_links( $mstba_links, $mstba_file ) {
 
 		return $mstba_links;
 
-	}
+	}  // end-if cap check
 
 	/** List additional links only for this plugin */
 	if ( $mstba_file == MSTBA_PLUGIN_BASEDIR . '/multisite-toolbar-additions.php' ) {
 
-		$mstba_links[] = '<a href="' . esc_url_raw( MSTBA_URL_WPORG_FAQ ) . '" target="_new" title="' . __( 'FAQ', 'multisite-toolbar-additions' ) . '">' . __( 'FAQ', 'multisite-toolbar-additions' ) . '</a>';
-		$mstba_links[] = '<a href="' . esc_url_raw( MSTBA_URL_WPORG_FORUM ) . '" target="_new" title="' . __( 'Support', 'multisite-toolbar-additions' ) . '">' . __( 'Support', 'multisite-toolbar-additions' ) . '</a>';
-		$mstba_links[] = '<a href="' . esc_url_raw( MSTBA_URL_TRANSLATE ) . '" target="_new" title="' . __( 'Translations', 'multisite-toolbar-additions' ) . '">' . __( 'Translations', 'multisite-toolbar-additions' ) . '</a>';
-		$mstba_links[] = '<a href="' . esc_url_raw( MSTBA_URL_DONATE ) . '" target="_new" title="' . __( 'Donate', 'multisite-toolbar-additions' ) . '"><strong>' . __( 'Donate', 'multisite-toolbar-additions' ) . '</strong></a>';
+		$mstba_links[] = '<a href="' . esc_url( MSTBA_URL_WPORG_FAQ ) . '" target="_new" title="' . __( 'FAQ', 'multisite-toolbar-additions' ) . '">' . __( 'FAQ', 'multisite-toolbar-additions' ) . '</a>';
 
-	}
+		$mstba_links[] = '<a href="' . esc_url( MSTBA_URL_WPORG_FORUM ) . '" target="_new" title="' . __( 'Support', 'multisite-toolbar-additions' ) . '">' . __( 'Support', 'multisite-toolbar-additions' ) . '</a>';
+
+		$mstba_links[] = '<a href="' . esc_url( MSTBA_URL_SNIPPETS ) . '" target="_new" title="' . __( 'Code Snippets for Customization', 'multisite-toolbar-additions' ) . '">' . __( 'Code Snippets', 'multisite-toolbar-additions' ) . '</a>';
+
+		$mstba_links[] = '<a href="' . esc_url( MSTBA_URL_TRANSLATE ) . '" target="_new" title="' . __( 'Translations', 'multisite-toolbar-additions' ) . '">' . __( 'Translations', 'multisite-toolbar-additions' ) . '</a>';
+
+		$mstba_links[] = '<a href="' . esc_url( MSTBA_URL_DONATE ) . '" target="_new" title="' . __( 'Donate', 'multisite-toolbar-additions' ) . '"><strong>' . __( 'Donate', 'multisite-toolbar-additions' ) . '</strong></a>';
+
+	}  // end-if plugin links
 
 	/** Output the links */
-	return $mstba_links;
+	return apply_filters( 'mstba_filter_plugin_links', $mstba_links );
 
 }  // end of function ddw_mstba_plugin_links
 
@@ -98,9 +113,13 @@ add_action( 'admin_head-nav-menus.php', 'ddw_mstba_widgets_help_content', 15 );
  * Load it after core help tabs on Menus admin page.
  * Some plugin menu instructions for super_admins plus general plugin info.
  *
- * @since 1.0.0
+ * @since  1.0.0
  *
- * @param $mstba_menu_area_help
+ * @uses   get_current_screen()
+ * @uses   ddw_mstba_plugin_get_data()
+ * @uses   WP_Screen::add_help_tab()
+ *
+ * @param  $mstba_menu_area_help
  *
  * @global mixed $mstba_widgets_screen
  */
@@ -127,11 +146,11 @@ function ddw_mstba_widgets_help_content() {
 		'<ul>' .
 		'<em>' . __( 'Please note:', 'multisite-toolbar-additions' ) . '</em> ' . __( 'Every parent item = one main toolbar entry! So best would be to only use one parent item and set all other items as children.', 'multisite-toolbar-additions' ) . '</p>' .
 		'<p><strong>' . __( 'Other, recommended Multisite &amp; Toolbar plugins:', 'multisite-toolbar-additions' ) . '</strong>' .
-			'<br />&raquo; <a href="' . esc_url_raw( MSTBA_URL_DDW_SERIES ) . '" target="_new" title="David Decker ' . __( 'Toolbar plugin series', 'multisite-toolbar-additions' ) . ' ...">' . __( 'My Toolbar plugin series', 'multisite-toolbar-additions' ) . ' (David Decker, DECKERWEB.de)</a>' .
-			'<br />&raquo; <a href="' . esc_url_raw( MSTBA_URL_WPORG_MORE ) . '" target="_new" title="' . __( 'More plugins at WordPress.org', 'multisite-toolbar-additions' ) . ' ...">' . __( 'More plugins at WordPress.org', 'multisite-toolbar-additions' ) . '</a></p>' .
+			'<br />&raquo; <a href="' . esc_url( MSTBA_URL_DDW_SERIES ) . '" target="_new" title="David Decker ' . __( 'Toolbar plugin series', 'multisite-toolbar-additions' ) . ' ...">' . __( 'My Toolbar plugin series', 'multisite-toolbar-additions' ) . ' (David Decker, DECKERWEB.de)</a>' .
+			'<br />&raquo; <a href="' . esc_url( MSTBA_URL_WPORG_MORE ) . '" target="_new" title="' . __( 'More plugins at WordPress.org', 'multisite-toolbar-additions' ) . ' ...">' . __( 'More plugins at WordPress.org', 'multisite-toolbar-additions' ) . '</a></p>' .
 		'<p><strong>' . __( 'Important plugin links:', 'multisite-toolbar-additions' ) . '</strong>' . 
-		'<br /><a href="' . esc_url_raw( MSTBA_URL_PLUGIN ) . '" target="_new" title="' . __( 'Plugin website', 'multisite-toolbar-additions' ) . '">' . __( 'Plugin website', 'multisite-toolbar-additions' ) . '</a> | <a href="' . esc_url_raw( MSTBA_URL_WPORG_FAQ ) . '" target="_new" title="' . __( 'FAQ', 'multisite-toolbar-additions' ) . '">' . __( 'FAQ', 'multisite-toolbar-additions' ) . '</a> | <a href="' . esc_url_raw( MSTBA_URL_WPORG_FORUM ) . '" target="_new" title="' . __( 'Support', 'multisite-toolbar-additions' ) . '">' . __( 'Support', 'multisite-toolbar-additions' ) . '</a> | <a href="' . esc_url_raw( MSTBA_URL_TRANSLATE ) . '" target="_new" title="' . __( 'Translations', 'multisite-toolbar-additions' ) . '">' . __( 'Translations', 'multisite-toolbar-additions' ) . '</a> | <a href="' . esc_url_raw( MSTBA_URL_DONATE ) . '" target="_new" title="' . __( 'Donate', 'multisite-toolbar-additions' ) . '"><strong>' . __( 'Donate', 'multisite-toolbar-additions' ) . '</strong></a></p>' .
-		'<p><a href="http://www.opensource.org/licenses/gpl-license.php" target="_new" title="' . esc_attr( MSTBA_PLUGIN_LICENSE ). '">' . esc_attr( MSTBA_PLUGIN_LICENSE ). '</a> &copy; ' . date( 'Y' ) . ' <a href="' . esc_url_raw( ddw_mstba_plugin_get_data( 'AuthorURI' ) ) . '" target="_new" title="' . esc_attr__( ddw_mstba_plugin_get_data( 'Author' ) ) . '">' . esc_attr__( ddw_mstba_plugin_get_data( 'Author' ) ) . '</a></p>';
+		'<br /><a href="' . esc_url( MSTBA_URL_PLUGIN ) . '" target="_new" title="' . __( 'Plugin website', 'multisite-toolbar-additions' ) . '">' . __( 'Plugin website', 'multisite-toolbar-additions' ) . '</a> | <a href="' . esc_url( MSTBA_URL_WPORG_FAQ ) . '" target="_new" title="' . __( 'FAQ', 'multisite-toolbar-additions' ) . '">' . __( 'FAQ', 'multisite-toolbar-additions' ) . '</a> | <a href="' . esc_url( MSTBA_URL_WPORG_FORUM ) . '" target="_new" title="' . __( 'Support', 'multisite-toolbar-additions' ) . '">' . __( 'Support', 'multisite-toolbar-additions' ) . '</a> | <a href="' . esc_url( MSTBA_URL_SNIPPETS ) . '" target="_new" title="' . __( 'Code Snippets for Customization', 'multisite-toolbar-additions' ) . '">' . __( 'Code Snippets', 'multisite-toolbar-additions' ) . '</a> | <a href="' . esc_url( MSTBA_URL_TRANSLATE ) . '" target="_new" title="' . __( 'Translations', 'multisite-toolbar-additions' ) . '">' . __( 'Translations', 'multisite-toolbar-additions' ) . '</a> | <a href="' . esc_url( MSTBA_URL_DONATE ) . '" target="_new" title="' . __( 'Donate', 'multisite-toolbar-additions' ) . '"><strong>' . __( 'Donate', 'multisite-toolbar-additions' ) . '</strong></a></p>' .
+		'<p><a href="http://www.opensource.org/licenses/gpl-license.php" target="_new" title="' . esc_attr( MSTBA_PLUGIN_LICENSE ). '">' . esc_attr( MSTBA_PLUGIN_LICENSE ). '</a> &copy; 2012-' . date( 'Y' ) . ' <a href="' . esc_url( ddw_mstba_plugin_get_data( 'AuthorURI' ) ) . '" target="_new" title="' . esc_attr__( ddw_mstba_plugin_get_data( 'Author' ) ) . '">' . esc_attr__( ddw_mstba_plugin_get_data( 'Author' ) ) . '</a></p>';
 
 	/** Add the new help tab */
 	$mstba_widgets_screen->add_help_tab( array(

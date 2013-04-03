@@ -7,7 +7,7 @@
 
 <li id="frm_field_id_<?php echo $field['id']; ?>" class="form-field edit_form_item frm_field_box ui-state-default frm_hide_options<?php echo $display['options'] ?> edit_field_type_<?php echo $display['type'] ?> frm_top_container" onmouseover="frm_field_hover(1,<?php echo $field['id']; ?>)" onmouseout="frm_field_hover(0,<?php echo $field['id']; ?>)">
     <a href="javascript:void(0);" class="alignright frm-show-hover frm-move frm-hover-icon" title="Move Field"><img src="<?php echo FRM_IMAGES_URL ?>/move.png" alt="Move" /></a>
-    <a href="javascript:frm_delete_field(<?php echo $field['id']; ?>)" class="alignright frm-show-hover frm-hover-icon" id="frm_delete_field<?php echo $field['id']; ?>" title="Delete Field"><img src="<?php echo FRM_IMAGES_URL ?>/trash.png" alt="Delete" /></a>
+    <a href="javascript:frm_delete_field(<?php echo $field['id']; ?>)" class="alignright frm-show-hover frm-hover-icon" id="frm_delete_field<?php echo $field['id']; ?>" title="<?php _e('Delete Field', 'formidable') ?>"><img src="<?php echo FRM_IMAGES_URL ?>/trash.png" alt="Delete" /></a>
     <a href="javascript:frm_duplicate_field(<?php echo $field['id']; ?>)" class="alignright frm-show-hover frm-hover-icon" title="<?php _e('Duplicate Field', 'formidable') ?>"><img src="<?php echo FRM_IMAGES_URL ?>/duplicate.png" alt="<?php _e('Duplicate', 'formidable') ?>" /></a>
     <?php do_action('frm_extra_field_actions', $field['id']); ?>
     
@@ -44,7 +44,7 @@
         
         <?php if (!isset($field['post_field']) or $field['post_field'] != 'post_category'){ ?>
         <?php _e('or', 'formidable'); ?>
-        <a title="<?php echo FrmAppHelper::truncate(esc_attr(strip_tags(str_replace('"', '&quot;', $field['name']))), 20) . ' '. __('Field Choices', 'formidable'); ?>" href="<?php echo esc_url(FRM_SCRIPT_URL .'&controller=fields&frm_action=import_choices&field_id='. $field['id'] .'&TB_iframe=1') ?>" class="thickbox frm_orange"><?php _e('Bulk Edit Field Choices', 'formidable') ?></a>
+        <a title="<?php echo FrmAppHelper::truncate(esc_attr(strip_tags(str_replace('"', '&quot;', $field['name']))), 20) . ' '. __('Field Choices', 'formidable'); ?>" href="<?php echo esc_url(admin_url('admin-ajax.php') .'?action=frm_import_choices&field_id='. $field['id'] .'&TB_iframe=1') ?>" class="thickbox frm_orange"><?php _e('Bulk Edit Field Choices', 'formidable') ?></a>
         <?php } ?>
     </div>
 <?php
@@ -53,7 +53,9 @@
     if(isset($field['post_field']) and $field['post_field'] == 'post_category'){
         echo FrmFieldsHelper::dropdown_categories(array('name' => $field_name, 'field' => $field) );
     }else{ ?>
-    <select name="<?php echo $field_name ?>" <?php echo (isset($field['size']) && $field['size']) ? 'style="width:auto"' : ''; ?>>
+    <select name="<?php echo $field_name; echo (isset($field['multiple']) and $field['multiple']) ? '[]' : ''; ?>" <?php 
+        echo (isset($field['size']) && $field['size']) ? 'style="width:auto"' : '';
+        echo (isset($field['multiple']) and $field['multiple']) ? ' multiple="multiple"' : ''; ?> >
         <?php foreach ($field['options'] as $opt_key => $opt){ 
             $field_val = apply_filters('frm_field_value_saved', $opt, $opt_key, $field);
             $opt = apply_filters('frm_field_label_seen', $opt, $opt_key, $field);
@@ -87,7 +89,7 @@
             
             <?php if (!isset($field['post_field']) or $field['post_field'] != 'post_category'){ ?>
             <?php _e('or', 'formidable'); ?>
-            <a title="<?php echo FrmAppHelper::truncate(esc_attr(strip_tags(str_replace('"', '&quot;', $field['name']))), 20) . ' '. __('Field Choices', 'formidable'); ?>" href="<?php echo esc_url(FRM_SCRIPT_URL . '&controller=fields&frm_action=import_choices&field_id='. $field['id'] .'&TB_iframe=1') ?>" class="thickbox frm_orange"><?php _e('Bulk Edit Field Choices', 'formidable') ?></a>
+            <a title="<?php echo FrmAppHelper::truncate(esc_attr(strip_tags(str_replace('"', '&quot;', $field['name']))), 20) . ' '. __('Field Choices', 'formidable'); ?>" href="<?php echo esc_url(admin_url('admin-ajax.php') .'?plugin=formidable&controller=fields&frm_action=import_choices&field_id='. $field['id'] .'&TB_iframe=1') ?>" class="thickbox frm_orange"><?php _e('Bulk Edit Field Choices', 'formidable') ?></a>
             <?php } ?>
         </div>
 <?php } ?>
@@ -147,7 +149,7 @@ if ($display['options']){ ?>
                         </span>
                         </td>
                     </tr>
-                    <tr class="frm_required_details<?php echo $field['id'] ?>"<?php if(!$field['required']) echo 'style="display:none;"'?>><td><label><?php _e('Error message for blank required field', 'formidable') ?></label></td>  
+                    <tr class="frm_required_details<?php echo $field['id'] ?>" <?php if(!$field['required']) echo 'style="display:none;"'?>><td><label><?php _e('Error message for blank required field', 'formidable') ?></label></td>  
                         <td><input type="text" name="field_options[blank_<?php echo $field['id'] ?>]" value="<?php echo esc_attr($field['blank']); ?>" class="frm_long_input" /></td>
                     </tr>
                 <?php } ?>
@@ -159,7 +161,7 @@ if ($display['options']){ ?>
                 <?php if ($display['size']){ ?>
                     <tr><td width="150px"><label><?php _e('Field Size', 'formidable') ?></label></td>
                         <td>
-                        <?php if($field['type'] == 'select' or $field['type'] == 'time'){ ?>
+                        <?php if(in_array($field['type'], array('select', 'time', 'data'))){ ?>
                             <?php if(!isset($values['custom_style']) or $values['custom_style']){ ?>
                                 <input type="checkbox" name="field_options[size_<?php echo $field['id'] ?>]" value="1" <?php echo (isset($field['size']) and $field['size'])? 'checked="checked"':''; ?> /> <span class="howto"><?php _e('automatic width', 'formidable') ?></span>
                             <?php }

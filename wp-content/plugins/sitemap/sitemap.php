@@ -3,21 +3,21 @@
 Plugin Name: Sitemap
 Plugin URI: http://wordpress.org/extend/plugins/page-list/
 Description: [pagelist], [subpages], [siblings] and [pagelist_ext] shortcodes
-Version: 4.0
+Version: 4.2
 Author: webvitaly
-Author URI: http://profiles.wordpress.org/webvitaly/
+Author URI: http://web-profile.com.ua/wordpress/plugins/
 License: GPLv2 or later
 */
 
 if ( !function_exists('pagelist_unqprfx_add_stylesheet') ) {
 	function pagelist_unqprfx_add_stylesheet() {
-		wp_enqueue_style( 'page-list-style', plugins_url( '/css/page-list.css', __FILE__ ), false, '4.0', 'all' );
+		wp_enqueue_style( 'page-list-style', plugins_url( '/css/page-list.css', __FILE__ ), false, '4.2', 'all' );
 	}
 	add_action('wp_print_styles', 'pagelist_unqprfx_add_stylesheet');
 }
 
 
-$pagelist_unqprfx_powered_line = "\n".'<!-- Page-list plugin v.4.0 wordpress.org/extend/plugins/page-list/ -->'."\n";
+$pagelist_unqprfx_powered_line = "\n".'<!-- Page-list plugin v.4.2 wordpress.org/extend/plugins/page-list/ -->'."\n";
 
 
 if ( !function_exists('pagelist_unqprfx_shortcode') ) {
@@ -215,8 +215,8 @@ if ( !function_exists('pagelist_unqprfx_ext_shortcode') ) {
 			'show_content' => 1,
 			'more_tag' => 1,
 			'limit_content' => 250,
-			'image_width' => '50',
-			'image_height' => '50',
+			'image_width' => '150',
+			'image_height' => '150',
 			'child_of' => '',
 			'sort_order' => 'ASC',
 			'sort_column' => 'menu_order, post_title',
@@ -327,22 +327,27 @@ if ( !function_exists('pagelist_unqprfx_ext_shortcode') ) {
 					$link = get_permalink( $page->ID );
 					$list_pages_html .= '<div class="page-list-ext-item">';
 					if( $show_image == 1 ){
-						if (function_exists('get_the_post_thumbnail')) {
-							if( get_the_post_thumbnail($page->ID) ){
+						if ( function_exists( 'get_the_post_thumbnail' ) ) { // if we have WordPress 2.9+
+							if( get_the_post_thumbnail( $page->ID ) ){ // if there is a featured image
 								$list_pages_html .= '<div class="page-list-ext-image"><a href="'.$link.'" title="'.esc_attr($page->post_title).'">';
-								$list_pages_html .= get_the_post_thumbnail($page->ID, array($image_width,$image_height));
+								//$list_pages_html .= get_the_post_thumbnail($page->ID, array($image_width,$image_height)); // doesn't work good with image size
+
+								$image = wp_get_attachment_image_src( get_post_thumbnail_id( $page->ID ), array($image_width,$image_height) ); // get featured img; 'large'
+								$img_url = $image[0]; // get the src of the featured image
+								$list_pages_html .= '<img src="'.$img_url.'" width="'.$image_width.'" alt="'.esc_attr($page->post_title).'" />'; // not using height="'.$image_height.'" because images could be not square shaped and they will be stretched
+
 								$list_pages_html .= '</a></div> ';
 							}else{
 								if( $show_first_image == 1 ){
 									$img_scr = pagelist_unqprfx_get_first_image( $page->post_content );
 									if( !empty( $img_scr ) ){
 										$list_pages_html .= '<div class="page-list-ext-image"><a href="'.$link.'" title="'.esc_attr($page->post_title).'">';
-										$list_pages_html .= '<img src="'.$img_scr.'" width="'.$image_width.'" />'; // not using height="'.$image_height.'" because images could be not square shaped and they will be stretched
+										$list_pages_html .= '<img src="'.$img_scr.'" width="'.$image_width.'" alt="'.esc_attr($page->post_title).'" />'; // not using height="'.$image_height.'" because images could be not square shaped and they will be stretched
 										$list_pages_html .= '</a></div> ';
 									}
 								}
 							}
-						}else{
+						}else{ // if we have old WordPress 2.8 or lower
 							if( $show_first_image == 1 ){
 								$img_scr = pagelist_unqprfx_get_first_image( $page->post_content );
 								if( !empty( $img_scr ) ){
@@ -511,9 +516,9 @@ if ( !function_exists('pagelist_unqprfx_get_first_image') ) {
 }
 
 if ( !function_exists('pagelist_unqprfx_plugin_meta') ) {
-	function pagelist_unqprfx_plugin_meta( $links, $file ) { // add 'Support' and 'Donate' links to plugin meta row
+	function pagelist_unqprfx_plugin_meta( $links, $file ) { // add 'Plugin page' and 'Donate' links to plugin meta row
 		if ( strpos( $file, 'sitemap.php' ) !== false ) {
-			$links = array_merge( $links, array( '<a href="http://web-profile.com.ua/wordpress/plugins/page-list/" title="Need help?">' . __('Support') . '</a>' ) );
+			$links = array_merge( $links, array( '<a href="http://web-profile.com.ua/wordpress/plugins/page-list/" title="Plugin page">' . __('Page-list') . '</a>' ) );
 			$links = array_merge( $links, array( '<a href="http://web-profile.com.ua/donate/" title="Support the development">' . __('Donate') . '</a>' ) );
 		}
 		return $links;

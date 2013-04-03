@@ -1,14 +1,14 @@
 <?php
 /*
   Plugin Name: Wordpress Page Widgets
-  Plugin URI: http://codeandmore.com/products/wordpress-plugins/wp-page-widget/
+  Plugin URI: http://www.codeandmore.com/products/wordpress-plugins/wp-page-widget/
   Description: Allow users to customize Widgets per page.
   Author: CodeAndMore
-  Version: 1.8
-  Author URI: http://codeandmore.com/
+  Version: 2.0
+  Author URI: http://www.codeandmore.com/
  */
 
-define('PAGE_WIDGET_VERSION', '1.8');
+define('PAGE_WIDGET_VERSION', '1.9');
 
 /* Hooks */
 add_action('admin_init', 'pw_init');
@@ -77,7 +77,14 @@ function pw_init() {
 		// do nothing
 		$upgraded = true;
 	}
-
+	if (version_compare($current_version, '1.9', '<')) {
+		// do nothing
+		$upgraded = true;
+	}
+	if (version_compare($current_version, '2.0', '<')) {
+		// do nothing
+		$upgraded = true;
+	}
 	if ($upgraded) {
 		update_option('page_widget_version', PAGE_WIDGET_VERSION);
 	}
@@ -93,9 +100,12 @@ function pw_print_scripts() {
 			// Page widget config for front page, search page
 			( in_array($pagenow, array('admin.php')) && (($_GET['page'] == 'pw-front-page') || ($_GET['page'] == 'pw-search-page')) )
 	) {
-
 		if (is_plugin_active('image-widget/image-widget.php')) {
-			wp_enqueue_script('pw-widgets2', WP_PLUGIN_URL . '/image-widget/image-widget.js', array('thickbox'), false, true);
+			wp_enqueue_script('tribe-image-widget', WP_PLUGIN_URL . '/image-widget/resources/js/image-widget.js', array('jquery', 'media-upload', 'media-views'), false, true);
+			wp_localize_script( 'tribe-image-widget', 'TribeImageWidget', array(
+			'frame_title' => __( 'Select an Image', 'image_widget' ),
+			'button_title' => __( 'Insert Into Widget', 'image_widget' ),
+			) );
 		}
 		wp_enqueue_script('pw-widgets', plugin_dir_url(__FILE__) . 'assets/js/page-widgets.js', array('jquery', 'jquery-ui-sortable', 'jquery-ui-draggable', 'jquery-ui-droppable'), '1.1', true);
 	}
@@ -151,7 +161,7 @@ function pw_admin_menu() {
 function pw_settings_page() {
 	global $wp_registered_sidebars;
 
-	if ($_POST['save-changes']) {
+	if (isset($_POST['save-changes'])) {
 		$opts = stripslashes_deep($_POST['pw_opts']);
 
 		update_option('pw_options', $opts);
@@ -385,12 +395,14 @@ function pw_get_settings() {
 	//get list taxonomies registered in system
 	$defaults['taxonomies'] = array();
 	$taxonomies = get_taxonomies(array('show_ui' => true));
+	
 	foreach ($taxonomies as $taxonomy) {
 		$defaults['taxonomies'][] = $taxonomy;
 	}
-
+	
 	$settings = get_option('pw_options', array());
 	return wp_parse_args($settings, $defaults);
+	
 }
 
 function pw_metabox_content($post) {
@@ -905,14 +917,18 @@ function pw_ajax_save_widget() {
 
 	if (!$_POST['post_id'] && !$_POST['tag_id'] && !$_POST['search_page'])
 		die('-1');
-
-	$post_id = stripslashes($_POST['post_id']);
-	$tag_id = stripslashes($_POST['tag_id']);
-	$taxonomy = stripslashes($_POST['taxonomy']);
-
+	
+	if (isset($_POST['post_id']))
+		$post_id = stripslashes($_POST['post_id']);
+	if (isset($_POST['tag_id']))
+		$tag_id = stripslashes($_POST['tag_id']);
+	if (isset($_POST['taxonomy']))
+		$taxonomy = stripslashes($_POST['taxonomy']);
+	
 	// For search page
-	$search_page = stripslashes($_POST['search_page']);
-
+	if (isset($_POST['search_page']))
+		$search_page = stripslashes($_POST['search_page']);
+	
 	unset($_POST['savewidgets'], $_POST['action']);
 
 	do_action('load-widgets.php');
@@ -949,7 +965,9 @@ function pw_ajax_save_widget() {
 
 
 	// Save widgets
-	if (!isset($_POST['delete_widget']) && !$_POST['delete_widget']) {
+	//var_dump(isset($_POST));
+	if (!isset($_POST['delete_widget']) || !$_POST['delete_widget']) {
+	//if (!isset($_POST['delete_widget']) && !$_POST['delete_widget']) {
 		foreach ((array) $wp_registered_widget_updates as $name => $control) {
 
 			if ($name == $id_base) {
@@ -1007,8 +1025,8 @@ function pw_ajax_save_widget() {
 
 	if ($form = $wp_registered_widget_controls[$widget_id])
 		call_user_func_array($form['callback'], $form['params']);
-	//print 'Updated ajax save widget.';
-	//die();
+	print 'Updated ajax save widget.';
+	die();
 }
 
 function pw_set_sidebars_widgets($sidebars_widgets, $post_id, $taxonomy = "", $search_page = NULL) {
@@ -1041,7 +1059,7 @@ function pw_filter_widgets($sidebars_widgets) {
 	if (
 			( is_admin()
 			&& !in_array($pagenow, array('post-new.php', 'post.php', 'edit-tags.php'))
-			&& (!in_array($pagenow, array('admin.php')) && (($_GET['page'] == 'pw-front-page') || ($_GET['page'] == 'pw-search-page')) )
+			&& (!in_array($pagenow, array('admin.php')) && (isset($_GET['page']) && ($_GET['page'] == 'pw-front-page') || isset($_GET['page']) && $_GET['page'] == 'pw-search-page')) 
 			)
 			|| (!is_admin() && !is_singular() && !is_search() && empty($objTaxonomy['taxonomy']))
 	) {
@@ -1051,7 +1069,7 @@ function pw_filter_widgets($sidebars_widgets) {
 
 
 	// Search page
-	if (is_search() || (is_admin() && $_GET['page'] == 'pw-search-page')) {
+	if (is_search() || (is_admin() && (isset($_GET['page']) && $_GET['page'] == 'pw-search-page'))) {
 		$enable_customize = get_option('_pw_search_page', true);
 		$_sidebars_widgets = get_option('_search_page_sidebars_widgets', true);
 	}
@@ -1061,13 +1079,17 @@ function pw_filter_widgets($sidebars_widgets) {
 	elseif (empty($objTaxonomy['taxonomy'])) {
 		//if admin alway use query string post = ID
 		//Fix conflic when other plugins use query post after load editing post!
-		$postID = $_GET['post'];
+
+		if ( is_object($post) && isset($_GET['post']) ) {
+			$postID = $_GET['post'];
+		}
 		if (is_admin() && isset($postID)) {
 			if ( !is_object($post) ) $post = new stdClass();
 				$post->ID = $postID;
 		}
+		if (isset($post->ID)) {
 		$enable_customize = get_post_meta($post->ID, '_customize_sidebars', true);
-		$_sidebars_widgets = get_post_meta($post->ID, '_sidebars_widgets', true);
+		$_sidebars_widgets = get_post_meta($post->ID, '_sidebars_widgets', true); }
 	}
 
 	// Taxonomy page
@@ -1078,7 +1100,7 @@ function pw_filter_widgets($sidebars_widgets) {
 		$_sidebars_widgets = $taxonomyMetaData['_sidebars_widgets'];
 	}
 
-	if ($enable_customize == 'yes' && !empty($_sidebars_widgets)) {
+	if (isset($enable_customize) && $enable_customize == 'yes' && !empty($_sidebars_widgets)) {
 		if (is_array($_sidebars_widgets) && isset($_sidebars_widgets['array_version']))
 			unset($_sidebars_widgets['array_version']);
 
@@ -1091,28 +1113,29 @@ function pw_filter_widget_display_instance($instance, $widget, $args) {
 	global $post;
 
 	$objTaxonomy = getTaxonomyAccess();
-
 	// Search page
 	if (is_search()) {
 		$enable_customize = get_option('_pw_search_page', true);
 		if ($enable_customize == 'yes') {
 			$widget_instance = get_option('widget_search_' . $widget->id_base);
+			
 			/*
 			  print '<pre>';
 			  var_dump($widget->number);
 			  var_dump($widget_instance);
 			  var_dump($widget_instance[3]);
 			  print '</pre>';
-			  exit();	// */
+			  //exit();	//
+			 * 
+			 */
 
 			if ($widget_instance && isset($widget_instance[$widget->number])) {
 				$instance = $widget_instance[$widget->number];
 			}
 		}
-	}
 
 	// Use custom widgets for taxonomy page.
-	else if (!empty($objTaxonomy['taxonomy'])) {
+	} elseif (!empty($objTaxonomy['taxonomy'])) {
 		$taxonomy = $objTaxonomy['taxonomy'];
 		$tax_id = $objTaxonomy['term_id'];
 
@@ -1124,12 +1147,15 @@ function pw_filter_widget_display_instance($instance, $widget, $args) {
 				$instance = $widget_instance[$widget->number];
 			}
 		}
+		
 	} elseif (!empty($post->ID)) {
 		$enable_customize = get_post_meta($post->ID, '_customize_sidebars', true);
 		if ($enable_customize == 'yes' && is_singular()) {
 			$widget_instance = get_option('widget_' . $post->ID . '_' . $widget->id_base);
+			
 			if ($widget_instance && isset($widget_instance[$widget->number])) {
 				$instance = $widget_instance[$widget->number];
+				
 			}
 		}
 	}
@@ -1162,6 +1188,7 @@ function pw_filter_widget_form_instance($instance, $widget) {
 			  var_dump($widget_instance);
 			  print '</pre>';
 			  exit();	// */
+			
 		} elseif (!$isTaxonomyEdit) {
 			$widget_instance = get_option('widget_' . $post->ID . '_' . $widget->id_base);
 		} elseif (!empty($objTaxonomy['taxonomy'])) {
@@ -1200,16 +1227,14 @@ function updateTaxonomiesMetaData($taxonomy, $tax_id, $data) {
 
 function getTaxonomyAccess() {
 	global $wp_query;
-
 	$return = array(
 		'term_id' => "",
 		'taxonomy' => ""
 	);
 
-	if (!is_admin()) {
+	if (!is_admin() && (is_tax() || is_tag() || is_category() ) ) { //&& isset($objRequested)) { 
 		$objRequested = $wp_query->queried_object;
-		//var_dump($wp_query);
-
+		
 		if (is_object($objRequested)) {
 			$return['term_id'] = isset($objRequested->term_id) ? $objRequested->term_id : "";
 			$return['taxonomy'] = isset($objRequested->taxonomy) ? $objRequested->taxonomy : "";
@@ -1228,13 +1253,16 @@ function getTaxonomyAccess() {
 	return $return;
 }
 
-// Add fake
-add_action('admin_head', 'pw_admin_head');
+/*
+Not need this action http://wordpress.org/support/topic/incompatibility-with-black-studio-tinymce-widget?replies=1
+add_action('admin_init', 'pw_admin_head');
 
 function pw_admin_head() {
 	global $pagenow;
 		if (
-			in_array($pagenow, array('post-new.php', 'post.php', 'edit-tags.php'))
+			in_array($pagenow, array('post-new.php', 'post.php'))
+			||
+			(($pagenow == 'edit-tags.php') && isset($_GET['action']) && $_GET['action'] == 'edit')
 			||
 			// Page widget config for front page, search page
 			( in_array($pagenow, array('admin.php')) && (($_GET['page'] == 'pw-front-page') || ($_GET['page'] == 'pw-search-page')) )
@@ -1250,3 +1278,4 @@ function pw_admin_head() {
 		}
 	}
 }
+*/

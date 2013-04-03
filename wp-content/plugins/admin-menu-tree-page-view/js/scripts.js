@@ -14,11 +14,11 @@ jQuery(function($) {
 		var s = $(this).val();
 		var selector = "li:AminMenuTreePageContains('"+s+"')";
 		var hits = ul.find(selector);
-		if (hits.length > 0 || s != "") {
+		if (hits.length > 0 || s !== "") {
 			ul.find("div.admin-menu-tree-page-filter-reset").fadeIn("fast");
 			ul.unhighlight();
 		}
-		if (s == "") {
+		if (s === "") {
 			ul.find("div.admin-menu-tree-page-filter-reset").fadeOut("fast");
 		}
 		ul.highlight(s);
@@ -37,7 +37,7 @@ jQuery(function($) {
 		
 		// if no hits: tell the user so we have less confusion. confusion is bad.
 		var nohits_div = ul.find("div.admin-menu-tree-page-filter-nohits");
-		if (hits.length == 0) {
+		if (hits.length === 0) {
 			nohits_div.show();
 		} else {
 			nohits_div.hide();
@@ -67,7 +67,7 @@ jQuery(function($) {
 	
 	// add links to expand/collapse
 	trees.find("li.admin-menu-tree-page-view-has-childs > div").after("<div class='admin-menu-tree-page-expand' title='Show/Hide child pages' />");
-	trees.find("div.admin-menu-tree-page-expand").live("click", function(e) {
+	trees.on("click", "div.admin-menu-tree-page-expand", function(e) {
 		
 		e.preventDefault();
 		var $t = $(this);
@@ -105,12 +105,12 @@ jQuery(function($) {
 
 
 	// mouse over to show edit-box
-	$("ul.admin-menu-tree-page-tree li div.amtpv-linkwrap:first-child").live("mouseenter mouseleave", function(e) {
+	trees.on("mouseenter mouseleave", "li div.amtpv-linkwrap:first-child", function(e) {
 
 		var t = $(this);
 		var li = t.closest("li");
 		var popupdiv = li.find("div.amtpv-editpopup:first");
-		var linkwrap = li.find("div.amtpv-linkwrap:first")
+		var linkwrap = li.find("div.amtpv-linkwrap:first");
 		//var popup_linkwrap = popupdiv.closest("div.amtpv-linkwrap");
 		
 		if (e.type == "mouseenter" || e.type == "mouseover") {
@@ -124,7 +124,7 @@ jQuery(function($) {
 				ul.find("div.amtpv-linkwrap").removeClass("amtpv-linkwrap-hover");
 				popupdiv.addClass("amtpv-editpopup-hover");
 				linkwrap.addClass("amtpv-linkwrap-hover");
-			}			
+			}
 			
 		} else if (e.type == "mouseleave" || e.type == "mouseout") {
 
@@ -146,11 +146,13 @@ jQuery(function($) {
 			
 		}
 	});
-	$("div.amtpv-editpopup").live("mouseenter mouseleave", function(e) {
+	
+	//
+	trees.on("mouseenter mouseleave", "div.amtpv-editpopup", function(e) {
 		var t = $(this);
 		var li = t.closest("li");
 		var popupdiv = li.find("div.amtpv-editpopup:first");
-		var linkwrap = li.find("div.amtpv-linkwrap:first")
+		var linkwrap = li.find("div.amtpv-linkwrap:first");
 		
 		if (e.type == "mouseenter" || e.type == "mouseover") {
 			t.addClass("amtpv-editpopup-hover-hover");
@@ -161,14 +163,10 @@ jQuery(function($) {
 			}
 		}
 	});
-	
-	// don't allow clicks directly on .amtpv-editpopup. it's kinda confusing
-	$("div.amtpv-editpopup").live("click", function(e) {
-		//e.preventDefault();
-	});
-	
+		
 	// edit/view links
-	$("div.amtpv-editpopup-edit, div.amtpv-editpopup-view").live("click",function(e) {
+	trees.on("click", "div.amtpv-editpopup-edit, div.amtpv-editpopup-view", function(e) {
+
 		e.preventDefault();
 		var t = $(this);
 		var link = t.data("link");
@@ -176,7 +174,7 @@ jQuery(function($) {
 		
 		if ( ($.client.os == "Mac" && (e.metaKey || e.shiftKey)) || ($.client.os != "Mac" && e.ctrlKey) ) {
 			new_win = true;
-		}		
+		}
 		if (new_win) {
 			window.open(link);
 		} else {
@@ -186,7 +184,7 @@ jQuery(function($) {
 	});
 	
 	// add links
-	$("div.amtpv-editpopup-add-after, div.amtpv-editpopup-add-inside").live("click", function(e) {
+	trees.on("click", "div.amtpv-editpopup-add-after, div.amtpv-editpopup-add-inside", function(e) {
 
 		var t = $(this);
 		var post_id = t.closest("a").data("post-id");
@@ -221,7 +219,7 @@ jQuery(function($) {
 		if (type=="after") {
 			add_pages.append( $("<div class='amtpv-editpopup-addpages-position'><input checked='checked' type='radio' name='amtpv-editpopup-addpages-position' id='amtpv-editpopup-addpages-position-after' value='after' /><label for='amtpv-editpopup-addpages-position-after'>After</label> <input type='radio' name='amtpv-editpopup-addpages-position' id='amtpv-editpopup-addpages-position-inside' value='inside' /><label for='amtpv-editpopup-addpages-position-inside'>Inside</label> </div") );
 		} else if (type=="inside") {
-			add_pages.append( $("<div class='amtpv-editpopup-addpages-position'><input type='radio' name='amtpv-editpopup-addpages-position' id='amtpv-editpopup-addpages-position-after' value='after' /><label for='amtpv-editpopup-addpages-position-after'>After</label> <input checked='checked' type='radio' name='amtpv-editpopup-addpages-position' id='amtpv-editpopup-addpages-position-inside' value='inside' /><label for='amtpv-editpopup-addpages-position-inside'>Inside</label> </div") );	
+			add_pages.append( $("<div class='amtpv-editpopup-addpages-position'><input type='radio' name='amtpv-editpopup-addpages-position' id='amtpv-editpopup-addpages-position-after' value='after' /><label for='amtpv-editpopup-addpages-position-after'>After</label> <input checked='checked' type='radio' name='amtpv-editpopup-addpages-position' id='amtpv-editpopup-addpages-position-inside' value='inside' /><label for='amtpv-editpopup-addpages-position-inside'>Inside</label> </div") );
 		}
 
 		add_pages.append( $("<div class='amtpv-editpopup-addpages-publish'><label for='amtpv-editpopup-addpages-publish-select'>Status</label><select id='amtpv-editpopup-addpages-publish-select' name='status'><option value='publish'>Published</option><option value='pending'>Pending Review</option><option value='draft' selected='selected'>Draft</option></select></div") );
@@ -247,7 +245,7 @@ jQuery(function($) {
 	});
 
 	// add new page-link
-	$("div.amtpv-editpopup-addpages-addpage a").live("click", function(e) {
+	trees.on("click", "div.amtpv-editpopup-addpages-addpage a", function(e) {
 		e.preventDefault();
 		var t = $(this);
 		var newelm = $("<li><span></span><input class='amtpv-editpopup-addpages-name' type='text' value=''/></li>");
@@ -257,7 +255,7 @@ jQuery(function($) {
 	
 	// when typing in the input, add another input if we are at the last input
 	// this way we don't have to click that "add page" button. less clicks = more productive.
-	$("input.amtpv-editpopup-addpages-name").live("keyup", function(e) {
+	trees.on("keyup", "input.amtpv-editpopup-addpages-name", function(e) {
 		// check if this is the last li
 		var t = $(this);
 		var ul = t.closest("ul");
@@ -265,19 +263,22 @@ jQuery(function($) {
 		
 		// if this input is the last one, and we have entered something, add another one
 		var isLast = (li.index() == ul.find("li").length-1);
-		if (isLast && t.val() != "") {
+		if (isLast && t.val() !== "") {
 			var newelm = $("<li class='hidden'><span></span><input class='amtpv-editpopup-addpages-name' type='text' value=''/></li>");
 			ul.append( newelm );
-			newelm.slideDown("fast");
+			newelm.show();
 		}
 		
 	});
 	
 	// cancel-link
-	$("a.amtpv-editpopup-addpages-cancel").live("click", function() {
-		var t = $(this);
-		var popup = t.closest("div.amtpv-editpopup");
-		var linkwrap = popup.closest("div.amtpv-linkwrap");
+	trees.on("click", "a.amtpv-editpopup-addpages-cancel", function(e) {
+
+		e.preventDefault();
+
+		var t = $(this),
+			popup = t.closest("div.amtpv-editpopup"),
+			linkwrap = popup.closest("div.amtpv-linkwrap");
 		
 		popup.find(".amtpv-editpopup-addpages").hide().remove();
 		popup.find("> div").show();
@@ -286,7 +287,7 @@ jQuery(function($) {
 	});
 	
 	// woho, add da pages!
-	$("form.amtpv-editpopup-addpages").live("submit", function(e) {
+	trees.on("submit", "form.amtpv-editpopup-addpages", function(e) {
 		// fetch all .amtpv-editpopup-addpages-name for this popup
 		
 		e.preventDefault();
@@ -306,7 +307,7 @@ jQuery(function($) {
 		
 		// we must at least have one name
 		// @todo: make this a bit better looking
-		if (arr_names.length == 0) {
+		if (arr_names.length === 0) {
 			alert("Please enter a name for the new page");
 			return false;
 		}
@@ -413,7 +414,7 @@ jQuery(function($) {
 	// click "pages" headline to hide or show the tree
 	// @todo: remember state in a cookie, to be read by PHP
 	// @todo: also add arrow or something that shows state
-	$(".admin-menu-tree-page-tree_headline").live("click", function() {
+	trees.on("click", ".admin-menu-tree-page-tree_headline", function() {
 		var t = $(this);
 		var ul = t.closest("ul");
 		var lis = ul.find("li").not(".admin-menu-tree-page-tree_headline"); // also consider .admin-menu-tree-page-filter
@@ -437,9 +438,9 @@ function admin_menu_tree_page_view_save_opened_posts() {
 // array with all post ids that are open
 var admin_menu_tree_page_view_opened_posts = jQuery.cookie('admin-menu-tree-page-view-open-posts') || "";
 admin_menu_tree_page_view_opened_posts = admin_menu_tree_page_view_opened_posts.split(",");
-if (admin_menu_tree_page_view_opened_posts[0] == "") {
+//if (admin_menu_tree_page_view_opened_posts[0] == "") {
 //	admin_menu_tree_page_view_opened_posts = [];
-}
+//}
 
 // http://stackoverflow.com/questions/187537/is-there-a-case-insensitive-jquery-contains-selector
 jQuery.expr[':'].AminMenuTreePageContains = function(a,i,m){

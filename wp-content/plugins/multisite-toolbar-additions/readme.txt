@@ -3,17 +3,17 @@ Contributors: daveshine, deckerweb
 Donate link: http://genesisthemes.de/en/donate/
 Tags: toolbar, tool bar, adminbar, admin bar, multisite, network, administration, menu, super admins, links, settings, manage, deckerweb, ddwtoolbar
 Requires at least: 3.3
-Tested up to: 3.5
-Stable tag: 1.2.0
-License: GPLv2 or later
+Tested up to: 3.5.1
+Stable tag: 1.3.0
+License: GPL-2.0+
 License URI: http://www.opensource.org/licenses/gpl-license.php
 
 This plugin adds a few useful admin links to the WordPress Toolbar / Admin Bar in Multisite or Network installs.
 
 == Description ==
 
-= Quick Access to Super Admin Resources - Time Saver! =
-This **small and lightweight** plugin just adds some missed and very useful admin links to your toolbar / admin bar in Multisite installs. Also included is support for some awesome, useful third-party plugins out of the box. So you might just switch from the backend or frontend of your site to the 'Network Wide Plugins' or access the 'Nav Menu' Settings of a sub site/blog. To make you even more happy, the plugin also works just perfectly in single WordPress installs (non-Multisite), just fewer menu items then... -- Use this time saver and get quicker access :-)
+> #### Quick Access to Super Admin Resources - Time Saver!
+> This **small and lightweight** plugin just adds some missed and very useful admin links to your toolbar / admin bar in Multisite installs. Also included is support for some awesome, useful third-party plugins out of the box. So you might just switch from the backend or frontend of your site to the 'Network Wide Plugins' or access the 'Nav Menu' Settings of a sub site/blog. To make you even more happy, the plugin also works just perfectly in single WordPress installs (non-Multisite), just fewer menu items then... -- Use this time saver and get quicker access :-)
 
 = General Features =
 * The plugin is **only intended towards Super Admins / Admins**.
@@ -46,9 +46,11 @@ This **small and lightweight** plugin just adds some missed and very useful admi
 * ["Network Mass Email" (free, Kenny Zaron)](http://wordpress.org/extend/plugins/network-mass-email/) - also network wide
 * ["Organizational Message Notifier" (free, Zaantar)](http://wordpress.org/extend/plugins/organizational-message-notifier/) - also network wide
 * ["Code Snippets" (free, by Shea Bunge)](http://wordpress.org/extend/plugins/code-snippets/) - also network wide
-* ["BackWPup" (free, by Daniel Hüsken)](http://wordpress.org/extend/plugins/backwpup/) - also network wide
+* ["BackWPup" (free, by Daniel Hüsken)](http://wordpress.org/extend/plugins/backwpup/) - also network wide - *v3.x plus older v2.x branch supported!*
 * ["Snapshot" (premium, by Paul Menard (Incsub)/ WPMU DEV)](http://ddwb.me/8f) - also network wide
 * ["Ultimate Branding" (premium, by Incsub Team/ WPMU DEV)](http://ddwb.me/8g) - also network wide
+* ["Smart Admin Tweaks" (premium, by Smart Plugins/ Milan Petrovic)](http://ddwb.me/8u) - also network wide
+* ["Smart Cleanup Tools" (premium, by Smart Plugins/ Milan Petrovic)](http://ddwb.me/8v) - also network wide
 * ["Login Security Solution" (free, by Daniel Convissor)](http://wordpress.org/extend/plugins/login-security-solution/) - also network wide
 * ["Multisite Language Switcher" (free, Dennis Ploetner)](http://wordpress.org/extend/plugins/multisite-language-switcher/)
 * ["Howdy Tweaks" (free, by Kailey Lampert)](http://wordpress.org/extend/plugins/howdy-tweaks/)
@@ -56,6 +58,7 @@ This **small and lightweight** plugin just adds some missed and very useful admi
 * ["Hyper Cache" (free, by Stefano Lissa)](http://wordpress.org/extend/plugins/hyper-cache/)
 * ["Hyper Cache Extended" (free, by Martin Lazarov)](http://wordpress.org/extend/plugins/hyper-cache-extended/)
 * ["Limit Login Attempts" (free, by Johan Eenfeldt)](http://wordpress.org/extend/plugins/limit-login-attempts/)
+* ["Optimize Database after Deleting Revisions" (free, by Rolf van Gelder)](http://wordpress.org/extend/plugins/rvg-optimize-database/)
 * ["WP-Optimize" (free, by Ruhani Rabin)](http://wordpress.org/extend/plugins/wp-optimize/)
 * ["Installer (WPRC Installer)" (free, by OnTheGoSystems, Inc. (WPML.org team))](http://wp-compatibility.com/installer-plugin/)
 * ["Code With WP Code Snippets" (free, by Thomas Griffin)](https://github.com/thomasgriffin/CWWP-Custom-Snippets) (plugin currently in beta, hosted at GitHub)
@@ -75,8 +78,7 @@ This **small and lightweight** plugin just adds some missed and very useful admi
 = Feedback =
 * I am open for your suggestions and feedback - Thank you for using or trying out one of my plugins!
 * Drop me a line [@deckerweb](http://twitter.com/deckerweb) on Twitter
-* Follow me on [my Facebook page](http://www.facebook.com/deckerweb.service)
-* Or follow me on [+David Decker](http://deckerweb.de/gplus) on Google Plus ;-)
+* Follow me on [+David Decker](http://deckerweb.de/gplus) on Google Plus ;-)
 
 = More =
 * For more WordPress Toolbar / Admin Bar specific plugins, [**have a look at my Toolbar Plugin Series**](http://wordpress.org/extend/plugins/tags/ddwtoolbar) :-)
@@ -207,6 +209,19 @@ All the custom & branding stuff code above can also be found as a Gist on Github
 
 == Changelog ==
 
+= 1.3.0 (2013-03-21) =
+* *Extended plugin support:*
+ * NEW: Added support for "Smart Cleanup Tools" (premium, by Smart Plugins/ Milan Petrovic).
+ * NEW: Added support for "Smart Admin Tweaks" (premium, by Smart Plugins/ Milan Petrovic).
+ * NEW: Added support for "Optimize Database after Deleting Revisions" (free, by Rolf van Gelder).
+ * UPDATE: Updated "Snapshot" plugin support with link for new destination "GreenQloud Storage".
+ * UPDATE: Updated support for "BackWPup" to support newest v3.x branch of the plugin.
+* NEW: Added additional "Install Plugin" & "Install Theme" items to the regular "+ Add New" section. This makes it even faster and more elegant to jump to the install/ upload/ search sections!
+* NEW: Little CSS tweak for Network Admin "My Sites Menu", to remove additional border line if Network Items from this plugin here are active.
+* UPDATE: Enhanced Network wide "Plugins" & "Themes" items.
+* CODE: Minor code/ documentation updates & improvements.
+* UPDATE: Updated German translations and also the .pot file for all translators!
+
 = 1.2.0 (2012-11-27) =
 * *Extended plugin support:*
  * NEW: Added support for "Snapshot" (premium, by Paul Menard (Incsub)/ WPMU DEV).
@@ -243,6 +258,9 @@ All the custom & branding stuff code above can also be found as a Gist on Github
 * Including support for 7 site specific plugins
 
 == Upgrade Notice ==
+
+= 1.3.0 =
+Several Additions & Improvements: Extended plugin support. Updated German translations as well as .pot file for translators.
 
 = 1.2.0 =
 Several Additions & Improvements: Extended plugin support. Updated German translations as well as .pot file for translators.

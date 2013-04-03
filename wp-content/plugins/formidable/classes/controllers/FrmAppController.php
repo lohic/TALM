@@ -43,7 +43,7 @@ class FrmAppController{
         }
         
         $count = count(get_post_types( array( 'show_ui' => true, '_builtin' => false, 'show_in_menu' => true ) ));
-        $pos = ((int)$count > 0) ? 22.7 : 29.3;
+        $pos = ((int)$count > 0) ? '22.7' : '29.3';
         $pos = apply_filters('frm_menu_position', $pos);
         
         if(current_user_can('frm_view_forms')){
@@ -56,8 +56,7 @@ class FrmAppController{
     }
     
     function menu_css(){ ?>
-<style type="text/css">
-#adminmenu .toplevel_page_formidable div.wp-menu-image{background: url(<?php echo FRM_IMAGES_URL ?>/form_16.png) no-repeat center;}
+<style type="text/css">#adminmenu .toplevel_page_formidable div.wp-menu-image{background: url(<?php echo FRM_IMAGES_URL ?>/form_16.png) no-repeat center;}.menu-icon-frmdisplay .wp-menu-image img{display:none;}
 </style>    
 <?php    
     //#adminmenu .toplevel_page_formidable:hover div.wp-menu-image{background: url(<?php echo FRM_IMAGES_URL /icon_16.png) no-repeat center;}
@@ -108,7 +107,7 @@ class FrmAppController{
             global $frmpro_is_installed, $frm_db_version, $frm_ajax_url;
             $db_version = get_option('frm_db_version');
             $pro_db_version = ($frmpro_is_installed) ? get_option('frmpro_db_version') : false;
-            if(((int)$db_version < (int)$frm_db_version) or ($frmpro_is_installed and (int)$pro_db_version < 16)){ //this number should match the db_version in FrmDb.php
+            if(((int)$db_version < (int)$frm_db_version) or ($frmpro_is_installed and (int)$pro_db_version < 18)){ //this number should match the db_version in FrmDb.php
             ?>
 <div class="error" id="frm_install_message" style="padding:7px;"><?php _e('Your Formidable database needs to be updated.<br/>Please deactivate and reactivate the plugin to fix this or', 'formidable'); ?> <a id="frm_install_link" href="#" onclick="frm_install_now();return false;"><?php _e('Update Now', 'formidable') ?></a></div>  
 <script type="text/javascript">
@@ -148,11 +147,13 @@ success:function(msg){jQuery("#frm_install_message").fadeOut("slow");}
             wp_enqueue_style('formidable-admin', FRM_URL. '/css/frm_admin.css', array(), $frm_version);
             wp_enqueue_script('jquery-elastic', FRM_URL.'/js/jquery/jquery.elastic.js', array('jquery'));
             add_thickbox();
-        }else if($pagenow == 'post.php' or ($pagenow == 'post-new.php' and $_REQUEST['post_type'] == 'frm_display')){
+        }else if($pagenow == 'post.php' or ($pagenow == 'post-new.php' and isset($_REQUEST['post_type']) and $_REQUEST['post_type'] == 'frm_display')){
             if(isset($_REQUEST['post_type'])){
                 $post_type = $_REQUEST['post_type'];
-            }else if(isset($_REQUEST['post'])){
+            }else if(isset($_REQUEST['post']) and !empty($_REQUEST['post'])){
                 $post = get_post($_REQUEST['post']);
+                if(!$post)
+                    return;
                 $post_type = $post->post_type;
             }else{
                 return;
@@ -183,11 +184,12 @@ success:function(msg){jQuery("#frm_install_message").fadeOut("slow");}
             //$frm_db_version is the version of the database we're moving to
             $old_db_version = get_option('frm_db_version');
             $pro_db_version = ($frmpro_is_installed) ? get_option('frmpro_db_version') : false;
-            if(((int)$old_db_version < (int)$frm_db_version) or ($frmpro_is_installed and (int)$pro_db_version < 16))
+            if(((int)$old_db_version < (int)$frm_db_version) or ($frmpro_is_installed and (int)$pro_db_version < 18))
                 $this->install($old_db_version);
         }
 
         wp_register_script('formidable', FRM_URL . '/js/formidable.js', array('jquery'), $frm_version, true);
+        wp_register_script('recaptcha-ajax', 'http'. (is_ssl() ? 's' : '').'://www.google.com/recaptcha/api/js/recaptcha_ajax.js', '', true);
         wp_enqueue_script('jquery');
         
         if(!is_admin() and $frm_settings->load_style == 'all'){
@@ -234,10 +236,8 @@ success:function(msg){jQuery("#frm_install_message").fadeOut("slow");}
             }
         }
 
-        if(!is_admin() and $location != 'header' and !empty($frm_forms_loaded)){ //load formidable js  
-            global $wp_scripts;
-            $wp_scripts->do_items( array('formidable') );
-        }
+        if(!is_admin() and $location != 'header' and !empty($frm_forms_loaded)) //load formidable js  
+            FrmAppHelper::load_scripts(array('formidable'));
     }
   
     function install($old_db_version=false){
@@ -383,4 +383,3 @@ success:function(msg){jQuery("#frm_install_message").fadeOut("slow");}
     }
 
 }
-?>

@@ -3,8 +3,8 @@ Contributors: sswells, srwells
 Donate link: http://formidablepro.com/donate
 Tags: admin, AJAX, captcha, contact, contact form, database, email, feedback, form, forms, javascript, jquery, page, plugin, poll, Post, spam, survey, template, widget, wpmu
 Requires at least: 3.0
-Tested up to: 3.5
-Stable tag: 1.06.07
+Tested up to: 3.5.1
+Stable tag: 1.06.10
 
 Quickly and easily build forms with a simple drag-and-drop interface and in-place editing. 
 
@@ -61,6 +61,71 @@ A. Try clearing your browser cache. As plugin modifications are made, frequent j
 [See more FAQs](http://formidablepro.com/formidable-faqs/ "Formidable Pro FAQs")
 
 == Changelog ==
+= 1.06.10 =
+* Allow the usage of any html attributes inside the [input] tag in the customizable HTML
+* PRO: Added "Chosen" autocomplete to dropdown fields
+* PRO: Added automatic width option to data from entries fields
+* PRO: Extended the "admin only" field option to all user roles, or only logged-in or logged-out users
+* PRO: Added multiple-select to data from entries dropdowns
+* PRO: Added more info to the form settings sidebar
+* PRO: Resolved conflict between ajax submit and plugins/themes with whitespace in php files
+* PRO: Fixed template export to properly serialize and escape for multiple choice fields
+
+= 1.06.09 =
+* DROPPED PHP4 SUPPORT. Do not update if you run PHP4.
+* Added the "create template" link into the free version
+* Added quotes around the menu position number to minimize menu position conflicts with other plugins
+* Moved all stripslashes to the point the data is retrieved from the database
+* Switched the field options bulk edit to use the admin ajax url to minimize plugin conflicts
+* Changed all occurrences of .live() to .on() for jQuery 1.9 compatibility
+* PRO: Added AJAX form submit
+* PRO: Dropped Open Flash Chart support due to security vulnerabilities
+* PRO: Added multiple option to dropdown fields
+* PRO: Added unique error message into global and field settings
+* PRO: Added option to limit by ranges in the frm-stats shortcode. Ex: [frm-stats id=50 '-1 month'<45<'-3 days']
+* PRO: Automatically strip javascript before displaying entries through a custom display
+* PRO: Added striphtml=1 and keepjs=1 options for use in custom displays
+* PRO: Added option to get the field description with [125 show="description"]
+* PRO: Added separate value column on entries page
+* PRO: Added link to delete entry only and leave post
+* PRO: Added box for custom css in the styling settings
+* PRO: Added buttons to insert default HTML or plain text for those who wish to modify the default message without starting from scratch
+* PRO: Added link to uploaded files in the entry edit form
+* PRO: Added "like" and "not like" options to the conditional logic for hiding and showing fields
+* PRO: Switched section headings to use h3 tags by default instead of h2
+* PRO: Migrated "Allow Only One Entry for Each" fields to the unique checkbox on each field
+* PRO: Allow for multiple uses of frm-entry-update-field for the same field and entry
+* PRO: Allow external short codes in the email recipients box
+* PRO: Allow the frm-search shortcode to be used in text widgets
+* PRO: Switched conditional fields to show and hide instead of fadeIn and fadeOut
+* PRO: Switched rich text fields to default to TinyMCE
+* PRO: Correctly send emails to [admin_email], and allow the same email address to receive multiple notifications from the same form
+* PRO: Filter shortcodes in success message when the form is limited to one entry per user and editable
+* PRO: Correctly show the taxonomy name even if it is not linked to a post
+* PRO: Fixed read-only option to work with dropdown fields
+* PRO: Fixed post password setting
+* PRO: Fixed post content replacement when entry is updated instead of only on creation
+* PRO: Fixed frm-stats shortcode to allow field keys when using the value option
+* PRO: Fixed custom displays getting used if they are in the trash
+* PRO: Fixed custom display pages to not include the unfiltered post content when there are no entries to display
+* PRO: Fixed the bulk delete option showing for users without permission to delete in the bulk actions dropdown on the admin entry listing page
+* PRO: Fixed the delete link in entry edit links shortcode to prevent it from going to a blank form when using the page_id param
+* PRO: Fixed calendar to show the correct number of extra boxes when not starting on Sunday
+* PRO: Fixed repeated, inline conditional logic in custom displays
+* PRO: Fixed option to copy forms to other sites in multi-site installs, so they will no longer be copied when the box is unchecked 
+* PRO: Fixed admin-only fields to not validate for users who can't see the field
+
+= 1.06.08 =
+* Changed class names on action links on the form listing table to prevent conflicts with themes and other plugins
+* PRO: Filter shortcodes if any in the login message
+* PRO: Fixed order of fields shown in default email notification
+* PRO: Keep files attached to the post when editing the entry and using multiple file upload option
+* PRO: Attach file uploads to WP post even if the upload field is not set as a custom field
+* PRO: Fixed bug forcing site name and admin email as the email "from" info when a custom name/email is selected
+* PRO: Send a notification even if the notification before it is empty
+* PRO: Fixed conditional logic on email notifications to make sure they are stopped when they should be
+* PRO: Automatically send emails to the saved value of a field when used in the "Email recipients" box without requiring show=field_value
+
 = 1.06.07 = 
 * Added mb_split fallback for servers without mbstring installed
 * Changed menu position to prevent override from other plugins and themes
@@ -112,7 +177,6 @@ A. Try clearing your browser cache. As plugin modifications are made, frequent j
 * PRO: Removed separate values checkbox for post status and taxonomy fields
 * PRO: Fixed double filtering forms if inserted in the dynamic box of a custom display used for posts
 * PRO: Fixed page size and limit overriding single entry displays
-
 
 = 1.06.05 =
 * Fixed WP 3.4 layout issues with missing sidebars
@@ -601,7 +665,7 @@ $[25 decimal=2 dec_point='.' thousands_sep=',']
 = 1.02.01 =
 * Emailer now works for everyone! (hopefully)
 * Optionally Reset HTML. Just clear out the box for the HTML for that field and hit update.
-* PRO: Fixed collapsable section to use correct default HTML. 
+* PRO: Fixed collapsible section to use correct default HTML. 
 * PRO: Only call rich text javascript on entries pages
 * PRO: A few small reports modifications. Report for the User ID field will show the percentage of your users who have submitted the form if you are allowing edits with only one submission per user.
 

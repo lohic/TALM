@@ -5,18 +5,22 @@
  * @package    Multisite Toolbar Additions
  * @subpackage Plugin/Extension Support
  * @author     David Decker - DECKERWEB
- * @copyright  Copyright 2012, David Decker - DECKERWEB
- * @license    http://www.opensource.org/licenses/gpl-license.php GPL v2.0 (or later)
+ * @copyright  Copyright (c) 2012-2013, David Decker - DECKERWEB
+ * @license    http://www.opensource.org/licenses/gpl-license.php GPL-2.0+
  * @link       http://genesisthemes.de/en/wp-plugins/multisite-toolbar-additions/
- * @link       http://twitter.com/deckerweb
+ * @link       http://deckerweb.de/twitter
  *
- * @since 1.0.0
+ * @since      1.0.0
  */
 
 /**
  * WP-Piwik (free, by Andr&eacute; Br&auml;kling)
  *
  * @since 1.0.0
+ *
+ * @uses  is_plugin_active_for_network()
+ * @uses  current_user_can()
+ * @uses  get_option()
  */
 /** If plugin is network activated - in Multisite */
 if ( is_plugin_active_for_network( 'wp-piwik/wp-piwik.php' ) ) {
@@ -34,24 +38,28 @@ if ( is_plugin_active_for_network( 'wp-piwik/wp-piwik.php' ) ) {
 
 	/** Add the settings items */
 	if ( current_user_can( 'manage_sites' ) ) {
+
 		$mstba_tb_items[ 'networkext_wppiwik_settings' ] = array(
 			'parent' => $networkext_wppiwik,
 			'title'  => __( 'Settings', 'multisite-toolbar-additions' ),
 			'href'   => network_admin_url( 'settings.php?page=wp-piwik/wp-piwik.php&tab=piwik' ),
 			'meta'   => array( 'target' => '', 'title' => __( 'Settings', 'multisite-toolbar-additions' ) )
 		);
+
 		$mstba_tb_items[ 'networkext_wppiwik_tracking' ] = array(
 			'parent' => $networkext_wppiwik,
 			'title'  => __( 'Tracking Settings', 'multisite-toolbar-additions' ),
 			'href'   => network_admin_url( 'settings.php?page=wp-piwik/wp-piwik.php&tab=tracking' ),
 			'meta'   => array( 'target' => '', 'title' => __( 'Tracking Settings', 'multisite-toolbar-additions' ) )
 		);
+
 		$mstba_tb_items[ 'networkext_wppiwik_views' ] = array(
 			'parent' => $networkext_wppiwik,
 			'title'  => __( 'Views Settings', 'multisite-toolbar-additions' ),
 			'href'   => network_admin_url( 'settings.php?page=wp-piwik/wp-piwik.php&tab=views' ),
 			'meta'   => array( 'target' => '', 'title' => __( 'Views Settings', 'multisite-toolbar-additions' ) )
 		);
+
 	}  // end-if cap check
 
 }  // end-if multisite check
@@ -70,24 +78,28 @@ elseif ( ! is_plugin_active_for_network( 'wp-piwik/wp-piwik.php' ) ) {
 
 	/** Add the settings items */
 	if ( current_user_can( 'activate_plugins' ) ) {
+
 		$mstba_tb_items[ 'siteext_wppiwik_settings' ] = array(
 			'parent' => $siteext_wppiwik,
 			'title'  => __( 'Settings', 'multisite-toolbar-additions' ),
 			'href'   => admin_url( 'options-general.php?page=wp-piwik/wp-piwik.php&tab=piwik' ),
 			'meta'   => array( 'target' => '', 'title' => __( 'Settings', 'multisite-toolbar-additions' ) )
 		);
+
 		$mstba_tb_items[ 'siteext_wppiwik_tracking' ] = array(
 			'parent' => $siteext_wppiwik,
 			'title'  => __( 'Tracking Settings', 'multisite-toolbar-additions' ),
 			'href'   => admin_url( 'options-general.php?page=wp-piwik/wp-piwik.php&tab=tracking' ),
 			'meta'   => array( 'target' => '', 'title' => __( 'Tracking Settings', 'multisite-toolbar-additions' ) )
 		);
+
 		$mstba_tb_items[ 'siteext_wppiwik_views' ] = array(
 			'parent' => $siteext_wppiwik,
 			'title'  => __( 'Views Settings', 'multisite-toolbar-additions' ),
 			'href'   => admin_url( 'options-general.php?page=wp-piwik/wp-piwik.php&tab=views' ),
 			'meta'   => array( 'target' => '', 'title' => __( 'Views Settings', 'multisite-toolbar-additions' ) )
 		);
+
 	}  // end-if cap check
 
 }  // end-if ! multisite check

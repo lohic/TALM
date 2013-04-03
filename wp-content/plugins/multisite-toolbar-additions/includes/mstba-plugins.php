@@ -5,10 +5,10 @@
  * @package    Multisite Toolbar Additions
  * @subpackage Plugin/Extension Support
  * @author     David Decker - DECKERWEB
- * @copyright  Copyright 2012, David Decker - DECKERWEB
- * @license    http://www.opensource.org/licenses/gpl-license.php GPL v2.0 (or later)
+ * @copyright  Copyright (c) 2012-2013, David Decker - DECKERWEB
+ * @license    http://www.opensource.org/licenses/gpl-license.php GPL-2.0+
  * @link       http://genesisthemes.de/en/wp-plugins/multisite-toolbar-additions/
- * @link       http://twitter.com/deckerweb
+ * @link       http://deckerweb.de/twitter
  *
  * @since 1.0.0
  */
@@ -26,6 +26,33 @@ $mstba_multisite_check = is_multisite() ? _x( 'Site', 'Translators: For sitewide
  *
  * @since 1.0.0
  */
+
+	/**
+	 * Smart Admin Tweaks (premium, by Smart Plugins/ Milan Petrovic)
+	 *
+	 * @since 1.3.0
+	 */
+	if ( class_exists( 'sat_loader' ) ) {
+
+		/** Include code part for Smart Admin Tweaks plugin support */
+		require_once( MSTBA_PLUGIN_DIR . '/includes/mstba-plugins-smartadmintweaks.php' );
+
+	}  // end-if Smart Admin Tweaks
+
+
+	/**
+	 * Smart Cleanup Tools (premium, by Smart Plugins/ Milan Petrovic)
+	 *
+	 * @since 1.3.0
+	 */
+	if ( defined( 'SCT_WP_CRON' ) ) {
+
+		/** Include code part for Smart Cleanup Tools plugin support */
+		require_once( MSTBA_PLUGIN_DIR . '/includes/mstba-plugins-smartcleanuptools.php' );
+
+	}  // end-if Smart Cleanup Tools
+
+
 	/**
 	 * Snapshot (premium, by Paul Menard (Incsub)/ WPMU DEV)
 	 *
@@ -33,14 +60,27 @@ $mstba_multisite_check = is_multisite() ? _x( 'Site', 'Translators: For sitewide
 	 */
 	if ( defined( 'SNAPSHOT_I18N_DOMAIN' ) && current_user_can( 'export' ) ) {
 
-		/** Include code part for Quick Cache plugin support */
+		/** Include code part for Snapshot plugin support */
 		require_once( MSTBA_PLUGIN_DIR . '/includes/mstba-plugins-snapshot.php' );
 
 	}  // end-if Snapshot
 
 
 	/**
-	 * BackWPup (free, by Daniel Hüsken)
+	 * BackWPup v3.x (free & premium, by Inpsyde Gmbh & Daniel Hüsken)
+	 *
+	 * @since 1.3.0
+	 */
+	if ( current_user_can( 'backwpup' ) && ! get_site_option( 'backwpup_cfg_showadminbar', TRUE ) ) {
+
+		/** Include code part for BackWPup v3.x plugin support */
+		require_once( MSTBA_PLUGIN_DIR . '/includes/mstba-plugins-backwpup3x.php' );
+
+	}  // end-if BackWPup 3.x check
+
+
+	/**
+	 * BackWPup v2.x (free, by Daniel Hüsken)
 	 *
 	 * @since 1.1.0
 	 */
@@ -52,12 +92,12 @@ $mstba_multisite_check = is_multisite() ? _x( 'Site', 'Translators: For sitewide
 		/** Load our stuff only if user has the BackWPup Admin Bar option NOT activated */
 		if ( ! $mstba_backwpup_option[ 'showadminbar' ] ) {
 
-			/** Include code part for BackWPup plugin support */
+			/** Include code part for BackWPup v2.x plugin support */
 			require_once( MSTBA_PLUGIN_DIR . '/includes/mstba-plugins-backwpup.php' );
 
 		}  // end-if options check
 
-	}  // end-if BackWPup
+	}  // end-if BackWPup v2.x
 
 
 	/**
@@ -107,7 +147,9 @@ $mstba_multisite_check = is_multisite() ? _x( 'Site', 'Translators: For sitewide
 	 *
 	 * @since 1.1.0
 	 */
-	if ( class_exists( 'Code_Snippets' ) && ( current_user_can( 'manage_snippets' ) || current_user_can( 'manage_network_snippets' ) ) ) {
+	if ( class_exists( 'Code_Snippets' )
+		&& ( current_user_can( 'manage_snippets' ) || current_user_can( 'manage_network_snippets' ) )
+	) {
 
 		/** Include code part for Code Snippets plugin support */
 		require_once( MSTBA_PLUGIN_DIR . '/includes/mstba-plugins-codesnippets.php' );
@@ -197,10 +239,10 @@ $mstba_multisite_check = is_multisite() ? _x( 'Site', 'Translators: For sitewide
 /**
  * Site Extend Group - hooking in plugin items
  *
- * @since 1.0
+ * @since 1.0.0
  */
 	/**
-	 * Installer [WP Installer/Manage Repositories] (free, by OnTheGoSystems, Inc.)
+	 * Installer [WP Installer/Manage Repositories] (free, by WP-Compatibility.com/ OnTheGoSystems, Inc.)
 	 *
 	 * @since 1.0.0
 	 */
@@ -212,6 +254,7 @@ $mstba_multisite_check = is_multisite() ? _x( 'Site', 'Translators: For sitewide
 			'href'   => admin_url( 'options-general.php?page=installer/pages/repositories.php' ),
 			'meta'   => array( 'target' => '', 'title' => __( 'Manage Repositories', 'multisite-toolbar-additions' ) )
 		);
+
 		$mstba_tb_items[ 'siteext_wprcinstaller_add' ] = array(
 			'parent' => $siteext_wprcinstaller,
 			'title'  => __( 'Add new Repository', 'multisite-toolbar-additions' ),
@@ -235,6 +278,7 @@ $mstba_multisite_check = is_multisite() ? _x( 'Site', 'Translators: For sitewide
 			'href'   => admin_url( 'edit.php?post_type=cwwp-custom-snippets' ),
 			'meta'   => array( 'target' => '', 'title' => $mstba_multisite_check . __( 'Code Snippets', 'multisite-toolbar-additions' ) )
 		);
+
 		$mstba_tb_items[ 'siteext_cwwpcsnippets_add' ] = array(
 			'parent' => $siteext_cwwpcsnippets,
 			'title'  => __( 'Add new Snippet', 'multisite-toolbar-additions' ),
@@ -244,12 +288,14 @@ $mstba_multisite_check = is_multisite() ? _x( 'Site', 'Translators: For sitewide
 
 		/** Capability check for import/export function */
 		if ( current_user_can( 'manage_options' ) ) {
+
 			$mstba_tb_items[ 'siteext_cwwpcsnippets_importexport' ] = array(
 				'parent' => $siteext_cwwpcsnippets,
 				'title'  => __( 'Import/ Export', 'multisite-toolbar-additions' ),
 				'href'   => admin_url( 'edit.php?post_type=cwwp-custom-snippets&page=import-export-code-snippets' ),
 				'meta'   => array( 'target' => '', 'title' => __( 'Import/ Export', 'multisite-toolbar-additions' ) )
 			);
+
 		}  // end-if cap check
 
 	}  // end-if Code With WP Custom Snippets
@@ -288,12 +334,14 @@ $mstba_multisite_check = is_multisite() ? _x( 'Site', 'Translators: For sitewide
 
 		/** Display menu item only if option is true */
 		if ( 'on' == get_option( 'relevanssi_log_queries' ) ) {
+
 			$mstba_tb_items[ 'siteext_relevanssi_searches' ] = array(
 				'parent' => $siteext_relevanssi,
 				'title'  => __( 'User Searches', 'multisite-toolbar-additions' ),
 				'href'   => RELEVANSSI_PREMIUM ? admin_url( 'index.php?page=relevanssi-premium/relevanssi.php' ) : admin_url( 'index.php?page=relevanssi/relevanssi.php' ),
 				'meta'   => array( 'target' => '', 'title' => __( 'User Searches', 'multisite-toolbar-additions' ) )
 			);
+
 		}  // end-if relevanssi option check
 
 	}  // end-if Relevanssi
@@ -453,18 +501,42 @@ $mstba_multisite_check = is_multisite() ? _x( 'Site', 'Translators: For sitewide
 	}  // end-if WP-Optimize
 
 
+	/**
+	 * Optimize Database after Deleting Revisions (free, by Rolf van Gelder)
+	 *
+	 * @since 1.3.0
+	 */
+	if ( function_exists( 'rvg_odb_admin_menu' ) && current_user_can( 'manage_options' ) ) {
+
+		$mstba_tb_items[ 'siteext_rvgoptimizedb' ] = array(
+			'parent' => $siteextgroup,
+			'title'  => __( 'Optimize Database', 'multisite-toolbar-additions' ),
+			'href'   => admin_url( 'tools.php?page=rvg-optimize-db.php' ),
+			'meta'   => array( 'target' => '', 'title' => __( 'Optimize Database', 'multisite-toolbar-additions' ) )
+		);
+
+			$mstba_tb_items[ 'siteext_rvgoptimizedb_settings' ] = array(
+				'parent' => $siteext_rvgoptimizedb,
+				'title'  => __( 'Settings', 'multisite-toolbar-additions' ),
+				'href'   => admin_url( 'options-general.php?page=rvg_odb_admin' ),
+				'meta'   => array( 'target' => '', 'title' => __( 'Settings', 'multisite-toolbar-additions' ) )
+			);
+
+	}  // end-if Optimize Database after Deleting Revisions
+
+
 /**
  * Special Hook Ins
  *
  * @since 1.1.0
  */
 	/**
-	 * User Management Tools (free, by scribu/AppThemes)
+	 * User Management Tools (free, by scribu/ AppThemes)
 	 *
 	 * @since 1.1.0
 	 */
-	if ( is_super_admin() &&
-		( function_exists( 'is_plugin_active_for_network' ) && is_plugin_active_for_network( 'user-management-tools/user-management-tools.php' ) )
+	if ( is_super_admin()
+		&& ( function_exists( 'is_plugin_active_for_network' ) && is_plugin_active_for_network( 'user-management-tools/user-management-tools.php' ) )
 	) {
 
 		if ( class_exists( 'User_Management_Tools' ) && current_user_can( 'manage_options' ) ) {
@@ -486,8 +558,8 @@ $mstba_multisite_check = is_multisite() ? _x( 'Site', 'Translators: For sitewide
 	 *
 	 * @since 1.1.0
 	 */
-	if ( is_super_admin() &&
-		( function_exists( 'is_plugin_active_for_network' ) && is_plugin_active_for_network( 'network-mass-email/network-mass-email.php' ) )
+	if ( is_super_admin()
+		&& ( function_exists( 'is_plugin_active_for_network' ) && is_plugin_active_for_network( 'network-mass-email/network-mass-email.php' ) )
 	) {
 
 		if ( function_exists( 'nme_decider' ) && current_user_can( 'manage_network' ) ) {

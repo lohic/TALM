@@ -3,8 +3,8 @@ Contributors: eskapism, MarsApril
 Donate link: http://eskapism.se/sida/donate/
 Tags: admin, page, pages, page tree, hierarchy, cms, tree, view, admin menu, menu, change order, drag and drop
 Requires at least: 3.0
-Tested up to: 3.5
-Stable tag: 2.5
+Tested up to: 3.5.1
+Stable tag: 2.6.5
 
 Get a tree view of all your pages directly in the admin menu. Search, edit, view, re-order/sort and add pages – all is just one click away!
 
@@ -49,6 +49,26 @@ Now the tree with the pages will be visible in the admin menu to the left.
 
 
 == Changelog ==
+
+= 2.6.5 =
+- Fixed a bug that caused errors when bulk editing posts
+
+= 2.6.4 =
+- Added Italian translation. Thanks!
+
+= 2.6.3 =
+- Added Dutch translation. Thanks!
+
+= 2.6.2 =
+- Added Slovak translation. Thanks Branco.
+
+= 2.6.1 =
+- Hopefully loads scripts and styles over SSL/HTTPS if FORCE_SSL is set.
+
+= 2.6 =
+- Fixes for popup on WP 3.5
+- Replaced live() with on() for jQuery
+- Small CSS fixes, for example search box label being a bit off
 
 = 2.5 =
 - Fix for search highlight being to big

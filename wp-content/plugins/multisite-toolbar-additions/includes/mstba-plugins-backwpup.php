@@ -1,22 +1,24 @@
 <?php
 /**
- * Display links to active plugins/extensions settings' pages: BackWPup.
+ * Display links to active plugins/extensions settings' pages: BackWPup - old v2.x branch.
  *
  * @package    Multisite Toolbar Additions
  * @subpackage Plugin/Extension Support
  * @author     David Decker - DECKERWEB
- * @copyright  Copyright 2012, David Decker - DECKERWEB
- * @license    http://www.opensource.org/licenses/gpl-license.php GPL v2.0 (or later)
+ * @copyright  Copyright (c) 2012-2013, David Decker - DECKERWEB
+ * @license    http://www.opensource.org/licenses/gpl-license.php GPL-2.0+
  * @link       http://genesisthemes.de/en/wp-plugins/multisite-toolbar-additions/
- * @link       http://twitter.com/deckerweb
+ * @link       http://deckerweb.de/twitter
  *
- * @since 1.1.0
+ * @since      1.1.0
  */
 
 /**
- * BackWPup (free, by Daniel Hüsken)
+ * BackWPup, old v2.x (free, by Daniel Hüsken)
  *
  * @since 1.1.0
+ *
+ * @uses  is_plugin_active_for_network()
  */
 /** If plugin is network activated, display stuff in 'network_admin' */
 if ( function_exists( 'is_plugin_active_for_network' ) && is_plugin_active_for_network( 'backwpup/backwpup.php' ) ) {

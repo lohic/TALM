@@ -2,24 +2,24 @@
 /*
 Plugin Name: iframe
 Plugin URI: http://wordpress.org/extend/plugins/iframe/
-Description: [iframe src="http://player.vimeo.com/video/819138" width="100%" height="480"] shortcode
-Version: 2.5
+Description: [iframe src="http://www.youtube.com/embed/A3PDXmYoF5U" width="100%" height="480"] shortcode
+Version: 2.6
 Author: webvitaly
-Author URI: http://profiles.wordpress.org/webvitaly/
+Author URI: http://web-profile.com.ua/wordpress/plugins/
 License: GPLv2 or later
 */
 
 
-if ( !function_exists( 'iframe_unqprfx_embed_shortcode' ) ) :
+if ( ! function_exists( 'iframe_unqprfx_embed_shortcode' ) ) :
 
 	function iframe_unqprfx_enqueue_script() {
 		wp_enqueue_script( 'jquery' );
 	}
-	add_action('wp_enqueue_scripts', 'iframe_unqprfx_enqueue_script');
+	add_action( 'wp_enqueue_scripts', 'iframe_unqprfx_enqueue_script' );
 	
-	function iframe_unqprfx_embed_shortcode($atts, $content = null) {
+	function iframe_unqprfx_embed_shortcode( $atts, $content = null ) {
 		$defaults = array(
-			'src' => 'http://player.vimeo.com/video/819138',
+			'src' => 'http://www.youtube.com/embed/A3PDXmYoF5U',
 			'width' => '100%',
 			'height' => '480',
 			'scrolling' => 'no',
@@ -27,8 +27,8 @@ if ( !function_exists( 'iframe_unqprfx_embed_shortcode' ) ) :
 			'frameborder' => '0'
 		);
 
-		foreach ($defaults as $default => $value) { // add defaults
-			if (!@array_key_exists($default, $atts)) { // hide warning with "@" when no params at all
+		foreach ( $defaults as $default => $value ) { // add defaults
+			if ( ! @array_key_exists( $default, $atts ) ) { // hide warning with "@" when no params at all
 				$atts[$default] = $value;
 			}
 		}
@@ -90,9 +90,9 @@ if ( !function_exists( 'iframe_unqprfx_embed_shortcode' ) ) :
 				';
 			}
 		}
-        $html .= "\n".'<!-- iframe plugin v.2.5 wordpress.org/extend/plugins/iframe/ -->'."\n";
+        $html .= "\n".'<!-- iframe plugin v.2.6 wordpress.org/extend/plugins/iframe/ -->'."\n";
 		$html .= '<iframe';
-        foreach ($atts as $attr => $value) {
+        foreach( $atts as $attr => $value ) {
 			if( $attr != 'same_height_as' ){ // remove some attributes
 				if( $value != '' ) { // adding all attributes
 					$html .= ' ' . $attr . '="' . $value . '"';
@@ -104,16 +104,16 @@ if ( !function_exists( 'iframe_unqprfx_embed_shortcode' ) ) :
 		$html .= '></iframe>';
 		return $html;
 	}
-	add_shortcode('iframe', 'iframe_unqprfx_embed_shortcode');
+	add_shortcode( 'iframe', 'iframe_unqprfx_embed_shortcode' );
 	
-endif;
 
-
-function iframe_unqprfx_plugin_meta( $links, $file ) { // add 'Support' and 'Donate' links to plugin meta row
-	if ( strpos( $file, 'iframe.php' ) !== false ) {
-		$links = array_merge( $links, array( '<a href="http://web-profile.com.ua/wordpress/plugins/iframe/" title="Need help?">' . __('Support') . '</a>' ) );
-		$links = array_merge( $links, array( '<a href="http://web-profile.com.ua/donate/" title="Support the development">' . __('Donate') . '</a>' ) );
+	function iframe_unqprfx_plugin_meta( $links, $file ) { // add 'Plugin page' and 'Donate' links to plugin meta row
+		if ( strpos( $file, 'iframe.php' ) !== false ) {
+			$links = array_merge( $links, array( '<a href="http://web-profile.com.ua/wordpress/plugins/iframe/" title="Plugin page">' . __('Iframe') . '</a>' ) );
+			$links = array_merge( $links, array( '<a href="http://web-profile.com.ua/donate/" title="Support the development">' . __('Donate') . '</a>' ) );
+		}
+		return $links;
 	}
-	return $links;
-}
-add_filter( 'plugin_row_meta', 'iframe_unqprfx_plugin_meta', 10, 2 );
+	add_filter( 'plugin_row_meta', 'iframe_unqprfx_plugin_meta', 10, 2 );
+	
+endif; // end of if(function_exists('iframe_unqprfx_embed_shortcode'))

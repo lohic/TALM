@@ -7,8 +7,8 @@ class FrmEntriesController{
     
     function FrmEntriesController(){
         add_action('admin_menu', array( &$this, 'menu' ), 20);
-        add_action('wp', array(&$this, 'process_entry'));
-        add_action('frm_wp', array(&$this, 'process_entry'));
+        add_action('wp', array(&$this, 'process_entry'), 10, 0);
+        add_action('frm_wp', array(&$this, 'process_entry'), 10, 0);
         add_filter('frm_redirect_msg', array( &$this, 'delete_entry_before_redirect'), 50, 3);
         add_filter('frm_redirect_url', array( &$this, 'delete_entry_before_wpredirect'), 50, 3);
         add_action('frm_after_entry_processed', array(&$this, 'delete_entry_after_save'), 100);
@@ -51,16 +51,15 @@ class FrmEntriesController{
             return __('Please select a valid form', 'formidable');
         }else if ($form->logged_in and !$user_ID){
             global $frm_settings;
-            return $frm_settings->login_msg;
+            return do_shortcode($frm_settings->login_msg);
         }
 
-        $form->options = stripslashes_deep(maybe_unserialize($form->options));
         if($form->logged_in and $user_ID and isset($form->options['logged_in_role']) and $form->options['logged_in_role'] != ''){
             if(FrmAppHelper::user_has_permission($form->options['logged_in_role'])){
                 return FrmEntriesController::get_form(FRM_VIEWS_PATH.'/frm-entries/frm-entry.php', $form, $title, $description);
             }else{
                 global $frm_settings;
-                return $frm_settings->login_msg;
+                return do_shortcode($frm_settings->login_msg);
             }
         }else    
             return FrmEntriesController::get_form(FRM_VIEWS_PATH.'/frm-entries/frm-entry.php', $form, $title, $description);
@@ -77,7 +76,7 @@ class FrmEntriesController{
         return false;
     }
     
-    function process_entry(){
+    function process_entry($errors=''){
         if(is_admin() or !isset($_POST) or !isset($_POST['form_id']) or !is_numeric($_POST['form_id']) or !isset($_POST['item_key']))
             return;
 
@@ -98,13 +97,14 @@ class FrmEntriesController{
         if(isset($frm_created_entry[$_POST['form_id']]))
             return;
             
-        $errors = $frm_entry->validate($_POST);
+        if($errors == '')
+            $errors = $frm_entry->validate($_POST);
         $frm_created_entry[$_POST['form_id']] = array('errors' => $errors);
         
         if( empty($errors) ){
             $_POST['frm_skip_cookie'] = 1;
             if($params['action'] == 'create'){
-                if (apply_filters('frm_continue_to_create', true, $_POST['form_id']))
+                if (apply_filters('frm_continue_to_create', true, $_POST['form_id']) and !isset($frm_created_entry[$_POST['form_id']]['entry_id']))
                     $frm_created_entry[$_POST['form_id']]['entry_id'] = $frm_entry->create( $_POST );
             }
             
@@ -120,7 +120,8 @@ class FrmEntriesController{
     }
     
     function delete_entry_before_wpredirect($url, $form, $atts){
-        $this->_delete_entry($atts['id'], $form);
+        if(!defined('DOING_AJAX'))
+            $this->_delete_entry($atts['id'], $form);
         return $url;
     }
     
@@ -140,21 +141,22 @@ class FrmEntriesController{
         }
     }
     
-    function &filter_email_value($value, $meta, $entry){
+    function &filter_email_value($value, $meta, $entry, $atts=array()){
         global $frm_field;
         
         $field = $frm_field->getOne($meta->field_id);
         if(!$field)
             return $value; 
             
-        $value = $this->filter_display_value($value, $field);
+        $value = $this->filter_display_value($value, $field, $atts);
         return $value;
     }
     
-    function &filter_display_value($value, $field){
+    function &filter_display_value($value, $field, $atts=array()){
         $field->field_options = maybe_unserialize($field->field_options);
         
-        if(!in_array($field->type, array('radio', 'checkbox', 'radio', 'select')) or !isset($field->field_options['separate_value']) or !$field->field_options['separate_value'])
+        $saved_value = (isset($atts['saved_value']) and $atts['saved_value']) ? true : false;
+        if(!in_array($field->type, array('radio', 'checkbox', 'radio', 'select')) or !isset($field->field_options['separate_value']) or !$field->field_options['separate_value'] or $saved_value)
             return $value;
             
         $field->options = maybe_unserialize($field->options);
@@ -236,4 +238,3 @@ class FrmEntriesController{
     }
     
 }
-?>

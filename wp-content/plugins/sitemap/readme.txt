@@ -3,8 +3,8 @@ Contributors: webvitaly
 Donate link: http://web-profile.com.ua/donate/
 Tags: page, page-list, pagelist, sitemap, subpages, siblings
 Requires at least: 3.0
-Tested up to: 3.5
-Stable tag: 4.0
+Tested up to: 3.5.1
+Stable tag: 4.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -14,6 +14,9 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 **Code moved to [page-list plugin](http://wordpress.org/extend/plugins/page-list/)** Please, delete Sitemap plugin and install [Pagelist plugin](http://wordpress.org/extend/plugins/page-list/). Don't be afraid, the functionality of these plugins is the same.
 
+**[Page-list](http://web-profile.com.ua/wordpress/plugins/page-list/ "Plugin page")** |
+**[all Page-list params](http://wordpress.org/extend/plugins/page-list/other_notes/)** |
+**[Donate](http://web-profile.com.ua/donate/ "Support the development")**
 
 = shortcodes: =
 
@@ -22,17 +25,15 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 * **[siblings]** - hierarchical tree of sibling pages to the current page;
 * **[pagelist_ext]** - list of pages with featured image and with excerpt;
 
-= aditional parameters examples: =
+= examples with aditional parameters: =
 
-* `[pagelist depth="2" child_of="4" exclude="6,7,8"]`
+* `[pagelist child_of="4" depth="2" exclude="6,7,8"]`
 * `[pagelist_ext child_of="4" exclude="6,7,8" image_width="50" image_height="50"]`
 * **[all Page-list params](http://wordpress.org/extend/plugins/page-list/other_notes/)**
 
-**[Page-list support page](http://web-profile.com.ua/wordpress/plugins/page-list/)**
-
 = Useful plugins: =
-* ["Iframe" - embed iframe with shortcode](http://wordpress.org/extend/plugins/iframe/ "embed iframe")
 * ["Anti-spam" - block spam in comments](http://wordpress.org/extend/plugins/anti-spam/ "no spam, no captcha")
+* ["Iframe" - embed iframe with shortcode](http://wordpress.org/extend/plugins/iframe/ "embed iframe")
 * ["Filenames to latin" - sanitize filenames to latin during upload](http://wordpress.org/extend/plugins/filenames-to-latin/ "sanitize filenames to latin")
 
 == Other Notes ==
@@ -103,7 +104,7 @@ Shortcode [pagelist_ext] is based on [get_pages()](http://codex.wordpress.org/Fu
 
 = What is the difference between [pagelist], [subpages] and [siblings]? =
 
-Shortcodes [pagelist], [subpages] and [siblings] accept the same parameters. The only difference is that [subpages] and [siblings] not accept  `child_of` parameter, because [subpages] shows subpages to the current page and [siblings] shows subpages to the parent page.
+Shortcodes [pagelist], [subpages] and [siblings] accept the same parameters. The only difference is that [subpages] and [siblings] not accept `child_of` parameter, because [subpages] shows subpages to the current page and [siblings] shows subpages to the parent page.
 
 = How to create sitemap.xml? =
 To create sitemap.xml you can use [Google XML Sitemaps](http://wordpress.org/extend/plugins/google-sitemap-generator/) plugin.
@@ -115,7 +116,7 @@ No, there is no "more-link" feature in the plugin. Because "[more-link](http://w
 * **bad for usability.** There is already link on title and "more-link" is an extra no needed element on page. If user cannot understand that the title is the link, than there is a problem in css styles and not in plugin's templates.
 
 = What to do if you need to change the plugin's code? =
-When you changed the plugin's code you should also change the plugin's version to '100' to avoid updates, which could override and delete your code.
+When you changed the plugin's code you should also change the plugin's version to '100' (for example) to avoid updates, which could override and delete your code.
 
 == Screenshots ==
 
@@ -123,6 +124,13 @@ When you changed the plugin's code you should also change the plugin's version t
 2. [pagelist_ext] shortcode
 
 == Changelog ==
+
+= 4.2 - 2013.02.16 =
+* fix in css styles (clearfix added to .page-list-ext)
+* make default image size 150x150 like default thumbnail size
+
+= 4.1 - 2013.01.27 =
+* change the type of output the image thumbnail in [pagelist_ext] shortcode
 
 = 4.0 - 2012.10.30 =
 * remove conflict between Pagelist and Sitemap plugins
@@ -220,5 +228,5 @@ When you changed the plugin's code you should also change the plugin's version t
 
 == Installation ==
 
-1. Install and activate the plugin on the Plugins page
-2. Add shortcodes to pages: `[pagelist]`, `[subpages]`, `[siblings]`, `[pagelist_ext]`
+1. install and activate the plugin on the Plugins page
+2. add shortcodes to pages: `[pagelist]`, `[subpages]`, `[siblings]`, `[pagelist_ext]`

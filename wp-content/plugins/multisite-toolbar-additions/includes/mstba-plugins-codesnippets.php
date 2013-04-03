@@ -5,18 +5,20 @@
  * @package    Multisite Toolbar Additions
  * @subpackage Plugin/Extension Support
  * @author     David Decker - DECKERWEB
- * @copyright  Copyright 2012, David Decker - DECKERWEB
- * @license    http://www.opensource.org/licenses/gpl-license.php GPL v2.0 (or later)
+ * @copyright  Copyright (c) 2012-2013, David Decker - DECKERWEB
+ * @license    http://www.opensource.org/licenses/gpl-license.php GPL-2.0+
  * @link       http://genesisthemes.de/en/wp-plugins/multisite-toolbar-additions/
- * @link       http://twitter.com/deckerweb
+ * @link       http://deckerweb.de/twitter
  *
- * @since 1.1.0
+ * @since      1.1.0
  */
 
 /**
  * Code Snippets (free, by Shea Bunge)
  *
  * @since 1.1.0
+ *
+ * @uses  current_user_can()
  */
 /** If plugin is network activated, display stuff in 'network_admin' */
 if ( current_user_can( 'manage_network_snippets' ) ) {
@@ -30,18 +32,21 @@ if ( current_user_can( 'manage_network_snippets' ) ) {
 
 	/** Check for snippets network install capability */
 	if ( current_user_can( 'install_network_snippets' ) ) {
+
 		$mstba_tb_items[ 'networkext_codesnippets_add' ] = array(
 			'parent' => $networkext_codesnippets,
 			'title'  => __( 'Add new Snippet', 'multisite-toolbar-additions' ),
 			'href'   => network_admin_url( 'admin.php?page=snippet' ),
 			'meta'   => array( 'target' => '', 'title' => __( 'Add new Snippet', 'multisite-toolbar-additions' ) )
 		);
+
 		$mstba_tb_items[ 'networkext_codesnippets_import' ] = array(
 			'parent' => $networkext_codesnippets,
 			'title'  => __( 'Import', 'multisite-toolbar-additions' ),
 			'href'   => network_admin_url( 'admin.php?page=import-snippets' ),
 			'meta'   => array( 'target' => '', 'title' => __( 'Import', 'multisite-toolbar-additions' ) )
 		);
+
 	}  // end-if cap check
 
 }  // end-if multisite check
@@ -58,18 +63,21 @@ if ( current_user_can( 'manage_snippets' ) ) {
 
 	/** Check for snippets site install capability */
 	if ( current_user_can( 'install_snippets' ) ) {
+
 		$mstba_tb_items[ 'siteext_codesnippets_add' ] = array(
 			'parent' => $siteext_codesnippets,
 			'title'  => __( 'Add new Snippet', 'multisite-toolbar-additions' ),
 			'href'   => admin_url( 'admin.php?page=snippet' ),
 			'meta'   => array( 'target' => '', 'title' => __( 'Add new Snippet', 'multisite-toolbar-additions' ) )
 		);
+
 		$mstba_tb_items[ 'siteext_codesnippets_import' ] = array(
 			'parent' => $siteext_codesnippets,
 			'title'  => __( 'Import', 'multisite-toolbar-additions' ),
 			'href'   => admin_url( 'admin.php?page=import-snippets' ),
 			'meta'   => array( 'target' => '', 'title' => __( 'Import', 'multisite-toolbar-additions' ) )
 		);
+
 	}  // end-if cap check
 
 }  // end-if ! multisite check

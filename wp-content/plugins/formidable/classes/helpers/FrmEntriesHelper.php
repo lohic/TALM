@@ -6,7 +6,7 @@ class FrmEntriesHelper{
         global $frm_form, $frm_settings, $frm_sidebar_width;
         $values = array();
         foreach (array('name' => '', 'description' => '', 'item_key' => '') as $var => $default)
-            $values[$var] = stripslashes(FrmAppHelper::get_post_param($var, $default));
+            $values[$var] = FrmAppHelper::get_post_param($var, $default);
             
         $values['fields'] = array();
         if ($fields){
@@ -21,7 +21,6 @@ class FrmEntriesHelper{
                 
                 $is_default = ($new_value == $default) ? true : false;
                     
-                $new_value = stripslashes_deep(maybe_unserialize($new_value));
                 if (!is_array($new_value))
                     $new_value = apply_filters('frm_get_default_value', $new_value, $field);
                 
@@ -34,25 +33,16 @@ class FrmEntriesHelper{
                 $field_array = array(
                     'id' => $field->id,
                     'value' => $new_value,
-                    'default_value' => maybe_unserialize($field->default_value),
-                    'name' => stripslashes($field->name),
-                    'description' => stripslashes($field->description),
+                    'default_value' => $field->default_value,
+                    'name' => $field->name,
+                    'description' => $field->description,
                     'type' => apply_filters('frm_field_type', $field->type, $field, $new_value),
-                    'options' => stripslashes_deep(maybe_unserialize($field->options)),
+                    'options' => $field->options,
                     'required' => $field->required,
                     'field_key' => $field->field_key,
                     'field_order' => $field->field_order,
                     'form_id' => $field->form_id
                 );
-                
-                /*if(in_array($field_array['type'], array('checkbox', 'radio', 'select')) and !empty($field_array['options'])){
-                    foreach((array)$field_array['options'] as $opt_key => $opt){
-                        if(!is_array($opt))
-                            $field_array['options'][$opt_key] = array('label' => $opt);
-                        unset($opt);
-                        unset($opt_key);
-                    }
-                } */
 
                 $opt_defaults = FrmFieldsHelper::get_default_field_opts($field_array['type'], $field, true);
                 $opt_defaults['required_indicator'] = '';
@@ -71,8 +61,17 @@ class FrmEntriesHelper{
                 
                 if ($field_array['custom_html'] == '')
                     $field_array['custom_html'] = FrmFieldsHelper::get_default_html($field->type);
-
-                $values['fields'][] = apply_filters('frm_setup_new_fields_vars', stripslashes_deep($field_array), $field);
+                    
+                $field_array = apply_filters('frm_setup_new_fields_vars', $field_array, $field);
+                
+                foreach((array)$field->field_options as $k => $v){
+                    if(!isset($field_array[$k]))
+                        $field_array[$k] = $v;
+                    unset($k);
+                    unset($v);
+                }
+                
+                $values['fields'][] = $field_array;
              
                 if (!$form or !isset($form->id))
                     $form = $frm_form->getOne($field->form_id);
@@ -138,5 +137,3 @@ class FrmEntriesHelper{
         do_action('frm_enqueue_form_scripts', $params);
     }
 }
-
-?>

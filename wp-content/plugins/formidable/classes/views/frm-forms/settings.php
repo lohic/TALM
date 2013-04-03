@@ -3,10 +3,16 @@
     <h2><?php _e('Edit Form', 'formidable') ?>
         <a href="?page=formidable-new" class="button add-new-h2"><?php _e('Add New', 'formidable'); ?></a>
     </h2>
-    <?php require(FRM_VIEWS_PATH.'/shared/errors.php'); ?>
-
+    <?php require(FRM_VIEWS_PATH.'/shared/errors.php');
     
+    if(version_compare( $GLOBALS['wp_version'], '3.3.3', '<')){ ?>
+    <div id="poststuff" class="metabox-holder has-right-sidebar">
+    <?php   
+        require(FRM_VIEWS_PATH .'/frm-forms/sidebar-settings.php'); 
+    }else{ ?>
     <div id="poststuff">
+    <?php } ?>
+    
         <div id="post-body" class="metabox-holder columns-2">
         <div id="post-body-content">
             <div class="alignleft">
@@ -28,16 +34,16 @@
     
     <div class="clear"></div> 
 
-        <input type="hidden" name="id" value="<?php echo $id; ?>" />
-        <input type="hidden" name="frm_action" value="update_settings" />
+    <input type="hidden" name="id" value="<?php echo $id; ?>" />
+    <input type="hidden" name="frm_action" value="update_settings" />
     <div id="poststuff" class="metabox-holder">
     <div id="post-body">
         <div class="meta-box-sortables">
         <div class="categorydiv postbox">
-        <h3 class="hndle"><span><?php echo FrmAppHelper::truncate(stripslashes($values['name']), 40) .' '. __('Settings', 'formidable') ?></span></h3>
+        <h3 class="hndle"><span><?php echo FrmAppHelper::truncate($values['name'], 40) .' '. __('Settings', 'formidable') ?></span></h3>
         <div class="inside">
         <div class="contextual-help-tabs">
-        <ul class="frm-category-tabs<?php if(version_compare( $GLOBALS['wp_version'], '3.3.0', '<')) echo 'category-tabs" id="category-tabs'; ?>">
+        <ul class="frm-category-tabs <?php if(version_compare( $GLOBALS['wp_version'], '3.3.0', '<')) echo 'category-tabs" id="category-tabs'; ?> frm-form-setting-tabs">
         	<li class="tabs active"><a onclick="frmSettingsTab(jQuery(this),'advanced');"><?php _e('General', 'formidable') ?></a></li>
         	<li><a href="#notification_settings"><?php _e('Emails', 'formidable') ?></a></li>
             <li><a href="#html_settings"><?php _e('Customize HTML', 'formidable') ?></a></li>
@@ -50,24 +56,16 @@
         <div style="display:block;" class="advanced_settings tabs-panel">
         	<table class="form-table">
                 <tr>
-                    <td width="200px"><label><?php _e('Form ShortCodes', 'formidable') ?></label> <a href="http://formidablepro.com/knowledgebase/publish-your-forms/" target="_blank"><img src="<?php echo FRM_IMAGES_URL ?>/tooltip.png" alt="?" class="frm_help" title="<?php _e('Key and id are generally synonymous. For more information on using this shortcode, click now.', 'formidable') ?>" /></a></td>
-                    <td><input type="text" style="width:255px; border:none; background:transparent;" readonly="true" onclick="this.select();" onfocus="this.select();" value="[formidable id=<?php echo $id; ?> title=true description=true]" /> <?php _e('or', 'formidable') ?>
-                        <input type="text" style="width:200px; border:none; background:transparent;" readonly="true" onclick="this.select();" onfocus="this.select();" value="[formidable key=<?php echo $values['form_key']; ?>]" />
-                    </td>
-                </tr>
-
-                <tr>
                     <td><label><?php _e('Form Key', 'formidable') ?></label></td>
                     <td><input type="text" name="form_key" value="<?php echo esc_attr($values['form_key']); ?>" /></td>
                 </tr>
 
-                <tr><td><label><?php _e('Styling', 'formidable') ?></label></td>
-                    <td><input type="checkbox" name="options[custom_style]" id="custom_style" <?php echo ($values['custom_style']) ? ' checked="checked"' : ''; ?> value="1" />
-                    <label for="custom_style"><?php _e('Use Formidable styling for this form', 'formidable') ?></label></td>
-                </tr> 
-
                 <tr><td><label><?php _e('Submit Button Text', 'formidable') ?></label></td>
                     <td><input type="text" name="options[submit_value]" value="<?php echo esc_attr($values['submit_value']); ?>" /></td>
+                </tr>
+                
+                <tr><td colspan="2"><input type="checkbox" name="options[custom_style]" id="custom_style" <?php echo ($values['custom_style']) ? ' checked="checked"' : ''; ?> value="1" />
+                    <label for="custom_style"><?php _e('Use Formidable styling for this form', 'formidable') ?></label></td>
                 </tr>
                 
                 <tr><td valign="top" colspan="2"><label><?php _e('Action After Form Submission', 'formidable') ?></label><br/>
@@ -86,12 +84,13 @@
                 </tr>
                 
                 <tr class="success_action_message_box success_action_box" <?php echo ($values['success_action'] == 'message') ? '' : 'style="display:none;"'; ?>><td valign="top" colspan="2"><label><?php _e('Confirmation Message', 'formidable') ?></label>
-                    <textarea id="success_msg" name="options[success_msg]" cols="50" rows="4" class="frm_long_input"><?php echo FrmAppHelper::esc_textarea($values['success_msg']); ?></textarea> <br/>
+                    <textarea id="success_msg" name="options[success_msg]" cols="50" rows="3" class="frm_long_input"><?php echo FrmAppHelper::esc_textarea($values['success_msg']); ?></textarea> <br/>
                     <div class="frm_show_form_opt">
                     <input type="checkbox" name="options[show_form]" id="show_form" value="1" <?php checked($values['show_form'], 1) ?> /> <label for="show_form"><?php _e('Show the form with the success message.', 'formidable')?></label>
                     </div>
                     <td>
                 </tr>
+
 
                 <?php do_action('frm_additional_form_options', $values); ?> 
                 
@@ -136,7 +135,7 @@
                         foreach($values['fields'] as $field){
                             if (apply_filters('frm_show_custom_html', true, $field['type'])){ ?>
                                 <p><label class="frm_primary_label"><?php echo $field['name'] ?></label>
-                                <textarea name="field_options[custom_html_<?php echo $field['id'] ?>]" rows="7" id="custom_html_<?php echo $field['id'] ?>" class="field_custom_html frm_long_input"><?php echo FrmAppHelper::esc_textarea($field['custom_html']) ?></textarea></p>
+                                <textarea name="field_options[custom_html_<?php echo $field['id'] ?>]" rows="7" id="custom_html_<?php echo $field['id'] ?>" class="field_custom_html frm_long_input"><?php echo FrmAppHelper::esc_textarea(stripslashes($field['custom_html'])) ?></textarea></p>
                             <?php }
                             unset($field);
                         }
@@ -151,7 +150,7 @@
             <?php if($frmpro_is_installed)
                 FrmProFormsController::post_options($values);
             else
-                 FrmAppController::update_message('create and edit posts, pages, and custom post types through your forms');
+                FrmAppController::update_message('create and edit posts, pages, and custom post types through your forms');
             ?>
         </div>
         
@@ -181,25 +180,10 @@
 
 
     </div>
-    <div id="postbox-container-1">
-        <?php if(!isset($hide_preview) or !$hide_preview){ 
-            if (!$values['is_template']){ ?>
-        <p class="howto" style="margin-top:0;"><?php _e('Insert into a post, page or text widget', 'formidable') ?>
-        <input type="text" style="text-align:center;font-weight:bold;width:100%;" readonly="true" onclick="this.select();" onfocus="this.select();" value="[formidable id=<?php echo $id; ?>]" /></p>
-        <?php } ?>
-
-        <p class="frm_orange"><a href="<?php echo FrmFormsHelper::get_direct_link($values['form_key']); ?>" target="_blank"><?php _e('Preview', 'formidable') ?></a>
-        <?php global $frm_settings; 
-            if ($frm_settings->preview_page_id > 0){ ?>
-            <?php _e('or', 'formidable') ?> 
-            <a href="<?php echo add_query_arg('form', $values['form_key'], get_permalink($frm_settings->preview_page_id)) ?>" target="_blank"><?php _e('Preview in Current Theme', 'formidable') ?></a>
-        <?php } ?>
-        </p>
-        <?php
-        } ?>
-        
-        <?php include(FRM_VIEWS_PATH .'/frm-forms/mb_insert_fields.php') ?>
-    </div>
+    <?php
+        if(version_compare( $GLOBALS['wp_version'], '3.3.2', '>'))
+            require(FRM_VIEWS_PATH .'/frm-forms/sidebar-settings.php'); 
+    ?>
     </div>
 </div>
 </div>
