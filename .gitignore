@@ -32,13 +32,10 @@ wp-content/*
 # specify (see the commented-out example for a hint on how to do this.)
 wp-content/themes/*
 !wp-content/themes/talm/
-
-wp-content/plugins/hello.php
-
-wp-content/plugins/hello.php
-
-wp-content/plugins/hello.php
-
-wp-content/plugins/hello.php
+!wp-content/themes/talm_redirection/
+!wp-content/themes/talm-tours/
+!wp-content/themes/talm-angers/
+!wp-content/themes/talm-lemans/
+!wp-content/themes/talm-plateforme/
 
 wp-content/plugins/hello.php
