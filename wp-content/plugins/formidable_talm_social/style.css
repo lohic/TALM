@@ -1,0 +1,406 @@
+/* CSS TALM SOCIAL */
+
+#bottombar{
+	height:135px;
+	position:fixed;
+	bottom:0;
+	left:0;
+	right:0;
+	z-index:3;
+}
+
+#bottombar #bottommenu {
+    /*display: table;*/
+    height: 135px;
+    margin: auto;
+    max-width: 1200px;
+	position:relative;
+}
+
+
+#bottombar .right {
+    background: none repeat scroll 0 0 transparent;
+    /*display: table-cell;
+    max-width: 1070px;*/
+	position:absolute;
+	left:130px;
+	height:135px;
+	top:0;
+	right:0;
+	margin:0;
+}
+
+
+#flux {
+	display: none;
+    float: left;
+    height: 135px;
+    margin: 0;
+    overflow: hidden;
+    padding: 0;
+    position: relative;
+    width: 100%;
+}
+
+#flux{
+	overflow:hidden;
+	overflow-x:hidden;
+	height:135px;
+	width:0;
+	background:rgba(0,0,0,0.8);
+}
+
+#flux .social_item{
+	width:150px;
+	float:left;
+	height:110px;
+	color:#FFF;
+	background:url("img/separateur_flux.png") no-repeat top right;
+	text-align:left;
+	margin-top:15px;
+	padding:0px 5px;
+}
+
+.social_item p{
+	font-family: "open-sans",georgia,sans-serif;
+}
+
+.social_item p.date{
+	font-style:italic;
+	font-size:9px;
+	color:#999;
+}
+
+.social_item p.auteur{
+	font-family: "parisine-std",sans-serif;
+    font-size: 10px;
+    margin-bottom: 1px;
+    margin-top: 3px;
+}
+
+.social_item.vimeo p.auteur{
+	color:#999;
+}
+
+.social_item p.texte{
+	font-size:10px;
+}
+
+.social_item p.titre{
+	font-size:10px;
+}
+
+
+.social_item p.texte .tag{
+	background: none repeat scroll 0 0 #FFFFFF;
+    color: #000000;
+    display: inline-block;
+    margin: 2px 0;
+    padding: 0 2px;
+}
+
+#flux .social_item:last-child{
+	border-right:none;
+}
+
+#fluxmenu {
+    background: none repeat scroll 0 0 rgba(0, 0, 0, 0.8);
+    /*display: table-cell;*/
+    width: 130px;
+    padding-top: 8px;
+    position: relative;
+    vertical-align: top;
+    /*max-width:130px;*/
+	height:127px;
+	position:absolute;
+}
+
+#fluxmenu p{
+	color:#ccc;
+	font-size:11px;
+	font-family: "parisine-std",sans-serif;
+	padding-left:10px;
+	margin-bottom:8px;
+}         
+
+#fluxmenu a{
+	display:block;
+	float:left;
+}
+
+#fluxmenu a#flux_facebook{
+	background:url("img/icn_facebook_widget.png") no-repeat 0 0;
+	width:11px;
+	height:11px;
+	margin-left:10px;	
+}
+#fluxmenu a#flux_facebook.actif, #fluxmenu a#flux_facebook:hover{
+	background:url("img/icn_facebook_widget.png") no-repeat 0 -11px;
+}
+
+#fluxmenu a#flux_twitter{
+	background:url("img/icn_twitter_widget.png") no-repeat 0 0;
+	width:17px;
+	height:11px;
+	margin-left:5px;	
+}
+
+#fluxmenu a#flux_twitter.actif, #fluxmenu a#flux_twitter:hover{
+	background:url("img/icn_twitter_widget.png") no-repeat 0 -11px;	
+}
+
+#fluxmenu a#flux_vimeo{
+	background:url("img/icn_vimeo_widget.png") no-repeat 0 0;
+	width:11px;
+	height:11px;	
+	margin-left:5px;	
+}
+
+#fluxmenu a#flux_vimeo.actif, #fluxmenu a#flux_vimeo:hover{
+	background:url("img/icn_vimeo_widget.png") no-repeat 0 -11px;	
+}
+ 
+#fluxmenu a#viewflux {
+    background: url("img/ouvrir_fermer_flux.png") no-repeat scroll 0 0 transparent;
+    float: right;
+    height: 11px;
+    margin-right: 8px;
+    margin-top: -20px;
+    padding: 0;
+    width: 11px;
+}
+
+#fluxmenu a#viewflux.actif, #fluxmenu a#viewflux.actif:hover{
+	background:url("img/ouvrir_fermer_flux.png") no-repeat scroll 0 -11px transparent;
+}
+
+#fluxmenu a#viewflux:hover{
+	background:url("img/ouvrir_fermer_flux.png") no-repeat scroll 0 -22px transparent;
+}
+
+
+/*---------------------------------
+ *  Carousel > Demo #2
+ *---------------------------------*/
+/* Navbar */
+.carousel .nav{
+	bottom: 0;
+    height: 135px;
+    left: 0;
+    padding: 0 6%;
+    width: 88%;
+}
+
+/* Navbar buttons */
+.carousel .nav .nav-btn{
+	position:absolute;
+	top:0;
+}
+
+.carousel .nav .nav-btn span{
+	display:none;
+}
+
+/* Buttons > Disable */
+.carousel .nav .btn-disable{
+	opacity:0.3/*can be set to any value until 1*/;
+	cursor:default;
+}
+
+.carousel .fluxcontent ul li.social_item a{
+	height:auto;
+	display:inline;
+}
+
+.carousel .fluxcontent ul li.social_item p.auteur a{
+	color:#fff;
+	font-weight:bold;
+}
+
+.carousel .fluxcontent ul li.social_item p.auteur a:hover{
+	text-decoration: underline;
+}
+
+.carousel .fluxcontent ul li.social_item p.image a{
+	height:82px;
+	display:block;
+}
+
+.carousel .fluxcontent ul li{
+	float: left;
+    margin: 13px 0 12px;
+    position: relative;
+    width: 124px;
+    padding:0px 5px;
+}
+
+.carousel .fluxcontent ul li a{
+	display:block;
+	height:59px;
+	overflow:hidden;
+	margin:0;
+	color:#999;
+}
+
+.carousel .fluxcontent ul li a:hover{
+	color:#666;
+}
+
+.sliderkit .fluxcontent{
+	display:table;
+}
+
+.nav-prev a{
+	background: url("img/defileur_gauche.png") no-repeat center center;
+    height: 135px;
+    display:block;
+    width:50px;
+}
+
+.nav-next a{
+	background: url("img/defileur_droite.png") no-repeat center center;
+	height: 135px;
+    display:block;
+    width:50px;
+}
+
+.nav-prev{
+    height: 135px;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width:50px;
+}
+
+.nav-next{
+	height: 135px;
+    right: 0;
+    position: absolute;
+    top: 0;
+    width:50px;
+}
+
+.sliderkit{
+	display:none;
+	position:relative;
+	overflow:hidden;
+	text-align:left;
+}
+
+.carousel a,
+.carousel a:hover{text-decoration:none;}
+.carousel img{border:0;}
+
+/*---------------------------------
+ *  Navigation
+ *---------------------------------*/
+.carousel .nav{z-index:10;position:absolute;text-align:center;}
+
+/* Nav > Clip */
+.carousel .fluxcontent{
+	position:relative;
+	overflow:hidden;
+	margin:0 auto;
+}
+.carousel .fluxcontent ul{position:relative;left:0;top:0;list-style:none;margin:0;padding:0;}
+.carousel .fluxcontent ul li{float:left;}
+.carousel .fluxcontent ul li a{display:block;overflow:hidden;}
+
+/*---------------------------------
+ *  Buttons
+ *---------------------------------*/
+.carousel .btn{
+	z-index:10;
+	display: block;
+	width:50px;
+}
+
+@media screen and (min-width: 1200px){
+	#bottombar #bottommenu {
+	    /*width: 1200px;*/
+	}
+}
+
+@media screen and (max-width: 810px){
+	#fluxmenu {
+	    width: 48px;
+	}
+
+	#fluxmenu > div {
+	    position:relative;
+	}
+
+	#fluxmenu a#viewflux, #fluxmenu a#viewflux:hover{
+	    background: url("img/icn_deplie_widget_gros.png") no-repeat scroll 0 0 transparent;
+	    height: 19px;
+	    margin: 0;
+	    position: absolute;
+	    right: 15px;
+	    top: 5px;
+	    width: 18px;
+	} 
+
+	#fluxmenu a#viewflux.actif, #fluxmenu a#viewflux.actif:hover{
+	    background: url("img/icn_deplie_widget_gros.png") no-repeat scroll 0 -19px transparent;
+	} 
+	
+
+	#fluxmenu a#flux_facebook {
+	    background: url("img/icn_facebook_widget_gros.png") no-repeat scroll 0 0 transparent;
+	    height: 17px;
+	    width: 17px;
+	    right:16px;
+	    top:45px;
+	    position:absolute;
+	}
+
+	#fluxmenu a#flux_facebook.actif, #fluxmenu a#flux_facebook:hover {
+	    background: url("img/icn_facebook_widget_gros.png") no-repeat scroll 0 -17px transparent;
+	}
+	
+
+	#fluxmenu a#flux_twitter {
+	    background: url("img/icn_twitter_widget_gros.png") no-repeat scroll 0 0 transparent;
+	    height: 17px;
+	    width: 26px;
+	    right:12px;
+	    top:73px;
+	   	position:absolute;
+	}
+
+	#fluxmenu a#flux_twitter.actif, #fluxmenu a#flux_twitter:hover{
+		background: url("img/icn_twitter_widget_gros.png") no-repeat scroll 0 -17px transparent;
+	}
+
+	
+	#fluxmenu a#flux_vimeo {
+	    background: url("img/icn_vimeo_widget_gros.png") no-repeat scroll 0 0 transparent;
+	    height: 16px;
+	    width: 17px;
+	    right:16px;
+	    top:101px;
+		position:absolute;
+	} 
+
+	#fluxmenu a#flux_vimeo.actif, #fluxmenu a#flux_vimeo:hover{
+		background: url("img/icn_vimeo_widget_gros.png") no-repeat scroll 0 -16px transparent;
+	}
+	
+	#fluxmenu p {
+	    display:none;
+	} 
+	
+	#bottombar .right {
+		left:48px;
+	}
+}
+
+
+@media screen and (max-width: 550px){
+	
+	.right {
+	    margin-left: 0;
+	    max-width: 100%;
+	}
+
+}
