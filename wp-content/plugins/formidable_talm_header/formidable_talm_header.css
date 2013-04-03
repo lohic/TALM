@@ -1,0 +1,29 @@
+/* CSS TALM HEADER */
+
+div#talm_header{
+	position:fixed;
+	z-index:999;
+	left:0;
+	right:0;
+	height:18px;
+	padding:5px 10px;
+	background:#333;
+	color:#dedede;
+	font-family: open-sans, georgia, sans-serif;
+	font-size:13px;
+	font-weight:normal;
+	-webkit-box-shadow:rgba(0,0,0,0.3) 10px 0px 10px;
+	-moz-box-shadow:rgba(0,0,0,0.3) 10px 0px 10px;
+	-o-box-shadow:rgba(0,0,0,0.3) 10px 0px 10px;
+	box-shadow:rgba(0,0,0,0.3) 10px 0px 10px;
+}
+
+div#talm_header a{
+	color:#14bec3;
+	text-decoration:none;
+}
+
+div#talm_header a:hover{
+	color:#dedede;
+	text-decoration:none
+}

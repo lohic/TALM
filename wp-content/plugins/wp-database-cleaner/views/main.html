@@ -1,0 +1,69 @@
+<!--#message#-->
+<div class="message">
+	{message}
+</div>
+
+<!--#main#-->
+<style type="text/css">
+<!--
+.message {
+	color: #090;
+}
+//-->
+</style>
+
+<div class="wrap">
+	<h2>WP Database Cleaner Options</h2>
+	
+	<p>
+	    <strong>Created by <a href="http://www.wpmize.com/" target="_blank">WPMize.com</a></strong>
+	</p>
+	
+	<p>
+		Please check the options you want to be applied for database cleanup:
+	</p>
+	
+ 	<form method="post" action="">
+		<table class="form-table">
+			<tr valign="top">
+				<th scope="row">Delete post revisions</th>
+				<td><input type="checkbox" name=handler[post_revisions] value="1" /></td>
+			</tr>
+			<tr valign="top">
+				<th scope="row">Delete auto drafts</th>
+				<td><input type="checkbox" name=handler[auto_drafts] value="1" /></td>
+			</tr>
+			<tr valign="top">
+				<th scope="row">Delete pending comments</th>
+				<td><input type="checkbox" name=handler[pending_comments] value="1" /></td>
+			</tr>
+			<tr valign="top">
+				<th scope="row">Delete spam comments</th>
+				<td><input type="checkbox" name=handler[spam_comments] value="1" /></td>
+			</tr>
+			<tr valign="top">
+				<th scope="row">Delete trash comments</th>
+				<td><input type="checkbox" name=handler[trash_comments] value="1" /></td>
+			</tr>
+			<tr valign="top">
+				<th scope="row">Delete tags with 0 posts associated</th>
+				<td><input type="checkbox" name=handler[no_children_tags] value="1" /></td>
+			</tr>
+			<tr valign="top">
+				<th scope="row">Delete categories with 0 posts associated</th>
+				<td><input type="checkbox" name=handler[no_children_categories] value="1" /></td>
+			</tr>
+			<tr valign="top">
+				<th scope="row">Delete trash posts</th>
+				<td><input type="checkbox" name=handler[trash_posts] value="1" /></td>
+			</tr>
+			<tr valign="top">
+				<th scope="row">&nbsp;</th>
+				<td><input type="submit" name="go" value="Proceed" /></td>
+			</tr>
+		</table>
+	</form>
+</div>
+
+<br />
+<br />
