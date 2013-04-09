@@ -27,6 +27,7 @@ wp-content/*
 # wp-content/plugins/*
 # !wp-content/plugins/my-single-file-plugin.php
 # !wp-content/plugins/my-directory-plugin/
+wp-content/plugins/all-in-one-event-calendar/
  
 # Ignore everything in the "themes" directory, except the themes you
 # specify (see the commented-out example for a hint on how to do this.)
