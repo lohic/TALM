@@ -3,7 +3,7 @@
 Plugin Name: Advanced Custom Fields: Flexible Content Field
 Plugin URI: http://www.advancedcustomfields.com/
 Description: Adds the flexible content field
-Version: 1.0.0
+Version: 1.0.1
 Author: Elliot Condon
 Author URI: http://www.elliotcondon.com/
 License: GPL
@@ -28,7 +28,7 @@ class acf_flexible_content_plugin
 	{
 		// vars
 		$settings = array(
-			'version' => '1.0.0',
+			'version' => '1.0.1',
 			'remote' => 'http://download.advancedcustomfields.com/FC9O-H6VN-E4CL-LT33/info/',
 			'basename' => plugin_basename(__FILE__),
 		);
