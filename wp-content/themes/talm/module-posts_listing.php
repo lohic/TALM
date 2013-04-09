@@ -6,42 +6,29 @@
 				<li class="selected"><a href="#filter-color-any" data-option-value="*">Tout afficher</a></li> 
 <?php 
 			$categories = get_sub_field('posts_categories');
-			preg_match_all ("/a[\s]+[^>]*?href[\s]?=[\s\"\']+".
-			                "(.*?)[\"\']+.*?>"."([^<]+|.*?)?<\/a>/",
-			                $categories, &$matches);
-
-			$matches = $matches[1];
+			
+			$liste_categories = array();
 			$slugs = array();
-
-			foreach($matches as $var)
+			
+			foreach($categories as $cat)
 			{  
-				$temp = explode('/',$var);
-				$slugs[] = $temp[count($temp)-2];
+				$slugs[] = $cat->slug;
+				?>
+				<li><a href="#" data-option-value=".<?php echo $cat->slug;?>"><?php echo $cat->name;?></a></li>
+				<?php
 			}
-			$liste_categories = "";
-			for($i=0; $i<count($slugs); $i++){
-				if($i<count($slugs)-1){
-					$liste_categories .= $slugs[$i].",";
-				}
-				else{
-					$liste_categories .= $slugs[$i];
-				}
-				
-				$cat_info = get_category_by_slug($slugs[$i]);
-				if($cat_info->count>0){
-?>
-				<li><a href="#" data-option-value=".<?php echo $slugs[$i];?>"><?php echo $cat_info->name;?></a></li>
-<?php
-				}
-			}
+
+			$liste_categories = implode(',',$slugs);
 ?>
 				
 			</ul> 
 		</section>
 		<section id="container" class="super-list variable-sizes clearfix">
 <?php 
+			$posts_per_page = get_sub_field('nbr_articles');
+			
 			//$my_query_listing = new WP_Query( array('category_name'=>$liste_categories, 'meta_key'=>'date_de_debut', 'order' => 'ASC','orderby' => 'meta_value', 'posts_per_page'=>-1));
-			$my_query_listing = new WP_Query( array('post_status'=>array('publish','future'),'category_name'=>$liste_categories, 'order' => 'DESC','orderby' => 'date', 'posts_per_page'=>20));
+			$my_query_listing = new WP_Query( array('post_status'=>array('publish','future'),'category_name'=>$liste_categories, 'order' => 'DESC','orderby' => 'date', 'posts_per_page'=>$posts_per_page));
 			while( $my_query_listing->have_posts() ) : $my_query_listing->the_post();
 					$la_categorie="";
 					$les_categories = get_the_category();

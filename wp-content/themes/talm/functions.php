@@ -11,24 +11,10 @@ if ( ! function_exists( 'talm_setup' ) ){
 
 	function talm_setup() {
 		
-		if(is_file(dirname(__File__) . '/fields/acf.php')){
+		// pour inclure le fichier ACF uniquement quand on n'est pas sur la plateforme de dev		
+		if(is_file(dirname(__File__) . '/fields/acf.php') && network_site_url() != 'http://talm.dev/'){
 			include(dirname(__File__) . '/fields/acf.php');	
 		}
-		
-		//add_theme_support('menus');
-		//add_theme_support('nav-menus');
-		
-		//if( function_exists(register_nav_menus) )
-		/*register_nav_menus(
-			array(
-				'main_menu_gauche' 		=> 'Menu principal gauche',
-				'main_menu_droite'		=> 'Menu principal droite',
-				'left_menu_dessus'		=> 'Menu gauche dessus',
-				'left_menu_dessous'		=> 'Menu gauche dessous'
-			)
-		);*/
-		
-		
 		
 		if ( function_exists('register_sidebar') )
 		register_sidebar(array('name'=>'Sidebar',
@@ -37,8 +23,7 @@ if ( ! function_exists( 'talm_setup' ) ){
 			'before_title' => '<h3>',
 			'after_title' => '</h3>',
 		));
-				
-		
+			
 		// permet d'activer le support des b-vignettes pour les pages et les posts
 		// on peut ainsi supprimer le champ ACF Image principale
 		// cf image à la une
@@ -55,8 +40,7 @@ if ( ! function_exists( 'talm_setup' ) ){
 
 		if( function_exists( 'register_field' ) )
 		{
-			//register_field('Tax_field', dirname(__File__) . '/fields/acf-tax.php');
-			register_field('Tax_field', dirname(__File__) . '/fields/acf-taxonomy-field/taxonomy-field.php');
+			register_field('Tax_field', dirname(__File__) . '/fields/acf-tax.php');
 		}
 		add_action('init', 'update_newsletter_user');
 		add_action('init', 'register_my_menus' );
