@@ -28,6 +28,9 @@ class Filosofo_Custom_Image_Sizes {
 		global $_wp_additional_image_sizes;
 
 		$attachment_id = (int) $attachment_id;
+		if(is_array($size_name)){
+		  $size_name = implode('x', $size_name);
+		}
 		$size_name = trim($size_name);
 		
 		$meta = wp_get_attachment_metadata($attachment_id);
