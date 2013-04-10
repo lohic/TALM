@@ -30,6 +30,7 @@ if ( ! function_exists( 'talm_setup' ) ){
 		add_theme_support( 'post-thumbnails' );
 		set_post_thumbnail_size(235, 160, true);
 		
+		add_image_size('talm-thumb', 235, 160, true);
 		add_image_size('talm-small', 530, 300, true);
 		add_image_size('talm-medium', 695, 400, true);
 		add_image_size('talm-large', 975, 485, true);
@@ -155,7 +156,7 @@ if( ! function_exists ( 'create_gallery') ) {
 
 			foreach ( $images as $image ){
 				echo '<div class="sliderkit-panel" id="panel_'.$image->ID.'">'."\n";
-				echo wp_get_attachment_image  ( $image->ID , 'talm-large' );
+				echo wp_get_attachment_image  ( $image->ID , 'talm-large');
 				echo '<div class="credits" id="credit_'.$image->ID.'"><p>'.apply_filters( 'the_title' , $image->post_title ).'</p></div>'."\n";
 				//$ref = wp_get_attachment_image_src ( $image->ID , $size );
 				echo '</div>'."\n";
