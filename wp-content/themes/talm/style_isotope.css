@@ -179,6 +179,10 @@ body {
     padding-top:5px;
 }
 
+.element footer.inverted{
+	top:130px;
+}
+
 .variable-sizes .element.width2 { width: 230px; }
 
 .variable-sizes .element.height2 { height: 230px; }

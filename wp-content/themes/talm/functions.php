@@ -266,4 +266,12 @@ function CharacterLimiter($text,$limit=50){
     $string=substr($text, 0, $limit);
         
     return $string.$dots; 
-} 
+}
+
+function getBlogSlug(){
+	$slug = "";
+	if(!empty($GLOBALS['path'])){
+		$slug = str_replace('/','',$GLOBALS['path']); 
+	}	
+	return $slug;
+}

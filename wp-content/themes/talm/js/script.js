@@ -74,11 +74,17 @@ $(document).ready(function(){
 
 	function makeTall(){  
 		//$(this).animate({"height":75},200);
-		var tableau_id=$(this).attr("id").split('_');
+		var tableau_id = $(this).attr("id").split('_');
 		var identifiant = "#footer_"+tableau_id[1];
-
-		$(identifiant).animate({
+		
+		$(identifiant+':not(.inverted)').animate({
 			top: '+=130'
+		},300,function(){
+			
+		});
+		
+		$(identifiant+'.inverted').animate({
+			top: '-=130'
 		},300,function(){
 			
 		});
@@ -86,12 +92,18 @@ $(document).ready(function(){
 
 	function makeShort(){ 
 		//$(this).animate({"height":50},200);
-		var tableau_id=$(this).attr("id").split('_');
+		var tableau_id = $(this).attr("id").split('_');
 		var identifiant = "#footer_"+tableau_id[1];
-	    $(identifiant).animate({
+	    $(identifiant+':not(.inverted)').animate({
 			top: '-=130'
 		},300,function(){
 				
+		});
+		
+		$(identifiant+'.inverted').animate({
+			top: '+=130'
+		},300,function(){
+			
 		});
 	}
 

@@ -39,14 +39,22 @@
 						}
 					}
 					$le_tag = "";
+					$tagTheme = false;
 
 					$tags = get_the_tags();
 					if($tags){
 						foreach($tags as $tag){
 							$le_tag_class = str_replace(' ','',$tag->name);
 							$le_tag_name = $tag->name;
+							// pour détecter si le tag correspond au site
+							// par exemple angers == angers
+							// dans ce cas on va inverser la vignette							
+							if($tag->name == getBlogSlug() && !$tagTheme){
+								$tagTheme = true;
+							}
 						} 
 					}
+					$tagTheme = $tagTheme == true ? 'inverted' : '';
 				?>
 				<article class="element <?php echo $le_tag_class;?> <?php echo $la_categorie_slug;?>" id="article_<?php the_ID();?>">
 					<a href="<?php the_permalink();?>">
@@ -56,7 +64,7 @@
 							echo wp_get_attachment_image  ( $id, 'talm-thumb');
 							//the_post_thumbnail();
 						?>
-							<footer id="footer_<?php the_ID();?>">
+							<footer id="footer_<?php the_ID();?>" class="<?php echo $tagTheme;?>">
 								<h3><?php echo $le_tag_name;?></h3>
 								<h2><?php echo CharacterLimiter(get_the_title(),30);?></h2>
 								<h4><?php the_field("sous_titre");?></h4>
