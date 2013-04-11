@@ -65,11 +65,12 @@
 							//the_post_thumbnail();
 						?>
 							<footer id="footer_<?php the_ID();?>" class="<?php echo $tagTheme;?>">
-								<h3><?php echo $le_tag_name;?></h3>
-								<h2><?php echo CharacterLimiter(get_the_title(),30);?></h2>
-								<h4><?php the_field("sous_titre");?></h4>
-								<p class="type"><?php echo $la_categorie;?></p>
+								<h3 class="titre"><?php echo $le_tag_name;?></h3>
+								<h2 class="titre"><?php echo CharacterLimiter(get_the_title(),30);?></h2>
+								<h4 class="titre"><?php the_field("sous_titre");?></h4>
+								<!--<p class="type"><?php echo $la_categorie;?></p>-->
 							</footer>
+                        	<p class="type"><?php echo $la_categorie;?></p>
 						<?php
 						}
 						else {

@@ -77,16 +77,20 @@ $(document).ready(function(){
 		var tableau_id = $(this).attr("id").split('_');
 		var identifiant = "#footer_"+tableau_id[1];
 		
-		$(identifiant+':not(.inverted)').animate({
-			top: '+=130'
-		},300,function(){
-			
+		$(identifiant+':not(.inverted) .titre').animate({opacity:0},300, function(){
+			$(identifiant+':not(.inverted)').animate({
+				top: 130
+			},300,function(){
+				
+			});
 		});
 		
+		
 		$(identifiant+'.inverted').animate({
-			top: '-=130'
+			top: 0
 		},300,function(){
-			
+			$(identifiant+' .titre').animate({opacity:100},300, function(){
+			});
 		});
 	}
 
@@ -94,16 +98,21 @@ $(document).ready(function(){
 		//$(this).animate({"height":50},200);
 		var tableau_id = $(this).attr("id").split('_');
 		var identifiant = "#footer_"+tableau_id[1];
-	    $(identifiant+':not(.inverted)').animate({
-			top: '-=130'
+		
+		$(identifiant+':not(.inverted)').animate({
+			top: 0
 		},300,function(){
+			$(identifiant+':not(.inverted) .titre').animate({opacity:100},300, function(){
 				
+			});
 		});
 		
-		$(identifiant+'.inverted').animate({
-			top: '+=130'
-		},300,function(){
-			
+		$(identifiant+' .titre').animate({opacity:0},300, function(){
+			$(identifiant+'.inverted').animate({
+				top: 130
+			},300,function(){
+				
+			});
 		});
 	}
 
