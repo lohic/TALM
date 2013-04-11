@@ -79,8 +79,8 @@
 								<h3><?php echo $le_tag_name;?></h3>
 								<h2><?php echo CharacterLimiter(get_the_title(),30);?></h2>
 								<h4><?php the_field("sous_titre");?></h4>
-								<p class="type"><?php echo $la_categorie;?></p>
 							</header>
+							<p class="type"><?php echo $la_categorie;?></p>
 						<?php
 						}
 						?>
