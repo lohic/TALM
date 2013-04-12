@@ -136,7 +136,7 @@ function ariane() {
 		}
 	}
 	if ( $ped >= 1 ) {
-		$rendu .= ' (Page '.$ped.')';
+		$rendu .= ' <span>(Page '.$ped.')</span>';
 	}
 	}
 	$rendu .= '</div>';

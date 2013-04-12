@@ -462,7 +462,7 @@ span.lemans{
     width:92.08%;
 }
 
-#ariane, #telechargement, #voir_aussi{
+#ariane, #telechargement, #voir_aussi, #navigation{
 	min-width:180px;
 	line-height:90%;
 }
@@ -513,6 +513,16 @@ ul.xoxo.blogroll{
 	font-style: italic;
 }
 
+#navigation{
+    padding-left: 10px; 
+	font-size:12px; 
+	font-family:"parisplus-std", serif;
+	line-height:15px;
+	font-style:italic;
+} 
+#navigation a{
+	text-decoration:underline;
+} 
 
 .column1 h3{
 	font-size:15px; 

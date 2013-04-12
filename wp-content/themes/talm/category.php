@@ -11,6 +11,9 @@
 							ariane();
 						?>
                     </div>
+                    <div id="navigation">
+					<?php posts_nav_link(' / ','page suivante','page pr&eacute;c&eacute;dente'); ?>
+                    </div>
                     <?php get_sidebar(); ?>
                 </div>
             </div>
