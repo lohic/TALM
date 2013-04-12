@@ -9,7 +9,9 @@ Template Name: Page modulable
                 <?php 
                     /*if(function_exists('bcn_display')){
                         bcn_display();
-                    }*/
+                    }
+					ariane();
+					*/
                 ?>
             </div>-->
             

@@ -15,6 +15,7 @@ if ( ! function_exists( 'talm_setup' ) ){
 		if(is_file(dirname(__File__) . '/fields/acf.php') && network_site_url() != 'http://talm.dev/'){
 			include(dirname(__File__) . '/fields/acf.php');	
 		}
+		include(dirname(__File__) . '/inc/ariane.php');
 		
 		if ( function_exists('register_sidebar') )
 		register_sidebar(array('name'=>'Sidebar',

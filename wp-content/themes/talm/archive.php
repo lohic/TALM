@@ -5,9 +5,10 @@
                 <div>
                     <div id="ariane">
                         <?php 
-							if(function_exists('bcn_display')){
+							/*if(function_exists('bcn_display')){
 								bcn_display();
-							}
+							}*/
+							ariane();
 						?>
                     </div>
                     <?php get_sidebar(); ?>
