@@ -230,6 +230,7 @@ $(document).ready(function(){
 		$(".element").removeProp('hoverIntent_s');
 		
 		$(".element:not(.smartphone)").hoverIntent( makeTall, makeShort );
+		
 		// on adapte la taille des SVG
 		$('.hasSVG').each(function(){
 			var ratio = $(this).find('svg').attr('ratio',ratio);
@@ -286,7 +287,7 @@ $(document).ready(function(){
 			itemSelector: '.element'
 		});
 		
-
+		//console.log($(document).width());
 	});
 });
 
@@ -320,6 +321,9 @@ function resizePlayerActus(){
 			$(this).find('img').css( 'margin-left',  0);
 		});
 		
+		$('.element .inverted').css('top',0);
+		$('.element .inverted .titre').css('opacity',100);
+		
 	}else{
 		$('.contentslider-std .conteneur_image_slider').each(function(){
 			var decalimage = ($(this).find('img').width() - $('.conteneur_image_slider').width())/2;
@@ -328,6 +332,9 @@ function resizePlayerActus(){
 			}
 			$(this).find('img').css( 'margin-left',  -decalimage);
 		});
+		
+		$('.element .inverted').css('top',130);
+		$('.element .inverted .titre').css('opacity',0);
 	}
 }
 

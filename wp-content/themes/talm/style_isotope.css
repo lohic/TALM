@@ -459,30 +459,38 @@ body {
 .clearfix { zoom: 1; }
 
 @media screen and (max-width: 550px){
-  #container {
-      width: 100%;
-  }
+	
+	#container {
+		width: 100%;
+	}
+	
+	.element img {
+		display: none;
+	}
 
-  .element img {
-    display: none;
-    
-  }
+	.element{
+		height:auto;
+	}
+	
+	.element footer.inverted{
+		top:0px;
+	}
 
-  .element{
-    height:auto;
-  }
+	.element footer.inverted .titre{
+		opacity:100;
+	}
 
-  #options p{
-    padding-left:10px;
-  }
+	#options p{
+		padding-left:10px;
+	}
 
-  #content #container article {
-      margin: 0px 0px 10px;
-      padding: 12px 0 0;
-      width: 100%;
-      background:url("img/ombre_isotope.png") repeat-x 0 top;
-      height:auto;
-  }
+	#content #container article {
+		margin: 0px 0px 10px;
+		padding: 12px 0 0;
+		width: 100%;
+		background:url("img/ombre_isotope.png") repeat-x 0 top;
+		height:auto;
+	}
 
   .element.tours footer, .element.tours header, .element.angers footer, .element.angers header, 
   .element.lemans footer, .element.lemans header , .element.talm footer, .element.talm header{

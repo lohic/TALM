@@ -16,7 +16,8 @@
 	<link rel="alternate" type="text/xml" title="RSS .92" href="<?php bloginfo('rss_url'); ?>" />
 	<link rel="alternate" type="application/atom+xml" title="Atom 0.3" href="<?php bloginfo('atom_url'); ?>" />
 	<link rel="pingback" href="<?php bloginfo('pingback_url'); ?>" /><?php wp_head(); ?>
-    <link rel="icon" type="image/png" href="/wp-content/themes/talm/img/favicon.png" />
+    <link rel="icon" type="image/png" href="<?php echo get_stylesheet_directory_uri(); ?>/img/favicon.png" />
+    <link rel="apple-touch-icon" type="image/png" href="<?php echo get_stylesheet_directory_uri(); ?>/img/favicon-iphone.png"/>
  
 	<?php wp_get_archives('type=monthly&format=link'); ?> 
 
@@ -49,7 +50,7 @@
         <div class="left">
         </div>
     	<div class="right">
-    		<h1><a href="<?php bloginfo( 'url' )?>"><img src="<?php  echo get_stylesheet_directory_uri();//bloginfo( 'template_url' ); ?>/img/logo.png" alt="logo TALM" id="logo"/><img src="<?php  echo get_stylesheet_directory_uri();//bloginfo( 'template_url' ); ?>/img/logo_villes.png" alt="logo TALM" id="logo_villes"/></a></h1>
+    		<h1><a href="<?php bloginfo( 'url' )?>"><img src="<?php  echo get_stylesheet_directory_uri();//bloginfo( 'template_url' ); ?>/img/logo.png" alt="logo TALM" id="logo"/><img src="<?php  echo get_stylesheet_directory_uri(); ?>/img/logo_villes.png" alt="logo TALM" id="logo_villes"/></a></h1>
             <nav id="menu_principal">
             	<?php
 				if ( has_nav_menu( 'main_menu_gauche' ) ) {
