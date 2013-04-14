@@ -49,12 +49,12 @@
 							// pour détecter si le tag correspond au site
 							// par exemple angers == angers
 							// dans ce cas on va inverser la vignette							
-							if($tag->name == getBlogSlug() && !$tagTheme){
+							if($tag->name == getBlogSlug() && !$tagTheme && $tag->name != 'talm'){
 								$tagTheme = true;
 							}
 						} 
 					}
-					$tagTheme = $tagTheme == true ? 'inverted' : '';
+					$tagTheme = $tagTheme ? 'inverted' : '';
 				?>
 				<article class="element <?php echo $le_tag_class;?> <?php echo $la_categorie_slug;?>" id="article_<?php the_ID();?>">
 					<a href="<?php the_permalink();?>">
