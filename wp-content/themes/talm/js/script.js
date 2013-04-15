@@ -117,17 +117,16 @@ $(document).ready(function(){
 	}
 
 	$('#ajaxactu').click(function(e){
-		
-		alert('clic');
-		
-		jQuery.post(
+		$.post(
 		   ajaxurl, 
 		   {
 			  'action':'get_posts_listing',
-			  'data':'foobarid'
+			  'data':'Ça marche',
 		   }, 
 		   function(response){
-			  alert('The server responded: ' + response);
+			  //alert('The server responded: ' + response);
+			  $('#container').html(response);
+			  $('#container').height('auto');
 		   }
 		);
 				

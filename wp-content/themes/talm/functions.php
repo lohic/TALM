@@ -46,8 +46,10 @@ if ( ! function_exists( 'talm_setup' ) ){
 		}
 		add_action('init', 'update_newsletter_user');
 		add_action('init', 'register_my_menus' );
-		
+		// AJAX
+		add_action('wp_head','custom_head');
 		add_action('wp_ajax_get_posts_listing', 'ajax_get_posts_listing');
+		add_action('wp_ajax_nopriv_get_posts_listing', 'ajax_get_posts_listing');
 		
 		add_filter( 'excerpt_length', 'custom_excerpt_length', 999 );
 				 
@@ -55,8 +57,17 @@ if ( ! function_exists( 'talm_setup' ) ){
 	
 }
 
+ 
+function custom_head()
+{
+    echo '<script type="text/javascript">var ajaxurl = \''.admin_url('admin-ajax.php').'\';</script>';
+}
+
 function ajax_get_posts_listing(){
-	echo "<p>youpi ajax fonctionne !!!</p>";	
+	//echo "<p>youpi ajax fonctionne !!!".$_POST['data']."</p>";
+	include(dirname(__File__) . '/inc/ajax-posts_listing.php');
+	
+	die();	
 }
 
 

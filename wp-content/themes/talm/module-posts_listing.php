@@ -1,5 +1,5 @@
 <div class="full">
-	<p><a href="#" id="">test</a></p>
+	<p><a href="#" id="ajaxactu">test</a></p>
 	<div id="conteneur_isotope">
 		<section id="options"> 
 			<p>Trier par</p>
@@ -53,6 +53,7 @@
 							if($tag->name == getBlogSlug() && !$tagTheme && $tag->name != 'talm'){
 								$tagTheme = true;
 							}
+							?><!-- blog slug : <?php echo getBlogSlug();?> tag name : <?php echo $tag->name;?> --><?php
 						} 
 					}
 					$tagTheme = $tagTheme ? 'inverted' : '';
