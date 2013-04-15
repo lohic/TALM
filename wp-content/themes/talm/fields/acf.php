@@ -22,9 +22,9 @@ add_action('acf/register_fields', 'my_register_fields');
 
 function my_register_fields()
 {
-	include_once('add-ons/acf-repeater/repeater.php');
-	include_once('add-ons/acf-gallery/gallery.php');
-	include_once('add-ons/acf-flexible-content/flexible-content.php');
+	//include_once('add-ons/acf-repeater/repeater.php');
+	//include_once('add-ons/acf-gallery/gallery.php');
+	//include_once('add-ons/acf-flexible-content/flexible-content.php');
 }
 
 // Page d‘options 
