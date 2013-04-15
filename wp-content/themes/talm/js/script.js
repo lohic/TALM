@@ -118,6 +118,8 @@ $(document).ready(function(){
 
 	$('#ajaxactu').click(function(e){
 		
+		alert('clic');
+		
 		jQuery.post(
 		   ajaxurl, 
 		   {
