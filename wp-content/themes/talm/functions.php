@@ -47,11 +47,18 @@ if ( ! function_exists( 'talm_setup' ) ){
 		add_action('init', 'update_newsletter_user');
 		add_action('init', 'register_my_menus' );
 		
+		add_action('wp_ajax_get_posts_listing', 'ajax_get_posts_listing');
+		
 		add_filter( 'excerpt_length', 'custom_excerpt_length', 999 );
 				 
 	}
 	
 }
+
+function ajax_get_posts_listing(){
+	echo "<p>youpi ajax fonctionne !!!</p>";	
+}
+
 
 if( ! function_exists ( 'register_my_menus') ) {
 	function register_my_menus(){
@@ -108,24 +115,6 @@ if( ! function_exists ( 'get_the_content_by_id' ) ) {
 		
 	}
 }
-
-/**
- * Adds new supported media types for upload.
- *
- * @see wp_check_filetype() or get_allowed_mime_types()
- * @param array $mimes Array of mime types keyed by the file extension regex corresponding to those types.
- * @return array
- */
-/*if( ! function_exists ( 'addUploadMimes') ) {
-	function addUploadMimes($mimes)
-	{
-		$mimes = array_merge($mimes, array(
-			'svg' => 'image/svg+xml'
-		));
-	 
-		return $mimes;
-	}
-}*/
 		
 /**
  * Crée une gallerie avec toutes les images uploadées.

@@ -1,11 +1,8 @@
-<div class="full">
-	
-	<div id="conteneur_isotope">
-		<section id="options"> 
-			<p>Trier par</p>
-			<ul id="filters" class="option-set clearfix " data-option-key="filter">
-				<li class="selected"><a href="#filter-color-any" data-option-value="*">Tout afficher</a></li> 
-<?php 
+
+<?php
+
+			echo 'OK OK OK';
+		
 			$categories = get_sub_field('posts_categories');
 			
 			$liste_categories = array();
@@ -14,18 +11,11 @@
 			foreach($categories as $cat)
 			{  
 				$slugs[] = $cat->slug;
-				?>
-				<li><a href="#" data-option-value=".<?php echo $cat->slug;?>"><?php echo $cat->name;?></a></li>
-				<?php
 			}
 
 			$liste_categories = implode(',',$slugs);
-?>
-				
-			</ul> 
-		</section>
-		<section id="container" class="super-list variable-sizes clearfix">
-<?php 
+
+
 			$posts_per_page = get_sub_field('nbr_articles');
 			
 			//$my_query_listing = new WP_Query( array('category_name'=>$liste_categories, 'meta_key'=>'date_de_debut', 'order' => 'ASC','orderby' => 'meta_value', 'posts_per_page'=>-1));
@@ -91,8 +81,4 @@
 			<?php 
 			endwhile;
 			wp_reset_postdata();
-?>				
-		</section>
-	</div>
-</div>
-
+?>
