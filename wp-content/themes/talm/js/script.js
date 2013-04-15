@@ -116,6 +116,21 @@ $(document).ready(function(){
 		});
 	}
 
+	$('#ajaxactu').click(function(e){
+		
+		jQuery.post(
+		   ajaxurl, 
+		   {
+			  'action':'get_posts_listing',
+			  'data':'foobarid'
+		   }, 
+		   function(response){
+			  alert('The server responded: ' + response);
+		   }
+		);
+				
+		e.preventDefault();
+	});
 	
 
 	/*$(".element").mouseenter(function(){
