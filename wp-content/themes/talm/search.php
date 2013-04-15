@@ -6,6 +6,9 @@
                     <div id="ariane">
                         <a title="Aller à Accueil." href="#">Accueil</a><a title="" href="#">Recherche</a>
                     </div>
+                    <div id="navigation">
+					<?php posts_nav_link(' / ','page suivante','page pr&eacute;c&eacute;dente'); ?>
+                    </div>
                     <?php get_sidebar(); ?>
                 </div>
             </div>
