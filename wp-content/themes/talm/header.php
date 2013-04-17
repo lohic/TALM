@@ -22,7 +22,10 @@
     <link rel="apple-touch-icon" type="image/png" href="<?php echo get_stylesheet_directory_uri(); ?>/img/favicon-iphone.png"/>
  
 	<?php wp_get_archives('type=monthly&format=link'); ?> 
-
+	
+	<!--[if lt IE 9]>
+	<script type="text/javascript" src="<?php bloginfo( 'template_url' ); ?>/js/html5shiv.js"></script>
+	<![endif]-->
 	<script type="text/javascript" src="<?php bloginfo( 'template_url' ); ?>/js/jquery-1.7.1.min.js"></script>
 	<script type="text/javascript" src="<?php bloginfo( 'template_url' ); ?>/js/jquery.scrollTo-min.js"></script>
 	<script type="text/javascript" src="<?php bloginfo( 'template_url' ); ?>/js/jquery.serialScroll-min.js"></script>
