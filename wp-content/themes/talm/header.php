@@ -7,8 +7,6 @@
 	<meta http-equiv="Content-Type" content="<?php bloginfo('html_type'); ?>; charset=<?php bloginfo('charset'); ?>" />
 	<meta name="generator" content="WordPress <?php bloginfo('version'); ?>" />
 	<meta name="viewport" content="width=device-width, maximum-scale=1.0">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
 
 	<!-- leave this for stats -->
 	<link rel="stylesheet" href="<?php bloginfo('stylesheet_url'); ?>" type="text/css" media="screen" />
