@@ -22,7 +22,7 @@
 	<?php wp_get_archives('type=monthly&format=link'); ?> 
 	
 	<!--[if lt IE 9]>
-	<link rel="stylesheet" href="<?php bloginfo( 'template_url' ); ?>/style-ie.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="<?php echo get_stylesheet_directory_uri(); ?>/style-ie.css" type="text/css" media="screen" />
 	<script type="text/javascript" src="<?php bloginfo( 'template_url' ); ?>/js/html5shiv.js"></script>
 	<![endif]-->
 	<script type="text/javascript" src="<?php bloginfo( 'template_url' ); ?>/js/jquery-1.7.1.min.js"></script>
