@@ -109,9 +109,9 @@
 	                </li>
 	            </ul>
 	            <div id="logos_partenaires">
-	            	<img src="<?php bloginfo( 'template_url' ); ?>/img/logo-ministere.png" alt="Ministère"/>
-	            	<img src="<?php bloginfo( 'template_url' ); ?>/img/logo-lemans.png" alt="Le Mans"/>
-	            	<img src="<?php bloginfo( 'template_url' ); ?>/img/logo-angers.png" alt="Angers"/>
-	            	<img src="<?php bloginfo( 'template_url' ); ?>/img/logo-tours.png" alt="Tours"/>
+	            	<img src="<?php bloginfo( 'template_url' ); ?>/img/logo-ministere.png" alt="Ministère" id="logo_ministere"/>
+	            	<img src="<?php bloginfo( 'template_url' ); ?>/img/logo-lemans.png" alt="Le Mans" id="logo_lemans"/>
+	            	<img src="<?php bloginfo( 'template_url' ); ?>/img/logo-angers.png" alt="Angers" id="logo_angers"/>
+	            	<img src="<?php bloginfo( 'template_url' ); ?>/img/logo-tours.png" alt="Tours" id="logo_tours"/>
 	            </div>
 	    </nav>

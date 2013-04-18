@@ -436,18 +436,23 @@ span.lemans{
 
 #logos_partenaires img{
 	float: right;
-    margin-right: 10px;
+    margin-right: 8px;
     margin-top: 13px;
 }
 
-#logos_partenaires img:last-child{
+#logos_partenaires img#logo_tours{
     margin-top: 3px;
 }
 
-#logos_partenaires img:first-child{
+#logos_partenaires img#logo_angers{
+    margin-top: 5px;
+}
+
+
+#logos_partenaires img#logo_ministere{
 	display: block;
     float: none;
-    margin-left: 93px;
+    margin-left: 95px;
 }
 
 /*********************
