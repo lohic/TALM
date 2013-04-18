@@ -18,3 +18,7 @@ IE 6,7,8 HACK pour TALM
 #fluxmenu {
 	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#C2000000,endColorstr=#C2000000);
 }
+
+#content .element p.type {
+	bottom:5px;
+}
