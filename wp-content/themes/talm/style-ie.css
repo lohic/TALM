@@ -6,8 +6,8 @@ IE 6,7,8 HACK pour TALM
 /* CSS Document */
 
 #page{
-	background: url("img/fond.gif") repeat-y scroll left top #FFFFFF;
-	-pie-background: url("img/fond.gif") repeat-y scroll left top #FFFFFF;
+	background: url("img/fond-ie.gif") repeat-y scroll left top #FFFFFF;
+	-pie-background: url("img/fond-ie.gif") repeat-y scroll left top #FFFFFF;
 }
 
 
