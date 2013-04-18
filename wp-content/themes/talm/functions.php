@@ -271,8 +271,15 @@ function CharacterLimiter($text,$limit=50){
 
 function getBlogSlug(){
 	$slug = "";
-	if(!empty($GLOBALS['path'])){
+	
+	if(!empty($GLOBALS['path']) && !SUBDOMAIN_INSTALL){
 		$slug = str_replace('/','',$GLOBALS['path']); 
-	}	
+	}
+	if(SUBDOMAIN_INSTALL){
+		$subject = get_bloginfo( 'url' );
+		$pattern = "/([a-z0-9_\-]{1,5}:\/\/)?(([a-z0-9_\-]{1,}):([a-z0-9_\-]{1,})\@)?((www\.)|([a-z0-9_\-]{1,}\.)+)?([a-z0-9_\-]{3,})(\.[a-z]{2,4})(\/([a-z0-9_\-]{1,}\/)+)?([a-z0-9_\-]{1,})?(\.[a-z]{2,})?(\?)?(((\&)?[a-z0-9_\-]{1,}(\=[a-z0-9_\-]{1,})?)+)?/";
+		preg_match($pattern, $subject, $matches);	
+		$slug = substr($matches[5],0,-1);	
+	}
 	return $slug;
 }

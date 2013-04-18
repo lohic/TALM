@@ -42,7 +42,7 @@
 	<?php wp_head(); ?>
 </head>
 <body class="<?php echo getBlogSlug();?>">
-
+<!-- <?php echo getBlogSlug();?> -->
 
 <div id="page" class="">
 	<ul id="liste-ecole">
