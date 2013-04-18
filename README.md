@@ -41,3 +41,16 @@ POUR INSTALLER WORDPRESS EN MULTISITE (en local):
 Wordpress MU sur MAMP CF :
 
 http://perishablepress.com/wordpress-multisite-subdomains-mamp/
+
+Notes AJAX & wordpress :
+
+- http://wordpress.stackexchange.com/questions/90221/jquery-load-php-php-file-without-the-template
+- http://codex.wordpress.org/Plugin_API/Action_Reference/wp_ajax_(action)
+- http://www.1stwebdesigner.com/css/implement-ajax-wordpress-themes/
+- http://www.wp-themix.org/wordpress/how-to-add-a-jquery-ajax-contact-form-to-wordpress/
+- http://www.garyc40.com/2010/03/5-tips-for-using-ajax-in-wordpress/
+- http://wordpress.org/support/topic/ajaxurl-is-not-defined
+- http://wordpress.stackexchange.com/questions/22256/how-wp-ajax-nopriv-since-wordpress-3-1
+- http://www.natedivine.com/web-development/difference-wp_ajax-wp_ajax_nopriv/
+- *** http://codex.wordpress.org/AJAX_in_Plugins
+- https://codex.wordpress.org/Class_Reference/WP_Query
