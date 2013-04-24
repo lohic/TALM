@@ -85,7 +85,6 @@ if(function_exists("register_field_group"))
 				'default_value' => '',
 				'toolbar' => 'basic',
 				'media_upload' => 'no',
-				'the_content' => 'no',
 			),
 			array (
 				'key' => 'field_505b3c09b1042',
@@ -147,11 +146,14 @@ if(function_exists("register_field_group"))
 				'key' => 'field_505b409bd7ae9',
 				'label' => 'Informations concours d\'entrée',
 				'name' => 'info_concours',
-				'type' => 'page_link',
+				'type' => 'post_object',
 				'post_type' => array (
 					0 => 'page',
 				),
-				'allow_null' => 1,
+				'taxonomy' => array (
+					0 => 'all',
+				),
+				'allow_null' => 0,
 				'multiple' => 0,
 			),
 		),
@@ -160,8 +162,8 @@ if(function_exists("register_field_group"))
 				array (
 					'param' => 'options_page',
 					'operator' => '==',
-					'value' => 'Options',
-					'order_no' => '0',
+					'value' => 'acf-options',
+					'order_no' => 0,
 				),
 			),
 			'allorany' => 'all',

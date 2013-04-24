@@ -77,7 +77,7 @@
 	            </ul>
 				<ul>
 	            	<?php if(get_field('url_plateforme_etudiante', 'option')!='' ){?><li><a href="<?php the_field('url_plateforme_etudiante', 'option');?>">Plateforme étudiante</a></li><?php } ?>
-	                <?php if(get_field('info_concours', 'option')!='' ){?><li><a href="<?php the_field('info_concours', 'option');?>">Concours d'entrée</a></li><?php } ?>
+	                <?php if( $posts = get_field('info_concours', 'option') ){?><li><a href="<?php echo get_permalink($posts->ID); ?>"><?php echo get_the_title($posts->ID); ?></a></li><?php } ?>
 	            </ul>
 			</nav>
         </div>
