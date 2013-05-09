@@ -4,7 +4,7 @@ Donate link: http://formidablepro.com/donate
 Tags: admin, AJAX, captcha, contact, contact form, database, email, feedback, form, forms, javascript, jquery, page, plugin, poll, Post, spam, survey, template, widget, wpmu
 Requires at least: 3.0
 Tested up to: 3.5.1
-Stable tag: 1.06.10
+Stable tag: 1.06.11
 
 Quickly and easily build forms with a simple drag-and-drop interface and in-place editing. 
 
@@ -61,6 +61,23 @@ A. Try clearing your browser cache. As plugin modifications are made, frequent j
 [See more FAQs](http://formidablepro.com/formidable-faqs/ "Formidable Pro FAQs")
 
 == Changelog ==
+= 1.06.11 =
+* Added styling classes: two thirds, scroll box, columns (frm_first_two_thirds, frm_last_two_thirds, frm_scroll_box, frm_total, frm_two_col, frm_three_col, frm_four_col, )
+* Added container in default html for new check box and radio fields
+* PRO: Added a print link on the view entry page in the back-end
+* PRO: Added support for category stats in the frm-stats shortcode
+* PRO: Allow the edit link to dynamically get the id of the entry when used on a post page. Ex: [frm-entry-edit-link id=current label="Edit" page_id=92]
+* PRO: Allow non-admin users to see the user ID drop down in the back-end when they have permission to edit entries from the back-end
+* PRO: Added frm_data_sort hook for sorting data from entries options
+* PRO: Allow dropdown fields to be selected as the post title
+* PRO: Switched data from entries drop downs to use field key in the html id instead of the field id for consistency
+* PRO: When importing templates, use the path shown in the box whether it has been saved or not
+* PRO: Fixed admin-only fields to still save to created post
+* PRO: Fixed issue preventing required multiple file upload fields from being required
+* PRO: Updated input mask script to 1.3.1
+* PRO: Added hooks for entries in the admin: frm_row_actions, frm_edit_entry_publish_box, frm_show_entry_publish_box, frm_edit_entry_sidebar
+
+
 = 1.06.10 =
 * Allow the usage of any html attributes inside the [input] tag in the customizable HTML
 * PRO: Added "Chosen" autocomplete to dropdown fields
