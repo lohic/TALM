@@ -174,6 +174,8 @@ if( ! function_exists ( 'create_attachement_list') ) {
 		if($identifiant == ''){
 			$identifiant = get_the_ID();
 		}
+		
+		//echo get_the_ID();
 
 		if ( $documents = get_children ( array (
 			'post_parent'	=> $identifiant,
@@ -192,6 +194,7 @@ if( ! function_exists ( 'create_attachement_list') ) {
 			
 			foreach ( $documents as $document ){
 				echo '<li class="telechargement">' . wp_get_attachment_link ( $document->ID , '', false , false ) . '</li>'."\n";
+				//echo '<li class="telechargement">' . wp_get_attachment_url ( $document->ID  ) . '</li>'."\n";
 			}
 		
 			echo '</ul>'."\n";
