@@ -162,12 +162,12 @@ $(document).ready(function(){
 	$(".texte_avec_onglet aside > ul").find(':first div.content').css("display", "block");
 
 	
-	$(".lien_onglet").click(function(e){
+	$(".lien_onglet>a").click(function(e){
 		e.preventDefault();
 		$(".lien_onglet").removeClass("actif");
 		$(".lien_onglet div.content").css("display", "none");
-		$(this).addClass("actif");
-		var tableau_id=$(this).attr("id").split('_');
+		$(this).parent().addClass("actif");
+		var tableau_id=$(this).parent().attr("id").split('_');
 		var identifiant = "content_onglet_"+tableau_id[1];
 		document.getElementById(identifiant).style.display="block";
 		//$('.lien_onglet.actif .content').scrollTo('0',500, { axis:"x" });
