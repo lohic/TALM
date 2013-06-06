@@ -313,7 +313,7 @@ ul#liste-ecole{
 	font-size: 18px;
 position: absolute;
 top: 200px;
-left: 81px;
+left: 73px;
 z-index: 800;
 } 
 
@@ -326,7 +326,7 @@ ul#liste-ecole li{
 
 ul#liste-ecole li a{
 	color:#000;
-	font-size:11px;
+	font-size:14px;
 	padding-top:3px; 
 	display:block;
 	clear:both;
