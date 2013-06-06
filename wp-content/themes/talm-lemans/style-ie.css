@@ -1,0 +1,24 @@
+/*
+IE 6,7,8 HACK pour TALM
+*/
+
+@charset "UTF-8";
+/* CSS Document */
+
+#page{
+	background: url("img/fond-ie.gif") repeat-y scroll left top #FFFFFF;
+	-pie-background: url("img/fond-ie.gif") repeat-y scroll left top #FFFFFF;
+}
+
+
+#flux{
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#C2000000,endColorstr=#C2000000);
+}
+
+#fluxmenu {
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#C2000000,endColorstr=#C2000000);
+}
+
+#content .element p.type {
+	bottom:5px;
+}
