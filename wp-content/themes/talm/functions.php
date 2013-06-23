@@ -143,19 +143,27 @@ if( ! function_exists ( 'create_gallery') ) {
 			'post_status'	=> null,
 			'post_mime_type'=> 'image',
 			'orderby'		=> 'menu_order',
-			'order'			=> 'ASC',
+			'order'			=> 'ASC'
 		) ) ) {
+			foreach($images as $image){
+				$dont_show = get_field('masquer_liste_galerie', $image->ID);
+				if(!$dont_show){
+					$list_images[] = $image;
+				}
+			}
+		}
+		if($list_images){
 			echo '<div class="sliderkit photoslider-mini">'."\n";
 			
 			$media_count = 0;
 			
 			echo '<div class="sliderkit-panels">'."\n";
-			if(count($images)>1){
+			if(count($liste_images)>1){
 				echo '<div class="sliderkit-btn sliderkit-go-btn sliderkit-go-prev"><a href="#" title="Previous"><span>Previous</span></a></div>'."\n";
 				echo '<div class="sliderkit-btn sliderkit-go-btn sliderkit-go-next"><a href="#" title="Next"><span>Next</span></a></div>'."\n";
 			}
 
-			foreach ( $images as $image ){
+			foreach ( $list_images as $image ){
 				echo '<div class="sliderkit-panel" id="panel_'.$image->ID.'">'."\n";
 				echo wp_get_attachment_image  ( $image->ID , 'talm-large');
 				echo '<div class="credits" id="credit_'.$image->ID.'"><p>'.apply_filters( 'the_title' , $image->post_title ).'</p></div>'."\n";
@@ -186,13 +194,22 @@ if( ! function_exists ( 'create_attachement_list') ) {
 			'orderby'		=> 'menu_order',
 			'order'			=> 'ASC',
 		) ) ) {
+			foreach($documents as $document){
+				$dont_show = get_field('masquer_liste_galerie', $document->ID);
+				if(!$dont_show){
+					$list_documents[] = $document;
+				}
+			}
+		}
+
+		if($list_documents){
 			if($titre != '')
 			//echo '<h3>' . $titre .'</h3>';
 			echo '<ul>'."\n";
 			
 			$media_count = 0;
 			
-			foreach ( $documents as $document ){
+			foreach ( $list_documents as $document ){
 				echo '<li class="telechargement">' . wp_get_attachment_link ( $document->ID , '', false , false ) . '</li>'."\n";
 				//echo '<li class="telechargement">' . wp_get_attachment_url ( $document->ID  ) . '</li>'."\n";
 			}

@@ -311,10 +311,11 @@ nav#menu_droit .social a#RSS:hover{
 **********************/
 ul#liste-ecole{
 	font-size: 18px;
-position: absolute;
-top: 200px;
-left: 81px;
-z-index: 800;
+	position: absolute;
+	top: 200px;
+	left: 0px;
+	z-index: 800;
+	width:130px;
 } 
 
 ul#liste-ecole li{
@@ -326,7 +327,7 @@ ul#liste-ecole li{
 
 ul#liste-ecole li a{
 	color:#000;
-	font-size:11px;
+	font-size:14px;
 	padding-top:3px; 
 	display:block;
 	clear:both;
@@ -579,6 +580,8 @@ ul.xoxo.blogroll{
     display: table;
     margin-bottom: 30px;
     width: 100%;
+    /*pour la largeur des colonnes sous webkit*/
+    table-layout:fixed;
 }
 
 .image{
@@ -1399,6 +1402,53 @@ h1.titre_recherche{
 p.recherche{
 	font-size:12px;
 	font-style:italic;
+	margin-top: 15px;
+}
+
+p.recherche + #navigation{
+	margin-top: 12px;
+}
+
+#navigation .alignleft{
+	float:left;
+}
+
+#navigation .alignright{
+	float:right;
+}
+
+#navigation.recherche.basse{
+	margin-top: 50px;
+	margin-bottom: 0;
+}
+
+#navigation.recherche{
+	height: 15px;
+    margin-bottom: 30px;
+    padding-left: 0;
+}
+
+#content .full .column2 #navigation.recherche a{
+	color:#000;
+	font-style:normal;
+	text-decoration: none;
+	font-weight: bold;
+	font-size:12px;
+	font-family: "parisine-std",sans-serif;
+}
+
+#content .full .column2 #navigation.recherche a:hover{
+	text-decoration: underline;
+}
+
+.alignleft a{
+	background: url("img/icn_precedent.png") no-repeat scroll 0 2px transparent;
+	padding-left: 15px;
+}
+
+.alignright a{
+	background: url("img/icn_suivant.png") no-repeat scroll right 2px transparent;
+	padding-right: 15px;
 }
 
 #content article.recherche{
@@ -1530,14 +1580,14 @@ h3.actu_talm {
 	padding-left:20px;
 	font-size:10px;
 	display:table-cell;
-	vertical-align:middle;
+	vertical-align:top;
 	width:45px;
 	padding-top:7px;
 }
 
 #options ul{
 	display:table-cell;
-	vertical-align:middle;
+	vertical-align:top;
 }
 
 #options a{
@@ -1554,6 +1604,48 @@ h3.actu_talm {
 	display:inline;
 	padding-left:20px;
 
+}
+
+.pagination_isotope{
+	text-align: right;
+	margin-bottom: 10px;
+	margin-top: 10px;
+}
+
+.pagination_isotope.basse{
+	margin-top: -10px;
+}
+
+.pagination_isotope span, .pagination_isotope a{
+	font-family: "parisine-std",sans-serif;
+	font-size:13px;
+	font-weight:bold;
+	color:#000;
+	margin-right: 7px;
+}
+
+.pagination_isotope span.current{
+	color:#14BEC3;
+}
+
+.pagination_isotope span.page{
+	padding-right: 30px;
+}
+
+.pagination_isotope a.prev, .pagination_isotope a.next{
+	display:inline-block;
+	width:11px;
+	height:11px;
+	margin-bottom: -1px;
+}
+
+.pagination_isotope a.prev{
+	background: url("img/icn_precedent.png") no-repeat scroll 0 0 transparent;
+}
+
+.pagination_isotope a.next{
+	background: url("img/icn_suivant.png") no-repeat scroll 0 0 transparent;
+	margin-right: 0;
 }
 
 /* evenement calendrier*/
@@ -1965,6 +2057,7 @@ article.element, section{
 		-moz-transition:none;
 		-o-transition:none;
 		transition:none;
+		font-size: 11px;
 	}
 
 	ul#liste-ecole li a.lien_tours:hover, ul#liste-ecole li a.lien_angers:hover, ul#liste-ecole li a.lien_lemans:hover{
@@ -2422,6 +2515,10 @@ article.element, section{
 	#content article header p {
 	    font-size: 15px;
 	    line-height: 19px;
+	}
+
+	#navigation.recherche{
+		padding:0 15px;
 	}
 
 	#ariane, #telechargement, #voir_aussi {

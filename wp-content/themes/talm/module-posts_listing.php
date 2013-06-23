@@ -13,9 +13,12 @@
 			foreach($categories as $cat)
 			{  
 				$slugs[] = $cat->slug;
+				//on affiche que les catégories racine (on teste si la catégorie a un parent)
+				if($cat->parent==0){
 				?>
-				<li><a href="#" data-option-value=".<?php echo $cat->slug;?>"><?php echo $cat->name;?></a></li>
+					<li><a href="#" data-option-value=".<?php echo $cat->slug;?>"><?php echo $cat->name;?></a></li>
 				<?php
+				}
 			}
 
 			$liste_categories = implode(',',$slugs);
@@ -23,19 +26,50 @@
 				
 			</ul> 
 		</section>
+<?php
+		$paged = (get_query_var('page')) ? get_query_var('page') : 1;
+		$posts_per_page = get_sub_field('nbr_articles');
+		//$my_query_listing = new WP_Query( array('category_name'=>$liste_categories, 'meta_key'=>'date_de_debut', 'order' => 'ASC','orderby' => 'meta_value', 'posts_per_page'=>-1));
+		$my_query_listing = new WP_Query( array('post_status'=>array('publish','future'),'category_name'=>$liste_categories, 'order' => 'DESC','orderby' => 'date', 'posts_per_page'=>$posts_per_page, 'paged' => $paged));
+		if($my_query_listing->max_num_pages>1){
+?>
+			<section class="pagination_isotope smaller mb2">
+				<span class="page">Page</span>
+				<?php
+					$big = 99999999; // need an unlikely integer
+
+					echo paginate_links( array(
+						'base' => str_replace( $big, '%#%', esc_url( get_pagenum_link( $big ) ) ),
+						'format' => '?paged=%#%',
+						'current' => max( 1, get_query_var('page') ),
+						'total' => $my_query_listing->max_num_pages,
+						'prev_text'    => ' ',
+						'next_text'    => ' ',
+					) );
+				?>
+			</section>
+<?php		
+		}
+?>
 		<section id="container" class="super-list variable-sizes clearfix">
 <?php 
-			$posts_per_page = get_sub_field('nbr_articles');
-			
-			//$my_query_listing = new WP_Query( array('category_name'=>$liste_categories, 'meta_key'=>'date_de_debut', 'order' => 'ASC','orderby' => 'meta_value', 'posts_per_page'=>-1));
-			$my_query_listing = new WP_Query( array('post_status'=>array('publish','future'),'category_name'=>$liste_categories, 'order' => 'DESC','orderby' => 'date', 'posts_per_page'=>$posts_per_page));
 			while( $my_query_listing->have_posts() ) : $my_query_listing->the_post();
 					$la_categorie="";
 					$les_categories = get_the_category();
 					foreach($les_categories as $une_categorie){
 						if(in_array($une_categorie->slug, $slugs)) {
 							$la_categorie = $une_categorie->name;
-							$la_categorie_slug = $une_categorie->slug;
+							// Pour que les filtres fonctionnent. 
+							// Si catégorie mère on affiche directement son slug
+							// Sinon on récupère le slug de l'ancetre racine (peu importe le niveau de profondeur de la sous-catégorie)
+							if($une_categorie->parent==0){
+								$la_categorie_slug = $une_categorie->slug;
+							}
+							else{
+								$ancetres = get_ancestors( $une_categorie->term_id, 'category' );
+								$categorie_mere=get_term_by('id', $ancetres[count($ancetres)-1], 'category');
+								$la_categorie_slug = $categorie_mere->slug;
+							}
 						}
 					}
 					$le_tag = "";
@@ -92,6 +126,27 @@
 			wp_reset_postdata();
 ?>				
 		</section>
+<?php
+		if($my_query_listing->max_num_pages>1){
+?>
+			<section class="pagination_isotope basse smaller mb2">
+				<span class="page">Page</span>
+				<?php
+					$big = 99999999; // need an unlikely integer
+
+					echo paginate_links( array(
+						'base' => str_replace( $big, '%#%', esc_url( get_pagenum_link( $big ) ) ),
+						'format' => '?paged=%#%',
+						'current' => max( 1, get_query_var('page') ),
+						'total' => $my_query_listing->max_num_pages,
+						'prev_text'    => ' ',
+						'next_text'    => ' ',
+					) );
+				?>
+			</section>
+<?php		
+		}
+?>
 	</div>
 </div>
 

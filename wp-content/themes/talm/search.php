@@ -4,11 +4,12 @@
             <div class="column1">
                 <div>
                     <div id="ariane">
-                        <a title="Aller à Accueil." href="#">Accueil</a><a title="" href="#">Recherche</a>
+                        <?php 
+                            ariane();
+                        ?>
+                        <!--<a title="Aller à Accueil." href="#">Accueil</a><a title="" href="#">Recherche</a>-->
                     </div>
-                    <div id="navigation">
-					<?php posts_nav_link(' / ','page suivante','page pr&eacute;c&eacute;dente'); ?>
-                    </div>
+                    
                     <?php get_sidebar(); ?>
                 </div>
             </div>
@@ -19,11 +20,17 @@
                     $search_query = array();
                     foreach($query_args as $key => $string) {
                         $query_split = explode("=", $string);
-                        $lachaine.=$query_split[1]." ";
+                        if(!is_numeric($query_split[1])){
+                            $lachaine.=urldecode($query_split[1])." ";
+                        }
                     }
                 ?>
                 <h1 class="titre_recherche">Résultats de la recherche</h1> 
                 <p class="recherche">'<?php echo utf8_decode($lachaine);?>'</p>
+                <div id="navigation" class="recherche">
+                    <span class="alignleft"><?php previous_posts_link('Précédents') ?></span>
+                    <span class="alignright"><?php next_posts_link('Suivants') ?></span>
+                </div>
                 <?php if ( have_posts() ) :     
                     global $wp_query;
                     $total_results = $wp_query->found_posts;
@@ -43,7 +50,11 @@
                     <?php endwhile; ?>
                 <?php else : ?>
                     <p>Aucun résultat pour votre recherche</p>
-                <?php endif; ?>                
+                <?php endif; ?>   
+                <div id="navigation" class="basse recherche">
+                    <span class="alignleft"><?php previous_posts_link('Précédents') ?></span>
+                    <span class="alignright"><?php next_posts_link('Suivants') ?></span>
+                </div>             
             </div>
         </div>
         <div class="reset"></div>

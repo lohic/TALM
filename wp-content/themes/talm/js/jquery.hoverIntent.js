@@ -32,8 +32,8 @@
 		// default configuration options
 		var cfg = {
 			sensitivity: 7,
-			interval: 100,
-			timeout: 0
+			interval: 300,
+			timeout: 300
 		};
 		// override configuration options with user supplied object
 		cfg = $.extend(cfg, g ? { over: f, out: g } : f );

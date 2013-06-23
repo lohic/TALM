@@ -81,10 +81,8 @@ $(document).ready(function(){
 			$(identifiant+':not(.inverted)').animate({
 				top: 130
 			},300,function(){
-				
 			});
 		});
-		
 		
 		$(identifiant+'.inverted').animate({
 			top: 0
@@ -95,23 +93,23 @@ $(document).ready(function(){
 	}
 
 	function makeShort(){ 
-		//$(this).animate({"height":50},200);
+		//$(this).animate({"height":50},300);
 		var tableau_id = $(this).attr("id").split('_');
 		var identifiant = "#footer_"+tableau_id[1];
 		
+		//bloc à débuguer pour vignettes TALM
 		$(identifiant+':not(.inverted)').animate({
 			top: 0
 		},300,function(){
 			$(identifiant+':not(.inverted) .titre').animate({opacity:100},300, function(){
-				
 			});
 		});
+		///fin du bloc à débuguer
 		
 		$(identifiant+' .titre').animate({opacity:0},300, function(){
 			$(identifiant+'.inverted').animate({
 				top: 130
 			},300,function(){
-				
 			});
 		});
 	}
@@ -140,11 +138,11 @@ $(document).ready(function(){
 
 	
 	/* SCRIPT POUR LA GALLERIE */
-	$('.next').click(function(){
+	$('nav .next').click(function(){
 		return false;
 	});
 	
-	$('.prev').click(function(){
+	$('nav .prev').click(function(){
 		return false;
 	});
 	
