@@ -4,7 +4,7 @@ if(get_sub_field("titre_du_bloc")){
 	$compteur=0;
 	$titre = get_sub_field("titre_du_bloc");
 
-	echo 	'<div class="full">
+	echo 	'<div class="full sans">
 				<article class="texte_avec_onglet">
 	            	<header>
 	                	<h2>'.$titre.'</h2>

@@ -1,4 +1,4 @@
-<div class="full">
+<div class="full sans">
 	<div id="conteneur_isotope">
 		<section id="options"> 
 			<p>Trier par</p>

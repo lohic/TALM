@@ -1,4 +1,4 @@
-<div class="full">
+<div class="full sans">
     <article class="slider">
         <div class="sliderkit contentslider-std">
 			<div class="sliderkit-nav">

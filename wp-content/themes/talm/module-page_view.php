@@ -13,7 +13,7 @@ if(get_sub_field("page_liee")){
 		$titre = get_the_title();		
 		if(!$resume){
 ?>
-			<div class="full">
+			<div class="full sans">
 					<article class="texte_seul">
 						<header>
 							<h2><?php echo $titre;?></h2>
@@ -45,7 +45,7 @@ if(get_sub_field("page_liee")){
 		else{
 			if($position=="droite"){
 ?>
-				<div class="full">
+				<div class="full sans">
 		            <article class="texte_image">
 		                <div class="conteneur_ombre">
 		                    <div class="contenu">
@@ -70,7 +70,7 @@ if(get_sub_field("page_liee")){
 			}	
 			else{
 ?>
-				<div class="full">
+				<div class="full sans">
 		            <article class="image_texte">
 		            	<div class="conteneur_image">
 		            		<a href="<?php echo get_permalink();?>"><?php echo get_the_post_thumbnail($p->ID, 'talm-small');?></a>

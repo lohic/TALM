@@ -584,6 +584,10 @@ ul.xoxo.blogroll{
     table-layout:fixed;
 }
 
+#page #content .full.sans {
+    table-layout:auto;
+}
+
 .image{
 	width:100%;
 }
