@@ -339,7 +339,7 @@ ul#liste-ecole li a{
 }
 
 ul#liste-ecole li a.lien_tours:hover{
-	color:#FF6900;
+	color:#ff8700;
 }
 
 ul#liste-ecole li a.lien_angers:hover{
@@ -347,7 +347,7 @@ ul#liste-ecole li a.lien_angers:hover{
 }
 
 ul#liste-ecole li a.lien_lemans:hover{
-	color:#780037;
+	color:#ad005b;
 }
 
 
@@ -1554,11 +1554,11 @@ h3.actu_angers {
 }
 
 h3.actu_tours {
-    background: #ff6900;
+    background: #ff8700;
 }
 
 h3.actu_lemans {
-    background: #9c0049;
+    background: #ad005b;
 }
 
 h3.actu_talm {
