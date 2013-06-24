@@ -186,7 +186,7 @@ h3.actu_angers {
 }
 
 h3.actu_tours {
-    background: #ff6900;
+    background: #ff8700;
 }
 
 h3.actu_lemans {
@@ -245,6 +245,13 @@ h3.actu_talm {
 #fluxmenu a#flux_vimeo.actif, #fluxmenu a#flux_vimeo:hover {
     background: url("img/icn_vimeo_widget.png") no-repeat scroll 0 -11px transparent !important;
 }
+
+
+.pagination_isotope span.current{
+	color:#dc0028;
+}
+
+
 
 /*
  *  CONTENT SLIDERS
