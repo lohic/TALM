@@ -27,10 +27,17 @@
 			</ul> 
 		</section>
 <?php
-		$paged = (get_query_var('page')) ? get_query_var('page') : 1;
+		
 		$posts_per_page = get_sub_field('nbr_articles');
 		//$my_query_listing = new WP_Query( array('category_name'=>$liste_categories, 'meta_key'=>'date_de_debut', 'order' => 'ASC','orderby' => 'meta_value', 'posts_per_page'=>-1));
+		
+		//$paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
+		if ( get_query_var('paged') ) { $paged = get_query_var('paged'); }
+		elseif ( get_query_var('page') ) { $paged = get_query_var('page'); }
+		else { $paged = 1; }
+		
 		$my_query_listing = new WP_Query( array('post_status'=>array('publish','future'),'category_name'=>$liste_categories, 'order' => 'DESC','orderby' => 'date', 'posts_per_page'=>$posts_per_page, 'paged' => $paged));
+		
 		if($my_query_listing->max_num_pages>1){
 ?>
 			<section class="pagination_isotope smaller mb2">
@@ -40,8 +47,8 @@
 
 					echo paginate_links( array(
 						'base' => str_replace( $big, '%#%', esc_url( get_pagenum_link( $big ) ) ),
-						'format' => '?paged=%#%',
-						'current' => max( 1, get_query_var('page') ),
+						'format' => '?page=%#%',
+						'current' => max( 1, $paged ),
 						'total' => $my_query_listing->max_num_pages,
 						'prev_text'    => ' ',
 						'next_text'    => ' ',
@@ -137,7 +144,7 @@
 					echo paginate_links( array(
 						'base' => str_replace( $big, '%#%', esc_url( get_pagenum_link( $big ) ) ),
 						'format' => '?paged=%#%',
-						'current' => max( 1, get_query_var('page') ),
+						'current' => max( 1, $paged ),
 						'total' => $my_query_listing->max_num_pages,
 						'prev_text'    => ' ',
 						'next_text'    => ' ',

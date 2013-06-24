@@ -246,6 +246,11 @@ h3.actu_talm {
     background: url("img/icn_vimeo_widget.png") no-repeat scroll 0 -11px transparent !important;
 }
 
+.pagination_isotope span.current{
+	color:ff8700;
+}
+
+
 /*
  *  CONTENT SLIDERS
  *  ------------------------------------------------
