@@ -1399,13 +1399,13 @@ h1.titre_recherche{
 	line-height:38px;
 }
 
-p.recherche{
+p.search{
 	font-size:12px;
 	font-style:italic;
 	margin-top: 15px;
 }
 
-p.recherche + #navigation{
+p.search + #navigation{
 	margin-top: 12px;
 }
 
@@ -1417,18 +1417,18 @@ p.recherche + #navigation{
 	float:right;
 }
 
-#navigation.recherche.basse{
+#navigation.search.basse{
 	margin-top: 50px;
 	margin-bottom: 0;
 }
 
-#navigation.recherche{
+#navigation.search{
 	height: 15px;
     margin-bottom: 30px;
     padding-left: 0;
 }
 
-#content .full .column2 #navigation.recherche a{
+#content .full .column2 #navigation.search a{
 	color:#000;
 	font-style:normal;
 	text-decoration: none;
@@ -1437,7 +1437,7 @@ p.recherche + #navigation{
 	font-family: "parisine-std",sans-serif;
 }
 
-#content .full .column2 #navigation.recherche a:hover{
+#content .full .column2 #navigation.search a:hover{
 	text-decoration: underline;
 }
 
@@ -1451,15 +1451,15 @@ p.recherche + #navigation{
 	padding-right: 15px;
 }
 
-#content article.recherche{
+#content article.search{
 	margin-top:30px;
 }
 
-#content article.recherche header{
+#content article.search header{
 	margin:0px;
 }
 
-#content .full .column2 .recherche h2 a{
+#content .full .column2 .search h2 a{
 	font-size:18px;
 	text-decoration:none;
 	font-family: "parisine-std",sans-serif;
@@ -1469,12 +1469,12 @@ p.recherche + #navigation{
     line-height:20px;
 }
 
-#content .recherche a.suite{
+#content .search a.suite{
 	font-size:13px;
 	font-style:italic;
 }
 
-#page #content .recherche p{
+#page #content .search p{
 	font-size:13px;
 	margin-bottom:0px;
 }
@@ -2386,7 +2386,7 @@ article.element, section{
 	    display: none;
 	}
 
-	h1.titre_recherche, p.recherche{
+	h1.titre_recherche, p.search{
 		padding:0px 15px;
 	}
 
@@ -2517,7 +2517,7 @@ article.element, section{
 	    line-height: 19px;
 	}
 
-	#navigation.recherche{
+	#navigation.search{
 		padding:0 15px;
 	}
 

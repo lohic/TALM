@@ -26,8 +26,8 @@
                     }
                 ?>
                 <h1 class="titre_recherche">Résultats de la recherche</h1> 
-                <p class="recherche">'<?php echo utf8_decode($lachaine);?>'</p>
-                <div id="navigation" class="recherche">
+                <p class="search">'<?php echo utf8_decode($lachaine);?>'</p>
+                <div id="navigation" class="search">
                     <span class="alignleft"><?php previous_posts_link('Précédents') ?></span>
                     <span class="alignright"><?php next_posts_link('Suivants') ?></span>
                 </div>
@@ -38,7 +38,7 @@
                 ?>
                           
                 <?php while ( have_posts() ) : the_post() ?>
-                        <article class="recherche">
+                        <article class="search">
                             <header>
                                 <h2><a href="<?php the_permalink(); ?>"><?php the_title();?></a></h2>
                             </header>
