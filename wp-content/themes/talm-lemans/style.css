@@ -20,7 +20,7 @@ body .background{
 }
 
 a{
-	color:#780037;
+	color:#ad005b;
 }
 
 /********************* 
@@ -50,7 +50,7 @@ a{
 **********************/
 
 #header .right{
-	border-color:#780037;
+	border-color:#ad005b;
 }
 
 nav#menu_droit .social a#facebook{
@@ -112,7 +112,7 @@ nav#menu_droit .social a#RSS{
 **********************/       
 
 #content .full .column2 a, #content .full .column2 .children a, #content article a, #content article div.content a.suite, #content article content a.suite {
-	color:#780037;
+	color:#ad005b;
 }
 
 #content .full .column2 .page-list a{
@@ -157,7 +157,7 @@ nav#menu_droit .social a#RSS{
 }
 
 #content article.texte_avec_onglet ul li.actif div.content p a{ 
-	color:#780037;
+	color:#ad005b;
 }
 
 #content article.image_texte .conteneur_ombre{
@@ -178,11 +178,11 @@ article.texte_image aside.lire_plus a, article.image_texte aside.lire_plus a{
 }
 
 #content .slider a.suite{
-	color: #780037;
+	color: #ad005b;
 }
 
 h3.actu_angers {
-    background: #780037;
+    background: #ad005b;
 }
 
 h3.actu_tours {
@@ -190,11 +190,11 @@ h3.actu_tours {
 }
 
 h3.actu_lemans {
-    background: #780037;
+    background: #ad005b;
 }
 
 h3.actu_talm {
-    background: #780037;
+    background: #ad005b;
 }
 
 /* evenement calendrier*/
