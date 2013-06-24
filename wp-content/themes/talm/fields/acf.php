@@ -403,4 +403,39 @@ if(function_exists("register_field_group"))
 		),
 		'menu_order' => 12,
 	));
+
+	register_field_group(array (
+		'id' => 'acf_attachements',
+		'title' => 'Attachements',
+		'fields' => array (
+			array (
+				'key' => 'field_51c574e0a6165',
+				'label' => 'Masquer dans la liste/galerie',
+				'name' => 'masquer_liste_galerie',
+				'type' => 'true_false',
+				'instructions' => 'Masquer dans la galerie d\'image ou dans la liste de liens',
+				'required' => 1,
+				'message' => 'Galerie/liste O/N',
+				'default_value' => 0,
+			),
+		),
+		'location' => array (
+			'rules' => array (
+				array (
+					'param' => 'ef_media',
+					'operator' => '==',
+					'value' => 'all',
+					'order_no' => 0,
+				),
+			),
+			'allorany' => 'all',
+		),
+		'options' => array (
+			'position' => 'normal',
+			'layout' => 'no_box',
+			'hide_on_screen' => array (
+			),
+		),
+		'menu_order' => 0,
+	));
 }

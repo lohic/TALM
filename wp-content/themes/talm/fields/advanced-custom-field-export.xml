@@ -16,7 +16,7 @@
 <!-- 7. WordPress will then import each of the posts, pages, comments, categories, etc. -->
 <!--    contained in this file into your site. -->
 
-<!-- generator="WordPress/3.5.1" created="2013-04-24 11:29" -->
+<!-- generator="WordPress/3.5.1" created="2013-06-24 17:47" -->
 <rss version="2.0"
 	xmlns:excerpt="http://wordpress.org/export/1.1/excerpt/"
 	xmlns:content="http://purl.org/rss/1.0/modules/content/"
@@ -26,20 +26,24 @@
 >
 
 <channel>
-	<title>TALM angers</title>
-	<link>http://talm.dev/angers</link>
-	<description>Un site utilisant Réseau Talm</description>
-	<pubDate>Wed, 24 Apr 2013 11:29:22 +0000</pubDate>
+	<title>TALM</title>
+	<link>http://talm.dev</link>
+	<description>Un site utilisant WordPress</description>
+	<pubDate>Mon, 24 Jun 2013 17:47:06 +0000</pubDate>
 	<language></language>
 	<wp:wxr_version>1.1</wp:wxr_version>
 	<wp:base_site_url>http://talm.dev/</wp:base_site_url>
-	<wp:base_blog_url>http://talm.dev/angers</wp:base_blog_url>
-	<wp:author><wp:author_id>1</wp:author_id><wp:author_login>adminTALM</wp:author_login><wp:author_email>contact@formidable-studio.net</wp:author_email><wp:author_display_name><![CDATA[adminTALM]]></wp:author_display_name><wp:author_first_name><![CDATA[]]></wp:author_first_name><wp:author_last_name><![CDATA[]]></wp:author_last_name></wp:author>
+	<wp:base_blog_url>http://talm.dev</wp:base_blog_url>
+	<wp:author><wp:author_id>1</wp:author_id><wp:author_login>admintalm</wp:author_login><wp:author_email>fabien.raymondaud@gmail.com</wp:author_email><wp:author_display_name><![CDATA[admintalm]]></wp:author_display_name><wp:author_first_name><![CDATA[]]></wp:author_first_name><wp:author_last_name><![CDATA[]]></wp:author_last_name></wp:author>
+	<wp:author><wp:author_id>2</wp:author_id><wp:author_login>adminsyclo</wp:author_login><wp:author_email>contact@syclo.fr</wp:author_email><wp:author_display_name><![CDATA[Loïc Horellou]]></wp:author_display_name><wp:author_first_name><![CDATA[Loïc]]></wp:author_first_name><wp:author_last_name><![CDATA[Horellou]]></wp:author_last_name></wp:author>
+	<wp:author><wp:author_id>3</wp:author_id><wp:author_login>esba le mans</wp:author_login><wp:author_email>esba-le-mans@www.esba-lemans.fr</wp:author_email><wp:author_display_name><![CDATA[ESBA Le Mans]]></wp:author_display_name><wp:author_first_name><![CDATA[ESBA]]></wp:author_first_name><wp:author_last_name><![CDATA[Le Mans]]></wp:author_last_name></wp:author>
+	<wp:author><wp:author_id>4</wp:author_id><wp:author_login>esbacom</wp:author_login><wp:author_email>nicolas.perez-courtade@ville.angers.fr</wp:author_email><wp:author_display_name><![CDATA[esbacom]]></wp:author_display_name><wp:author_first_name><![CDATA[]]></wp:author_first_name><wp:author_last_name><![CDATA[]]></wp:author_last_name></wp:author>
+	<wp:author><wp:author_id>5</wp:author_id><wp:author_login>sandra</wp:author_login><wp:author_email>sandra@www.esba-lemans.fr</wp:author_email><wp:author_display_name><![CDATA[sandra]]></wp:author_display_name><wp:author_first_name><![CDATA[sandra]]></wp:author_first_name><wp:author_last_name><![CDATA[]]></wp:author_last_name></wp:author>
 	<item>
 		<title>Page simple</title>
 		<link></link>
 		<pubDate></pubDate>
-		<dc:creator>adminTALM</dc:creator>
+		<dc:creator>admintalm</dc:creator>
 		<guid isPermaLink="false"></guid>
 		<wp:post_id>108</wp:post_id>
 		<wp:post_date>2012-05-11 15:39:24</wp:post_date>
@@ -66,7 +70,7 @@
 		</wp:postmeta>
 		<wp:postmeta>
 			<wp:meta_key>rule</wp:meta_key>
-			<wp:meta_value><![CDATA[a:4:{s:5:"param";s:9:"post_type";s:8:"operator";s:2:"!=";s:5:"value";s:11:"ai1ec_event";s:8:"order_no";s:1:"2";}]]></wp:meta_value>
+			<wp:meta_value><![CDATA[a:4:{s:5:"param";s:9:"post_type";s:8:"operator";s:2:"!=";s:5:"value";s:11:"ai1ec_event";s:8:"order_no";i:2;}]]></wp:meta_value>
 		</wp:postmeta>
 		<wp:postmeta>
 			<wp:meta_key>position</wp:meta_key>
@@ -82,22 +86,22 @@
 		</wp:postmeta>
 		<wp:postmeta>
 			<wp:meta_key>field_50571d5155f9a</wp:meta_key>
-			<wp:meta_value><![CDATA[a:10:{s:3:"key";s:19:"field_50571d5155f9a";s:5:"label";s:17:"Pages en relation";s:4:"name";s:17:"pages_en_relation";s:4:"type";s:12:"relationship";s:12:"instructions";s:38:"Liste des pages liées à ce document.";s:8:"required";s:1:"0";s:9:"post_type";a:1:{i:0;s:4:"page";}s:8:"taxonomy";a:1:{i:0;s:3:"all";}s:3:"max";s:0:"";s:8:"order_no";s:1:"0";}]]></wp:meta_value>
+			<wp:meta_value><![CDATA[a:11:{s:3:"key";s:19:"field_50571d5155f9a";s:5:"label";s:17:"Pages en relation";s:4:"name";s:17:"pages_en_relation";s:4:"type";s:12:"relationship";s:12:"instructions";s:38:"Liste des pages liées à ce document.";s:8:"required";s:1:"0";s:9:"post_type";a:1:{i:0;s:4:"page";}s:8:"taxonomy";a:1:{i:0;s:3:"all";}s:3:"max";s:0:"";s:17:"conditional_logic";a:3:{s:6:"status";s:1:"0";s:5:"rules";a:1:{i:0;a:3:{s:5:"field";s:0:"";s:8:"operator";s:2:"==";s:5:"value";s:0:"";}}s:8:"allorany";s:3:"all";}s:8:"order_no";i:0;}]]></wp:meta_value>
 		</wp:postmeta>
 		<wp:postmeta>
 			<wp:meta_key>rule</wp:meta_key>
-			<wp:meta_value><![CDATA[a:4:{s:5:"param";s:9:"post_type";s:8:"operator";s:2:"!=";s:5:"value";s:4:"post";s:8:"order_no";s:1:"1";}]]></wp:meta_value>
+			<wp:meta_value><![CDATA[a:4:{s:5:"param";s:9:"post_type";s:8:"operator";s:2:"!=";s:5:"value";s:4:"post";s:8:"order_no";i:1;}]]></wp:meta_value>
 		</wp:postmeta>
 		<wp:postmeta>
 			<wp:meta_key>rule</wp:meta_key>
-			<wp:meta_value><![CDATA[a:4:{s:5:"param";s:13:"page_template";s:8:"operator";s:2:"==";s:5:"value";s:7:"default";s:8:"order_no";s:1:"0";}]]></wp:meta_value>
+			<wp:meta_value><![CDATA[a:4:{s:5:"param";s:13:"page_template";s:8:"operator";s:2:"==";s:5:"value";s:7:"default";s:8:"order_no";i:0;}]]></wp:meta_value>
 		</wp:postmeta>
 	</item>
 	<item>
 		<title>Page modulable</title>
 		<link></link>
 		<pubDate></pubDate>
-		<dc:creator>adminTALM</dc:creator>
+		<dc:creator>admintalm</dc:creator>
 		<guid isPermaLink="false"></guid>
 		<wp:post_id>516</wp:post_id>
 		<wp:post_date>2012-05-08 17:45:42</wp:post_date>
@@ -147,7 +151,7 @@
 		<title>options TALM</title>
 		<link></link>
 		<pubDate></pubDate>
-		<dc:creator>adminTALM</dc:creator>
+		<dc:creator>admintalm</dc:creator>
 		<guid isPermaLink="false"></guid>
 		<wp:post_id>12930</wp:post_id>
 		<wp:post_date>2012-09-20 17:53:45</wp:post_date>
@@ -225,7 +229,7 @@
 		<title>Chapeau article</title>
 		<link></link>
 		<pubDate></pubDate>
-		<dc:creator>adminTALM</dc:creator>
+		<dc:creator>admintalm</dc:creator>
 		<guid isPermaLink="false"></guid>
 		<wp:post_id>13859</wp:post_id>
 		<wp:post_date>2012-09-24 14:15:43</wp:post_date>
@@ -265,6 +269,52 @@
 		<wp:postmeta>
 			<wp:meta_key>hide_on_screen</wp:meta_key>
 			<wp:meta_value><![CDATA[]]></wp:meta_value>
+		</wp:postmeta>
+	</item>
+	<item>
+		<title>Attachements</title>
+		<link></link>
+		<pubDate></pubDate>
+		<dc:creator>admintalm</dc:creator>
+		<guid isPermaLink="false"></guid>
+		<wp:post_id>20154</wp:post_id>
+		<wp:post_date>2013-06-22 10:58:24</wp:post_date>
+		<wp:post_date_gmt>2013-06-22 09:58:24</wp:post_date_gmt>
+		<wp:comment_status>closed</wp:comment_status>
+		<wp:ping_status>closed</wp:ping_status>
+		<wp:post_name>acf_attachements</wp:post_name>
+		<wp:status>publish</wp:status>
+		<wp:post_parent>0</wp:post_parent>
+		<wp:menu_order>0</wp:menu_order>
+		<wp:post_type>acf</wp:post_type>
+		<wp:post_password></wp:post_password>
+		<wp:postmeta>
+			<wp:meta_key>_edit_last</wp:meta_key>
+			<wp:meta_value><![CDATA[1]]></wp:meta_value>
+		</wp:postmeta>
+		<wp:postmeta>
+			<wp:meta_key>field_51c574e0a6165</wp:meta_key>
+			<wp:meta_value><![CDATA[a:10:{s:3:"key";s:19:"field_51c574e0a6165";s:5:"label";s:29:"Masquer dans la liste/galerie";s:4:"name";s:21:"masquer_liste_galerie";s:4:"type";s:10:"true_false";s:12:"instructions";s:57:"Masquer dans la galerie d'image ou dans la liste de liens";s:8:"required";s:1:"1";s:7:"message";s:17:"Galerie/liste O/N";s:13:"default_value";s:1:"0";s:17:"conditional_logic";a:3:{s:6:"status";s:1:"0";s:5:"rules";a:1:{i:0;a:3:{s:5:"field";s:4:"null";s:8:"operator";s:2:"==";s:5:"value";s:0:"";}}s:8:"allorany";s:3:"all";}s:8:"order_no";i:0;}]]></wp:meta_value>
+		</wp:postmeta>
+		<wp:postmeta>
+			<wp:meta_key>allorany</wp:meta_key>
+			<wp:meta_value><![CDATA[all]]></wp:meta_value>
+		</wp:postmeta>
+		<wp:postmeta>
+			<wp:meta_key>position</wp:meta_key>
+			<wp:meta_value><![CDATA[normal]]></wp:meta_value>
+		</wp:postmeta>
+		<wp:postmeta>
+			<wp:meta_key>layout</wp:meta_key>
+			<wp:meta_value><![CDATA[no_box]]></wp:meta_value>
+		</wp:postmeta>
+		<wp:postmeta>
+			<wp:meta_key>hide_on_screen</wp:meta_key>
+			<wp:meta_value><![CDATA[]]></wp:meta_value>
+		</wp:postmeta>
+		<wp:postmeta>
+			<wp:meta_key>rule</wp:meta_key>
+			<wp:meta_value><![CDATA[a:4:{s:5:"param";s:8:"ef_media";s:8:"operator";s:2:"==";s:5:"value";s:3:"all";s:8:"order_no";i:0;}]]></wp:meta_value>
 		</wp:postmeta>
 	</item>
 </channel>
