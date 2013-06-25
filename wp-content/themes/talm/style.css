@@ -580,8 +580,8 @@ ul.xoxo.blogroll{
     display: table;
     margin-bottom: 30px;
     width: 100%;
-    /*pour la largeur des colonnes sous webkit
-    table-layout:fixed;*/
+    /*pour la largeur des colonnes sous webkit*/
+    table-layout:fixed;
 }
 
 /*#page #content .full.sans {
@@ -2197,6 +2197,10 @@ article.element, section{
 
 	#content .full {
     	margin-left: 0%;
+	}
+
+	#page #content .full{
+    	table-layout:auto;
 	}
 
 	#content .full .column1 {
