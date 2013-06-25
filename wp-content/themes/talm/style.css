@@ -580,13 +580,13 @@ ul.xoxo.blogroll{
     display: table;
     margin-bottom: 30px;
     width: 100%;
-    /*pour la largeur des colonnes sous webkit*/
-    table-layout:fixed;
+    /*pour la largeur des colonnes sous webkit
+    table-layout:fixed;*/
 }
 
-#page #content .full.sans {
+/*#page #content .full.sans {
     table-layout:auto;
-}
+}*/
 
 .image{
 	width:100%;
