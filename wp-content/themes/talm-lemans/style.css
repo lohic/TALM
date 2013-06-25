@@ -397,9 +397,9 @@ h3.actu_talm {
 	    padding-top: 0px;
 	}
 
-	nav#menu_principal li {
+	/*nav#menu_principal li {
 	    margin-right:0px;
-	}
+	}*/
 
 	nav#menu_principal ul#menu_1.colonne, nav#menu_principal ul#menu_2.colonne {
 	    width: 320px;
