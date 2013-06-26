@@ -2366,6 +2366,10 @@ article.element, section{
 		min-height:auto;
 	}
 
+	#page #content .full{
+    	table-layout:fixed;
+	}
+
 	#page #menu #adresse{
 		display:none;
 	}
