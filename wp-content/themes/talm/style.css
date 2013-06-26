@@ -246,12 +246,13 @@ nav#menu_droit ul {
 nav#menu_droit .social{
 	text-align:right;
 	float:right;
-	width:110px;
 	margin-bottom:13px;
 }
 
 nav#menu_droit .social li{
 	display:table-cell;
+	/*pour l'alignement quand tous les réseaux ne sont pas présents*/
+	float:left;
 }
 
 nav#menu_droit .social a{
@@ -2361,6 +2362,10 @@ article.element, section{
 }
 
 @media screen and (max-width: 550px){
+	#content article .conteneur_ombre > div.contenu{
+		min-height:auto;
+	}
+
 	#page #menu #adresse{
 		display:none;
 	}

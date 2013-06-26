@@ -94,7 +94,7 @@ nav#menu_droit .social a#RSS{
 
 
 #page #menu ul li a, #page #menu ul#adresse li a, #page #menu, #page #menu ul#adresse li{
-	color:#fae5e9; 
+	color:#f7eeec; 
 }
 
 #page #menu ul li a:hover{
@@ -102,7 +102,7 @@ nav#menu_droit .social a#RSS{
 }
 
 #page #menu ul li.filet{
-	border-top:solid 1px #fae5e9;
+	border-top:solid 1px #f7eeec;
 }
 
 /*********************
@@ -370,6 +370,14 @@ h3.actu_talm {
 
 	#page {
     	background: url("img/fond2_tablette.gif") no-repeat scroll left top, url("img/fond_tablette.gif") repeat-y scroll left top #FFFFFF;
+	}
+
+	#page #menu ul li a{
+		color:#ccc;
+	}
+
+	#page #menu ul li a:hover{
+		color:#666;
 	}
 }
 
