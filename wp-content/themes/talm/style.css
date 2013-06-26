@@ -241,6 +241,7 @@ nav#menu_droit{
 } 
 
 nav#menu_droit ul {
+	clear: both;
 }
 
 nav#menu_droit .social{
@@ -809,9 +810,11 @@ ul.xoxo.blogroll{
     font-weight: normal;
     text-decoration: underline;
 }
-#content article div.content a.suite, #content article content a.suite:hover {
+
+#content article div.content a.suite:hover, #content article content a.suite:hover {
 	text-decoration:none;
 }
+
 #content .full .filet{
 	margin-top:1px;
 	margin-left:-42px;
@@ -2336,8 +2339,12 @@ article.element, section{
 	    line-height:20px;
 	}
 
-	#page #menu ul#adresse li a {
+	#page #menu ul#adresse li a{
 	    color: #ccc;
+	}
+
+	#page #menu ul#adresse li a:hover{
+		color:#666;
 	}
 
 	#page #menu ul li {

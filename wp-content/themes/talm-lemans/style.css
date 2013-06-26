@@ -372,11 +372,11 @@ h3.actu_talm {
     	background: url("img/fond2_tablette.gif") no-repeat scroll left top, url("img/fond_tablette.gif") repeat-y scroll left top #FFFFFF;
 	}
 
-	#page #menu ul li a{
+	#page #menu ul li a, #page #menu ul#adresse li a{
 		color:#ccc;
 	}
 
-	#page #menu ul li a:hover{
+	#page #menu ul li a:hover, #page #menu ul#adresse li a:hover{
 		color:#666;
 	}
 }
@@ -429,16 +429,7 @@ h3.actu_talm {
 	    background: url("img/lisere_onglet.png") repeat-x scroll 0 bottom transparent;
 	}
 
-	.slider .contentslider-std .sliderkit-panel div.textes {
-	    left: 20px;
-	    padding-bottom: 10px;
-	}
-
 	#content .slider .contentslider-std p.type{
 		background:url("img/icn_lien_blanc.png") no-repeat scroll 0 0 transparent;
-	}
-
-	#content .slider .contentslider-std h3{
-		margin:0px 0px 5px;
 	}
 }

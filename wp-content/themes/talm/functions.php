@@ -158,7 +158,7 @@ if( ! function_exists ( 'create_gallery') ) {
 			$media_count = 0;
 			
 			echo '<div class="sliderkit-panels">'."\n";
-			if(count($liste_images)>1){
+			if(count($list_images)>1){
 				echo '<div class="sliderkit-btn sliderkit-go-btn sliderkit-go-prev"><a href="#" title="Previous"><span>Previous</span></a></div>'."\n";
 				echo '<div class="sliderkit-btn sliderkit-go-btn sliderkit-go-next"><a href="#" title="Next"><span>Next</span></a></div>'."\n";
 			}
