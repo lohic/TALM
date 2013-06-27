@@ -403,18 +403,6 @@ h3.actu_talm {
 	    padding-top: 0px;
 	}
 
-	/*nav#menu_principal li {
-	    margin-right:0px;
-	}*/
-
-	nav#menu_principal ul#menu_1.colonne, nav#menu_principal ul#menu_2.colonne {
-	    width: 320px;
-	}
-
-	nav#menu_principal ul.colonne#menu_1 li:last-child, nav#menu_principal ul.colonne#menu_2 li:last-child{
-		margin-right:0px;
-	}
-
 	.image img {
 	    background: url("img/ombre_mobile.png") repeat-x scroll center bottom transparent;
 	}
