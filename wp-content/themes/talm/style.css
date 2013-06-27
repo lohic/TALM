@@ -2369,6 +2369,10 @@ article.element, section{
 }
 
 @media screen and (max-width: 550px){
+	.pagination_isotope{
+		padding-right: 15px;
+	}
+
 	#content article .conteneur_ombre > div.contenu{
 		min-height:auto;
 	}
