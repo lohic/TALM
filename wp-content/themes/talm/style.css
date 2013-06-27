@@ -2675,6 +2675,8 @@ article.element, section{
 	#content article .conteneur_ombre > div.contenu {
 	    background: none;
 	    padding-left: 0px;
+	    min-height:0;
+	    padding-bottom:0px;
 	}
 
 	#content article.texte_image_reduit .conteneur_ombre > div {
