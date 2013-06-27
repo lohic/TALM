@@ -2486,6 +2486,7 @@ article.element, section{
 	    position: relative;
     	text-align: right;
     	top: 0;
+    	margin-top: 10px;
     }
 
 	#logo {
