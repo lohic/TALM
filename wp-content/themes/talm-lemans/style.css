@@ -398,11 +398,12 @@ h3.actu_talm {
 	}
 
 	#page {
-    	background:url("img/fond_mobile.gif") no-repeat center top;
+    	background:url("img/fond_mobile-top.gif") no-repeat center top;
 	}
 
 	nav#menu_principal {
 	    padding-top: 0px;
+	    background:url("img/fond_mobile-bottom.gif") no-repeat center bottom;
 	}
 
 	.image img {
