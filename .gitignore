@@ -40,3 +40,5 @@ wp-content/themes/*
 !wp-content/themes/talm-plateforme/
 
 wp-content/plugins/hello.php
+
+.DS_Store
