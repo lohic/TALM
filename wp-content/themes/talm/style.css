@@ -683,7 +683,7 @@ ul.xoxo.blogroll{
 #content .full .column2 img{
 	max-width:100%;
 	height:auto;
-	display:block;
+	/*display:block; supprimé pour que les images insérées dans les textes d'articles puissent se positionner sur la même ligne (sophie)*/
 }
 
 #content .full .column2 a{ 
