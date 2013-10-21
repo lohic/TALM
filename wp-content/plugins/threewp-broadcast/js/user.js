@@ -1,116 +1,170 @@
 jQuery(document).ready(function($) {
-	window.broadcast = {
-		init: function(){
-			
-			// Allow blogs to be mass selected, unselected.							
-			$("#__broadcast__broadcast_group").change(function(){
-				var blogs = $(this).val().split(" ");
-				for (var counter=0; counter < blogs.length; counter++)
+	window.broadcast =
+	{
+		$arrow : null,
+		$broadcast : null,
+		$broadcast_blogs_htmls : null,
+		$blogs_html : null,
+		$select_all : null,
+		$invert_selection : null,
+
+		init : function()
+		{
+			this.$broadcast = $( '#threewp_broadcast.postbox' );
+
+			// If the box doesn't exist, do nothing.
+			if ( this.$broadcast.length < 1 )
+				return;
+
+			// If the box doesn't contain any input information, do nothing.
+			if ( $( 'input', this.$broadcast ).length < 1 )
+				return;
+
+			this.$blogs_html = $( '.blogs.html_section', this.$broadcast );
+			this.$broadcast_blogs_htmls = $( 'input.checkbox', this.$blogs_html );
+
+			// Container for selection change.
+			this.$selection_change_container = $( '<div />' )
+				.addClass( 'clear' )
+				.addClass( 'selection_change_container' )
+				.appendTo( this.$blogs_html );
+
+			// Append "Select all / none" text.
+			this.$select_all = $( '<span />' )
+				.addClass( 'selection_change select_deselect_all' )
+				.click(function()
 				{
-					$("#__broadcast__groups__666__" + blogs[counter] ).attr("checked", true);
+					var checkedStatus = ! window.broadcast.$broadcast_blogs_htmls.first().prop( 'checked' );
+					window.broadcast.$broadcast_blogs_htmls.each( function(index, item)
+					{
+						var $item = $( item );
+						// Only change the status of the blogs that aren't disabled.
+						if ( $item.prop( 'disabled' ) != true )
+							$item.prop( 'checked', checkedStatus );
+					});
+				})
+				.text( broadcast_strings.select_deselect_all )
+				.appendTo( this.$selection_change_container );
+
+			this.$selection_change_container.append( '&emsp;' );
+
+			this.$invert_selection = $( '<span />' )
+				.click( function()
+				{
+					window.broadcast.$broadcast_blogs_htmls.each( function(index, item)
+					{
+						var $item = $( item );
+						var checked = $item.prop( 'checked' );
+						$item.prop( 'checked', ! checked );
+					});
+				})
+				.addClass( 'selection_change invert_selection' )
+				.text( broadcast_strings.invert_selection )
+				.appendTo( this.$selection_change_container );
+
+			// Need to hide the blog list?
+			if ( this.$broadcast_blogs_htmls.length > 5 )
+			{
+				this.$arrow = $( '<div />' )
+					.addClass( 'arrow howto' )
+					.appendTo( this.$blogs_html )
+					.click( function()
+					{
+						var $this = $( this );
+						if ( window.broadcast.$blogs_html.hasClass( 'opened' ) )
+							window.broadcast.hide_blogs();
+						else
+							window.broadcast.show_blogs();
+					});
+
+				this.hide_blogs();
+			}
+
+			// GROUP functionality: Allow blogs to be mass selected, unselected.
+			$( ".blog_groups select", this.$broadcast ).change(function()
+			{
+				var $this = $( this );
+				var blogs = $this.val().split(' ');
+				for ( var counter=0; counter < blogs.length; counter++)
+					$( "#plainview_form2_inputs_checkboxes_blogs_" + blogs[counter], window.broadcast.$broadcast ).prop( 'checked', true );
+				// Select the "no value" option.
+				$this.val( '' );
+
+				// If the blog list is closed, then expand and then close again to show the newly selected blogs.
+				if ( window.broadcast.$blogs_html.hasClass( 'closed' ) )
+					window.broadcast.$arrow.click().click();
+			});
+
+		},
+
+		/**
+			Hides all the blogs ... except those that have been selected.
+		**/
+		hide_blogs : function()
+		{
+			window.broadcast.$blogs_html.removeClass( 'opened' ).addClass( 'closed' );
+			this.$arrow.html( broadcast_strings.show_all );
+
+			// Hide all those blogs that aren't checked
+			this.$broadcast_blogs_htmls.each( function( index, item )
+			{
+				var $this = $( this );
+				var checked = $this.prop( 'checked' );
+				// Ignore inputs that are supposed to be hidden.
+				if ( $this.prop( 'hidden' ) === true )
+					return;
+				if ( ! checked )
+					$this.parent().hide();
+			});
+		},
+
+		// Ajaxify the settings page.
+		init_settings_page : function()
+		{
+			this.$settings_form = $( 'body.broadcast_page_threewp_broadcast_admin_menu form#broadcast_settings' );
+			if ( this.$settings_form.length < 1 )
+				return;
+
+			// Ajaxify the whitelist / blacklist
+			this.$settings_form.$broadcast_internal_fields = $( '#plainview_form2_inputs_checkbox_broadcast_internal_custom_fields', this.$settings_form );
+			this.$settings_form.$blacklist = $( '#plainview_form2_inputs_textarea_custom_field_blacklist', this.$settings_form );
+			this.$settings_form.$whitelist = $( '#plainview_form2_inputs_textarea_custom_field_whitelist', this.$settings_form );
+
+			// Fade in the respective settings when the internal fields box is clicked.
+			this.$settings_form.$broadcast_internal_fields.change( function()
+			{
+				var checked = $( this ).prop( 'checked' );
+
+				if ( checked )
+				{
+					window.broadcast.$settings_form.$blacklist.prop( 'readonly', ! checked ).fadeTo( 200, 1.0 );
+					window.broadcast.$settings_form.$whitelist.prop( 'readonly', checked ).fadeTo( 200, 0.5 );
 				}
-				$("#__broadcast_group").val("");
+				else
+				{
+					window.broadcast.$settings_form.$blacklist.prop( 'readonly', ! checked ).fadeTo( 200, 0.5 );
+					window.broadcast.$settings_form.$whitelist.prop( 'readonly', checked ).fadeTo( 200, 1.0 );
+				}
+			}).change();
+		},
+
+		/**
+			Reshows all the hidden blogs.
+		**/
+		show_blogs : function()
+		{
+			window.broadcast.$blogs_html.removeClass( 'closed' ).addClass( 'opened' );
+			this.$arrow.html( broadcast_strings.hide_all );
+			$.each( this.$broadcast_blogs_htmls, function( index, item )
+			{
+				var $this = $( this );
+				if ( $this.prop( 'hidden' ) === true )
+					return;
+				$this.parent().show();
 			});
-			
-			// React to changes to the tags click.
-			if ( !$("#__broadcast__tags").attr("checked") )
-				$("p.broadcast_input_tags_create").hide();
-				
-			$("#__broadcast__tags").change(function(){
-				$("p.broadcast_input_tags_create").animate({
-					height: "toggle"
-				});
-			});
-			
-			// React to changes to the taxonomies click.
-			if ( !$("#__broadcast__taxonomies").attr("checked") )
-				$("p.broadcast_input_taxonomies_create").hide();
-				
-			$("#__broadcast__taxonomies").change(function(){
-				$("p.broadcast_input_taxonomies_create").animate({
-					height: "toggle"
-				});
-			});
-			
 		}
 	};
-	
+
 	broadcast.init();
-
-	$broadcast = $("#threewp_broadcast");
-
-	
-	var blog_count = $( ".blogs ul.broadcast_blogs li", $broadcast ).length;
-	
-	
-	if ( $( "input", $broadcast ).length < 1 )
-		return;
-	
-	// Select all / none
-	$broadcast.append(" \
-		<p class=\"selection_change select_deselect_all\">" + broadcast_strings.select_deselect_all + "</p> \
-		<p class=\"selection_change invert_selection\">" + broadcast_strings.invert_selection + "</p>");
-
-	$(".select_deselect_all").click(function(){
-		var checkedStatus = ! $("#threewp_broadcast .broadcast_blogs .checkbox").attr("checked");
-		$("#threewp_broadcast .broadcast_blogs .checkbox").each(function(key, value){
-			if ( $(value).attr("disabled") != true)
-				$(value).attr("checked", checkedStatus);
-		});
-	})
-
-	$("#threewp_broadcast .invert_selection").click( function(){
-			$.each( $(".broadcast_blogs input"), function(index, item){
-					$(item).attr("checked", ! $(item).attr("checked") ); 
-			});
-	});
-	
-	// Need to hide the blog list?
-	if ( blog_count > 5 )
-	{
-		$("#threewp_broadcast .broadcast_to").addClass("broadcast_to_opened").append("<div class=\"arrow_container\"><div class=\"arrow\"></div></div>");
-		
-		close_broadcasted_blogs( $("#threewp_broadcast .broadcast_to") );
-		
-		// Make it switchable!
-		$("#threewp_broadcast .broadcast_to .arrow_container").click(function(){
-			if ( $(this).parent().hasClass("broadcast_to_opened") )
-				close_broadcasted_blogs( $(this).parent() );
-			else
-				open_broadcasted_blogs( $(this).parent() );
-		});
-		
-	}
-	
-	/**
-		Hides all the blogs ... except those that have been selected.
-	**/
-	function close_broadcasted_blogs( item )
-	{
-		// Close it up!
-		$(item).removeClass("broadcast_to_opened");
-		$(item).addClass("broadcast_to_closed");
-
-		// Copy all selected blogs to the activated list
-		$.each( $("#threewp_broadcast .blogs ul.broadcast_blogs li"), function (index,item){
-			var checked = $("input", item).attr("checked");
-			if ( ! checked )
-				$(item).hide();
-		}); 
-	}
-	
-	/**
-		Reshows all the hidden blogs.
-	**/
-	function open_broadcasted_blogs( item )
-	{
-		// Open it up!
-		$(item).removeClass("broadcast_to_closed");
-		$(item).addClass("broadcast_to_opened");
-		
-		$.each( $("#threewp_broadcast .blogs ul.broadcast_blogs li"), function(index, item){
-			$(item).show();
-		});
-	}
-
+	broadcast.init_settings_page();
 });

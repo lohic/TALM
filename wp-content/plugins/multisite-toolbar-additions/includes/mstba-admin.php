@@ -14,6 +14,16 @@
  */
 
 /**
+ * Prevent direct access to this file.
+ *
+ * @since 1.4.0
+ */
+if ( ! defined( 'ABSPATH' ) ) {
+	exit( 'Sorry, you are not allowed to access this file directly.' );
+}
+
+
+/**
  * Setting internal plugin helper links constants.
  *
  * @since 1.0.0
@@ -39,7 +49,7 @@ if ( get_locale() == 'de_DE' || get_locale() == 'de_AT' || get_locale() == 'de_C
 /**
  * Add "Custom Menu" link to plugin page.
  *
- * @since 1.0.0
+ * @since  1.0.0
  *
  * @param  $mstba_links
  * @param  $mstba_menu_link
@@ -52,7 +62,12 @@ function ddw_mstba_custom_menu_link( $mstba_links ) {
 	if ( current_user_can( 'edit_theme_options' ) ) {
 
 		/** Settings Page link */
-		$mstba_menu_link = sprintf( '<a href="%s" title="%s">%s</a>' , admin_url( 'nav-menus.php' ) , __( 'Setup a custom toolbar menu', 'multisite-toolbar-additions' ) , __( 'Custom Menu', 'multisite-toolbar-additions' ) );
+		$mstba_menu_link = sprintf(
+			'<a href="%s" title="%s">%s</a>',
+			admin_url( 'nav-menus.php' ),
+			__( 'Setup a custom toolbar menu', 'multisite-toolbar-additions' ),
+			__( 'Custom Menu', 'multisite-toolbar-additions' )
+		);
 	
 		/** Set the order of the links */
 		array_unshift( $mstba_links, $mstba_menu_link );
@@ -144,7 +159,7 @@ function ddw_mstba_widgets_help_content() {
 			'<li>' . __( 'Setup your links, might mostly be custom links, or any other...', 'multisite-toolbar-additions' ) . '</li>' .
 			'<li>' . __( 'Save the new menu to the plugin\'s menu location. That\'s it :)', 'multisite-toolbar-additions' ) . '</li>' .
 		'<ul>' .
-		'<em>' . __( 'Please note:', 'multisite-toolbar-additions' ) . '</em> ' . __( 'Every parent item = one main toolbar entry! So best would be to only use one parent item and set all other items as children.', 'multisite-toolbar-additions' ) . '</p>' .
+		'<em>' . __( 'Please note:', 'multisite-toolbar-additions' ) . '</em> ' . __( 'Every parent item = one main toolbar entry! So best would be to only use one parent item and set all other items as children.', 'multisite-toolbar-additions' ) . ' (<a href="https://www.dropbox.com/s/7u83c0g5ehk4ozq/screenshot-5.png" target="_new">' . __( 'See also this screenshot.', 'multisite-toolbar-additions' ) . '</a>)</p>' .
 		'<p><strong>' . __( 'Other, recommended Multisite &amp; Toolbar plugins:', 'multisite-toolbar-additions' ) . '</strong>' .
 			'<br />&raquo; <a href="' . esc_url( MSTBA_URL_DDW_SERIES ) . '" target="_new" title="David Decker ' . __( 'Toolbar plugin series', 'multisite-toolbar-additions' ) . ' ...">' . __( 'My Toolbar plugin series', 'multisite-toolbar-additions' ) . ' (David Decker, DECKERWEB.de)</a>' .
 			'<br />&raquo; <a href="' . esc_url( MSTBA_URL_WPORG_MORE ) . '" target="_new" title="' . __( 'More plugins at WordPress.org', 'multisite-toolbar-additions' ) . ' ...">' . __( 'More plugins at WordPress.org', 'multisite-toolbar-additions' ) . '</a></p>' .

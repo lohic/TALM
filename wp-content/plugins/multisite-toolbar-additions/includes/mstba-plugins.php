@@ -10,8 +10,18 @@
  * @link       http://genesisthemes.de/en/wp-plugins/multisite-toolbar-additions/
  * @link       http://deckerweb.de/twitter
  *
- * @since 1.0.0
+ * @since      1.0.0
  */
+
+/**
+ * Prevent direct access to this file.
+ *
+ * @since 1.4.0
+ */
+if ( ! defined( 'ABSPATH' ) ) {
+	exit( 'Sorry, you are not allowed to access this file directly.' );
+}
+
 
 /**
  * Helper variable.
@@ -22,7 +32,7 @@ $mstba_multisite_check = is_multisite() ? _x( 'Site', 'Translators: For sitewide
 
 
 /**
- * Network Extend Group - hooking in (network) plugin items
+ * Network Extend Group - hooking in network-aware plugin items
  *
  * @since 1.0.0
  */
@@ -51,6 +61,19 @@ $mstba_multisite_check = is_multisite() ? _x( 'Site', 'Translators: For sitewide
 		require_once( MSTBA_PLUGIN_DIR . '/includes/mstba-plugins-smartcleanuptools.php' );
 
 	}  // end-if Smart Cleanup Tools
+
+
+	/**
+	 * Smart Options Optimizer (premium, by Smart Plugins/ Milan Petrovic)
+	 *
+	 * @since 1.4.0
+	 */
+	if ( class_exists( 'soo_loader' ) ) {
+
+		/** Include code part for Smart Options Optimizer plugin support */
+		require_once( MSTBA_PLUGIN_DIR . '/includes/mstba-plugins-smartoptionsoptimizer.php' );
+
+	}  // end-if Smart Options Optimizer
 
 
 	/**
@@ -158,6 +181,37 @@ $mstba_multisite_check = is_multisite() ? _x( 'Site', 'Translators: For sitewide
 
 
 	/**
+	 * WordPress MU Domain Mapping (free, by Donncha O Caoimh, Ron Rennick, Automatic Inc.)
+	 *
+	 * @since 1.4.0
+	 */
+	if ( is_multisite() && function_exists( 'dm_text_domain' ) && current_user_can( 'manage_options' ) ) {
+
+		/** Include code part for WP MU Domain Mapping plugin support */
+		require_once( MSTBA_PLUGIN_DIR . '/includes/mstba-plugins-wpmudomainmapping.php' );
+
+	}  // end-if Multisite Robots.txt Manager
+
+
+	/**
+	 * Multisite Robots.txt Manager (free, by tribalNerd)
+	 *
+	 * Note: Currently versions 0.4.x and former 0.3.x are supported.
+	 *
+	 * @since 1.4.0
+	 */
+	if ( is_multisite()
+		&& ( class_exists( 'msrtm_robots_txt' ) || class_exists( 'display_robots' ) )
+		&& current_user_can( 'manage_options' )
+	) {
+
+		/** Include code part for MS Robots.txt Manager plugin support */
+		require_once( MSTBA_PLUGIN_DIR . '/includes/mstba-plugins-msrobotstxt.php' );
+
+	}  // end-if Multisite Robots.txt Manager
+
+
+	/**
 	 * WPMS Site Maintenance Mode (free, by 7 Media Web Solutions, LLC)
 	 *
 	 * @since 1.0.0
@@ -224,6 +278,19 @@ $mstba_multisite_check = is_multisite() ? _x( 'Site', 'Translators: For sitewide
 
 
 	/**
+	 * Hide My WP (premium, by Hassan Jahangiri)
+	 *
+	 * @since 1.4.0
+	 */
+	if ( class_exists( 'HideMyWP' ) && current_user_can( 'manage_options' ) ) {
+
+		/** Include code part for Hide My WP plugin support */
+		require_once( MSTBA_PLUGIN_DIR . '/includes/mstba-plugins-hidemywp.php' );
+
+	}  // end-if Hide My WP
+
+
+	/**
 	 * Ultimate Branding (premium, by Incsub Team/ WPMU DEV)
 	 *
 	 * @since 1.2.0
@@ -233,11 +300,124 @@ $mstba_multisite_check = is_multisite() ? _x( 'Site', 'Translators: For sitewide
 		/** Include code part for Quick Cache plugin support */
 		require_once( MSTBA_PLUGIN_DIR . '/includes/mstba-plugins-ultimatebranding.php' );
 
-	}  // end-if Snapshot
+	}  // end-if Ultimate Branding
+
+
+	/**
+	 * Blog Copier (free, by Modern Tribe, Inc.)
+	 *
+	 * @since 1.4.0
+	 */
+	if ( class_exists( 'BlogCopier' ) && current_user_can( 'manage_sites' ) ) {
+
+		$mstba_tb_items[ 'networkext_blogcopier' ] = array(
+			'parent' => 'network-admin-s',
+			'title'  => __( 'Blog Copier', 'multisite-toolbar-additions' ),
+			'href'   => network_admin_url( 'sites.php?page=blog-copier' ),
+			'meta'   => array( 'target' => '', 'title' => _x( 'Blog Copier - Clone Website (Sub Site)', 'Translators: For the tooltip', 'multisite-toolbar-additions' ) )
+		);
+
+		/** For our Network 'new-content' section */
+		if ( is_network_admin() && ddw_mstba_network_new_content_filter() ) {
+
+			$mstba_tb_items[ 'networkext_newcontent_blogcopier' ] = array(
+				'parent' => 'new-content-site',
+				'title'  => __( 'Clone Site', 'multisite-toolbar-additions' ),
+				'href'   => network_admin_url( 'sites.php?page=blog-copier' ),
+				'meta'   => array( 'target' => '', 'title' => _x( 'Blog Copier - Clone Website (Sub Site)', 'Translators: For the tooltip', 'multisite-toolbar-additions' ) )
+			);
+
+		}  // end-if is_network_admin() check
+
+	}  // end-if Blog Copier
+
+
+	/**
+	 * NS Cloner - Site Copier (free, by Never Settle [neversettle.it])
+	 *
+	 * @since 1.4.0
+	 */
+	if ( defined( 'NS_CLONER_PLUGIN_URL' ) && current_user_can( 'manage_network_options' ) ) {
+
+		$mstba_tb_items[ 'networkext_nscloner' ] = array(
+			'parent' => 'network-admin-s',
+			'title'  => __( 'NS Cloner', 'multisite-toolbar-additions' ),
+			'href'   => network_admin_url( 'sites.php?page=ns-cloner' ),
+			'meta'   => array( 'target' => '', 'title' => _x( 'NS Cloner - Clone Website (Sub Site)', 'Translators: For the tooltip', 'multisite-toolbar-additions' ) )
+		);
+
+		/** For our Network 'new-content' section */
+		if ( is_network_admin() && ddw_mstba_network_new_content_filter() ) {
+
+			$mstba_tb_items[ 'networkext_newcontent_nscloner' ] = array(
+				'parent' => 'new-content-site',
+				'title'  => __( 'Clone Site', 'multisite-toolbar-additions' ),
+				'href'   => network_admin_url( 'sites.php?page=ns-cloner' ),
+				'meta'   => array( 'target' => '', 'title' => _x( 'NS Cloner - Clone Website (Sub Site)', 'Translators: For the tooltip', 'multisite-toolbar-additions' ) )
+			);
+
+		}  // end-if is_network_admin() check
+
+	}  // end-if NS Cloner
+
+
+	/**
+	 * NS Cloner Pro (premium, by Never Settle [neversettle.it])
+	 *
+	 * @since 1.4.0
+	 */
+	if ( defined( 'NS_CLONER_PRO_PLUGIN_URL' ) && current_user_can( 'manage_network_options' ) ) {
+
+		$mstba_tb_items[ 'networkext_nsclonerpro' ] = array(
+			'parent' => 'network-admin-s',
+			'title'  => __( 'NS Cloner Pro', 'multisite-toolbar-additions' ),
+			'href'   => network_admin_url( 'sites.php?page=ns-cloner-pro' ),
+			'meta'   => array( 'target' => '', 'title' => _x( 'NS Cloner Pro - Clone Website (Sub Sites)', 'Translators: For the tooltip', 'multisite-toolbar-additions' ) )
+		);
+
+		/** For our Network 'new-content' section */
+		if ( is_network_admin() && ddw_mstba_network_new_content_filter() ) {
+
+			$mstba_tb_items[ 'networkext_newcontent_nsclonerpro' ] = array(
+				'parent' => 'new-content-site',
+				'title'  => __( 'Clone Site', 'multisite-toolbar-additions' ),
+				'href'   => network_admin_url( 'sites.php?page=ns-cloner-pro' ),
+				'meta'   => array( 'target' => '', 'title' => _x( 'NS Cloner Pro - Clone Website (Sub Sites)', 'Translators: For the tooltip', 'multisite-toolbar-additions' ) )
+			);
+
+		}  // end-if is_network_admin() check
+
+	}  // end-if NS Cloner Pro
+
+
+	/**
+	 * WP Migrate DB Pro (premium, by Delicious Brains (Brad Touesnard & Chris Aprea))
+	 *
+	 * @since 1.4.0
+	 */
+	if ( function_exists( 'wp_migrate_db_pro_init' ) ) {
+
+		/** Include code part for WP Migrate DB Pro support */
+		require_once( MSTBA_PLUGIN_DIR . '/includes/mstba-plugins-wpmigratedbpro.php' );
+
+	}  // end-if WP Migrate DB Pro
+
+
+	/**
+	 * Simple System Info (premium, by Smart Plugins/ Milan Petrovic)
+	 *
+	 * @since 1.4.0
+	 */
+	if ( class_exists( 'ssi_loader' ) ) {
+
+		/** Include code part for Simple System Info plugin support */
+		require_once( MSTBA_PLUGIN_DIR . '/includes/mstba-plugins-simplesysteminfo.php' );
+
+	}  // end-if Simple System Info
 
 
 /**
- * Site Extend Group - hooking in plugin items
+ * Site Extend Group - hooking in (site-specific, non network-aware) plugin items.
  *
  * @since 1.0.0
  */
@@ -450,6 +630,36 @@ $mstba_multisite_check = is_multisite() ? _x( 'Site', 'Translators: For sitewide
 
 
 	/**
+	 * Codestyling Localization (free, by Heiko Rabe)
+	 *
+	 * @since 1.4.0
+	 */
+	if ( defined( 'CSP_PO_TEXTDOMAIN' ) && current_user_can( 'manage_options' ) ) {
+
+		$mstba_tb_items[ 'siteext_codestylinglocalization' ] = array(
+			'parent' => $siteextgroup,
+			'title'  => __( 'Manage Translations', 'multisite-toolbar-additions' ),
+			'href'   => admin_url( 'tools.php?page=codestyling-localization/codestyling-localization.php' ),
+			'meta'   => array( 'target' => '', 'title' => _x( 'Codestyling Localization - Manage Translations', 'Translators: For the tooltip', 'multisite-toolbar-additions' ) )
+		);
+
+	}  // end-if Codestyling Localization
+
+
+	/**
+	 * P3 (Plugin Performance Profiler) (free, by GoDaddy.com)
+	 *
+	 * @since 1.4.0
+	 */
+	if ( defined( 'P3_PLUGIN_SLUG' ) && current_user_can( 'manage_options' ) ) {
+
+		/** Include code part for P3 plugin support */
+		require_once( MSTBA_PLUGIN_DIR . '/includes/mstba-plugins-p3profiler.php' );
+
+	}  // end-if P3 (Plugin Performance Profiler)
+
+
+	/**
 	 * Limit Login Attempts (free, by Johan Eenfeldt)
 	 *
 	 * @since 1.0.0
@@ -482,6 +692,23 @@ $mstba_multisite_check = is_multisite() ? _x( 'Site', 'Translators: For sitewide
 		);
 
 	}  // end-if Login Security Solution
+
+
+	/**
+	 * WP Migrate DB (free, by Brad Touesnard)
+	 *
+	 * @since 1.4.0
+	 */
+	if ( class_exists( 'WP_Migrate_DB' ) && current_user_can( 'update_core' ) ) {
+
+		$mstba_tb_items[ 'siteext_wpmigratedb' ] = array(
+			'parent' => $siteextgroup,
+			'title'  => __( 'Migrate Database', 'multisite-toolbar-additions' ),
+			'href'   => admin_url( 'tools.php?page=wp-migrate-db' ),
+			'meta'   => array( 'target' => '', 'title' => __( 'Migrate Database', 'multisite-toolbar-additions' ) )
+		);
+
+	}  // end-if WP Migrate DB
 
 
 	/**
@@ -523,6 +750,54 @@ $mstba_multisite_check = is_multisite() ? _x( 'Site', 'Translators: For sitewide
 			);
 
 	}  // end-if Optimize Database after Deleting Revisions
+
+
+	/**
+	 * Go Sidebar Wizard (premium, by Granth)
+	 *
+	 * @since 1.4.0
+	 */
+	if ( defined( 'GW_GO_SBWIZARD_VER' ) && current_user_can( 'edit_pages' ) ) {
+
+		$mstba_tb_items[ 'widgets-plggosbwizard' ] = array(
+			'parent' => $widgets,
+			'title'  => __( 'Go Sidebar Wizard', 'multisite-toolbar-additions' ),
+			'href'   => admin_url( 'admin.php?page=go-sbwizard' ),
+			'meta'   => array( 'target' => '', 'title' => __( 'Go Sidebar Wizard', 'multisite-toolbar-additions' ) )
+		);
+
+		$mstba_tb_items[ 'widgets-plggosbwizard-sidebars' ] = array(
+			'parent' => $widgets,
+			'title'  => __( 'Custom Sidebars', 'multisite-toolbar-additions' ),
+			'href'   => admin_url( 'admin.php?page=go-sbwizard-custom-sidebars' ),
+			'meta'   => array( 'target' => '', 'title' => __( 'Custom Sidebars', 'multisite-toolbar-additions' ) )
+		);
+
+	}  // end-if Go Sidebar Wizard
+
+
+	/**
+	 * Widget Settings Importer/Exporter (free, by Kevin Langley, Sean McCafferty, Mark Parolisi)
+	 *
+	 * @since 1.4.0
+	 */
+	if ( class_exists( 'Widget_Data' ) && current_user_can( 'administrator' ) ) {
+
+		$mstba_tb_items[ 'widgets-plgwdata-export' ] = array(
+			'parent' => $widgets,
+			'title'  => __( 'Widget Settings Export', 'multisite-toolbar-additions' ),
+			'href'   => admin_url( 'tools.php?page=widget-settings-export' ),
+			'meta'   => array( 'target' => '', 'title' => __( 'Widget Settings Export', 'multisite-toolbar-additions' ) )
+		);
+
+		$mstba_tb_items[ 'widgets-plgwdata-import' ] = array(
+			'parent' => $widgets,
+			'title'  => __( 'Widget Settings Import', 'multisite-toolbar-additions' ),
+			'href'   => admin_url( 'tools.php?page=widget-settings-import' ),
+			'meta'   => array( 'target' => '', 'title' => __( 'Widget Settings Import', 'multisite-toolbar-additions' ) )
+		);
+
+	}  // end-if Widget Settings Importer/Exporter
 
 
 /**
@@ -574,3 +849,37 @@ $mstba_multisite_check = is_multisite() ? _x( 'Site', 'Translators: For sitewide
 		}  // end-if plugin & cap check
 
 	}  // end-if Network Mass Email (network activated)
+
+
+	/**
+	 * Restrict Widgets (free, by Digital Factory)
+	 *
+	 * @since 1.4.0
+	 */
+	if ( class_exists( 'RestrictWidgets' ) && current_user_can( 'manage_widgets' ) ) {
+
+		$mstba_tb_items[ 'widgets-plgrestrictw' ] = array(
+			'parent' => $widgets,
+			'title'  => __( 'Restrict Widgets', 'multisite-toolbar-additions' ),
+			'href'   => admin_url( 'widgets.php' ) . '#widgets-options',
+			'meta'   => array( 'target' => '', 'title' => __( 'Restrict Widgets', 'multisite-toolbar-additions' ) )
+		);
+
+	}  // end-if Restrict Widgets
+
+
+	/**
+	 * Tabify Edit Screen (free, by Marko Heijnen)
+	 *
+	 * @since 1.4.0
+	 */
+	if ( class_exists( 'Tabify_Edit_Screen' ) && current_user_can( 'manage_options' ) ) {
+
+		$mstba_tb_items[ 'mcbase-plgtabifyedits' ] = array(
+			'parent' => $mcbase,
+			'title'  => __( 'Tabify Edit Screens', 'multisite-toolbar-additions' ),
+			'href'   => admin_url( 'options-general.php?page=tabify-edit-screen' ),
+			'meta'   => array( 'target' => '', 'title' => __( 'Tabify Edit Screens', 'multisite-toolbar-additions' ) )
+		);
+
+	}  // end-if Tabify Edit Screen

@@ -169,14 +169,7 @@
 
 			// sortable
 			_flex.add_sortable( div );
-			
-			
-			// set column widths
-			$(div).find('.layout').each(function(){
-				acf.fields.repeater.set_column_widths( $(this) );
-			});
-			
-			
+						
 		});
 		
 	});

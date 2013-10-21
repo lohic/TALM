@@ -4,7 +4,7 @@ Donate link: http://web-profile.com.ua/donate/
 Tags: iframe, embed, youtube, vimeo, google-map, google-maps
 Requires at least: 3.0
 Tested up to: 3.5.1
-Stable tag: 2.6
+Stable tag: 2.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -13,21 +13,29 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 == Description ==
 
 **[iframe](http://web-profile.com.ua/wordpress/plugins/iframe/ "Plugin page")** |
-**[All iframe params](http://wordpress.org/extend/plugins/iframe/other_notes/)** |
+**[All iframe params](http://wordpress.org/plugins/iframe/other_notes/)** |
 **[Donate](http://web-profile.com.ua/donate/ "Support the development")**
 
-Use iframe to embed video from YouTube or Vimeo or to embed Google Map or just to embed content from external page.
+[iframe src="http://www.youtube.com/embed/A3PDXmYoF5U" width="100%" height="480"] shortcode
+should show something like this:
 
-Embed iframe using shortcode `[iframe src="http://www.youtube.com/embed/A3PDXmYoF5U" width="100%" height="480"]`
+[youtube http://www.youtube.com/watch?v=A3PDXmYoF5U]
 
-= Useful plugins: =
-* ["Anti-spam" - block spam in comments](http://wordpress.org/extend/plugins/anti-spam/ "no spam, no captcha")
-* ["Page-list" - show list of pages with shortcodes](http://wordpress.org/extend/plugins/page-list/ "list of pages with shortcodes")
-* ["Filenames to latin" - sanitize filenames to latin during upload](http://wordpress.org/extend/plugins/filenames-to-latin/ "sanitize filenames to latin")
+
+Iframe shortcode is the replacement of the iframe html tag and accepts the same [params as iframe](http://wordpress.org/plugins/iframe/other_notes/) html tag does.
+You may use iframe shortcode to embed content from YouTube, Vimeo, Google Maps or from any external page.
+
+If you need to embed content from YouTube, Vimeo, SlideShare, SoundCloud, Twitter via direct link, you may use `[embed]http://www.youtube.com/watch?v=A3PDXmYoF5U[/embed]` shortcode.
+[embed] shortcode is a core WordPress feature and can [embed content from many resources via direct link](http://codex.wordpress.org/Embeds).
+
+= Useful: =
+* ["Anti-spam" - block spam in comments](http://wordpress.org/plugins/anti-spam/ "no spam, no captcha")
+* ["Page-list" - show list of pages with shortcodes](http://wordpress.org/plugins/page-list/ "list of pages with shortcodes")
+* ["activetab" - responsive light theme](http://wordpress.org/themes/activetab "responsive light theme")
 
 == Other Notes ==
 
-= Iframe params: =
+= iframe params: =
 * **src** - source of the iframe `[iframe src="http://www.youtube.com/embed/A3PDXmYoF5U"]` (by default src="http://www.youtube.com/embed/A3PDXmYoF5U");
 * **width** - width in pixels or in percents `[iframe width="100%" src="http://www.youtube.com/embed/A3PDXmYoF5U"]` or `[iframe width="640" src="http://www.youtube.com/embed/A3PDXmYoF5U"]` (by default width="100%");
 * **height** - height in pixels `[iframe height="480" src="http://www.youtube.com/embed/A3PDXmYoF5U"]` (by default height="480");
@@ -49,6 +57,9 @@ Embed iframe using shortcode `[iframe src="http://www.youtube.com/embed/A3PDXmYo
 1. [iframe] shortcode
 
 == Changelog ==
+
+= 2.7 - 2013-06-09 =
+* minor changes
 
 = 2.6 - 2013-03-18 =
 * minor changes

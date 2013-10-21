@@ -9,7 +9,7 @@ $frm_css_loaded = true;
 }
 
 echo FrmFormsHelper::replace_shortcodes($values['before_html'], $form, $title, $description); ?>
-<div class="frm_form_fields">
+<div class="frm_form_fields <?php echo apply_filters('frm_form_fields_class', '', $values); ?>">
 <fieldset>
 <div>
 <input type="hidden" name="frm_action" value="<?php echo esc_attr($form_action) ?>" />
@@ -59,3 +59,7 @@ if(isset($wp_filter['frm_entries_footer_scripts']) and !empty($wp_filter['frm_en
 <script type="text/javascript">
 <?php do_action('frm_entries_footer_scripts', $values['fields'], $form); ?>
 </script><?php } ?>
+
+<?php if (!$form->is_template and $form->status == 'published' and !is_admin())
+    FrmFormsHelper::get_custom_submit($values['submit_html'], $form, $submit, $form_action);
+?>

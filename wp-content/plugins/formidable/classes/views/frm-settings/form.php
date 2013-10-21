@@ -27,7 +27,9 @@
     <div class="postbox">
         <h3 class="hndle"><div id="icon-ms-admin" class="icon32 frm_postbox_icon"><br/></div> <?php _e('Formidable Pro Account Information', 'formidable')?></h3>
         <div class="inside">
-            <?php $frm_update->pro_cred_form(); ?>
+            <?php 
+            $upd = new FrmUpdatesController();
+            $upd->pro_cred_form(); ?>
         </div>
     </div>
 <?php } ?>
@@ -244,7 +246,7 @@
 function frm_uninstall_now(){ 
 if(confirm("<?php _e('Are you sure you want to do this? Clicking OK will delete all forms, form data, and all other Formidable data. There is no Undo.', 'formidable') ?>")){
     jQuery('.frm_uninstall a').replaceWith('<img src="<?php echo FRM_IMAGES_URL; ?>/wpspin_light.gif" alt="Loading..." />');
-    jQuery.ajax({type:"POST",url:"<?php echo $frm_ajax_url ?>",data:"action=frm_uninstall",
+    jQuery.ajax({type:"POST",url:"<?php echo admin_url('admin-ajax.php') ?>",data:"action=frm_uninstall",
     success:function(msg){jQuery(".frm_uninstall").fadeOut("slow");}
     });
 }

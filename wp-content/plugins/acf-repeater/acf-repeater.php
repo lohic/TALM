@@ -3,7 +3,7 @@
 Plugin Name: Advanced Custom Fields: Repeater Field
 Plugin URI: http://www.advancedcustomfields.com/
 Description: Adds the repeater field
-Version: 1.0.0
+Version: 1.0.1
 Author: Elliot Condon
 Author URI: http://www.elliotcondon.com/
 License: GPL
@@ -28,7 +28,7 @@ class acf_repeater_plugin
 	{
 		// vars
 		$settings = array(
-			'version' => '1.0.0',
+			'version' => '1.0.1',
 			'remote' => 'http://download.advancedcustomfields.com/QJF7-L4IX-UCNP-RF2W/info/',
 			'basename' => plugin_basename(__FILE__),
 		);

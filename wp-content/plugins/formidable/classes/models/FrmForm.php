@@ -24,6 +24,8 @@ class FrmForm{
         
     $options['before_html'] = isset($values['options']['before_html']) ? $values['options']['before_html'] : FrmFormsHelper::get_default_html('before');
     $options['after_html'] = isset($values['options']['after_html']) ? $values['options']['after_html'] : FrmFormsHelper::get_default_html('after');
+    $options['submit_html'] = isset($values['options']['submit_html']) ? $values['options']['submit_html'] : FrmFormsHelper::get_default_html('submit');
+    
     $options = apply_filters('frm_form_options_before_update', $options, $values);
     $new_values['options'] = serialize($options);
     $new_values['created_at'] = current_time('mysql', 1);
@@ -105,6 +107,8 @@ class FrmForm{
         $options['custom_style'] = isset($values['options']['custom_style']) ? $values['options']['custom_style'] : 0;
         $options['before_html'] = isset($values['options']['before_html']) ? $values['options']['before_html'] : FrmFormsHelper::get_default_html('before');
         $options['after_html'] = isset($values['options']['after_html']) ? $values['options']['after_html'] : FrmFormsHelper::get_default_html('after');
+        $options['submit_html'] = (isset($values['options']['submit_html']) and $values['options']['submit_html'] != '') ? $values['options']['submit_html'] : FrmFormsHelper::get_default_html('submit');
+        
         $options = apply_filters('frm_form_options_before_update', $options, $values);
         $new_values['options'] = serialize($options);
     }
@@ -122,15 +126,17 @@ class FrmForm{
         $query_results = true;
     }
 
-    $all_fields = $frm_field->getAll(array('fi.form_id' => $id));
+    $all_fields = $frm_field->getAll(array('fi.form_id' => $id), 'field_order');
     if ($all_fields and (isset($values['options']) or isset($values['item_meta']) or isset($values['field_options']))){
         if(!isset($values['item_meta']))
             $values['item_meta'] = array();
         $existing_keys = array_keys($values['item_meta']);
+
         foreach ($all_fields as $fid){
-            if (!in_array($fid->id, $existing_keys))
+            if (!in_array($fid->id, $existing_keys) and (isset($values['frm_fields_submitted']) and in_array($fid->id, $values['frm_fields_submitted'])) or isset($values['options']))
                 $values['item_meta'][$fid->id] = '';
         }
+        
         foreach ($values['item_meta'] as $field_id => $default_value){ 
             $field = $frm_field->getOne($field_id);
             if (!$field) continue;
@@ -142,7 +148,7 @@ class FrmForm{
                     $field_options['custom_html'] = isset($values['field_options']['custom_html_'.$field_id]) ? $values['field_options']['custom_html_'.$field_id] : (isset($field_options['custom_html']) ? $field_options['custom_html'] : FrmFieldsHelper::get_default_html($field->type));
                     $field_options = apply_filters('frm_update_form_field_options', $field_options, $field, $values);
                     $frm_field->update($field_id, array('field_options' => $field_options));
-                }else if($field->type == 'hidden'){
+                }else if($field->type == 'hidden' or $field->type == 'user_id'){
                     $prev_opts = $field_options;
                     $field_options = apply_filters('frm_update_form_field_options', $field_options, $field, $values);
                     if($prev_opts != $field_options)
@@ -152,8 +158,10 @@ class FrmForm{
             }else{
                 //updating the form
                 
-                foreach (array('size', 'max', 'label', 'invalid', 'required_indicator', 'blank', 'classes') as $opt)
+                foreach (array('size', 'max', 'label', 'invalid', 'blank', 'classes') as $opt)
                     $field_options[$opt] = isset($values['field_options'][$opt.'_'.$field_id]) ? trim($values['field_options'][$opt.'_'.$field_id]) : ''; 
+                
+                $field_options['required_indicator'] = isset($values['field_options']['required_indicator_'. $field_id]) ? trim($values['field_options']['required_indicator_'. $field_id]) : '*'; 
                 $field_options['separate_value'] = isset($values['field_options']['separate_value_'.$field_id]) ? trim($values['field_options']['separate_value_'.$field_id]) : 0; 
                     
                 $field_options = apply_filters('frm_update_field_options', $field_options, $field, $values);
@@ -270,12 +278,12 @@ class FrmForm{
   }
 
     function getAll( $where = array(), $order_by = '', $limit = '' ){
-        global $wpdb, $frmdb, $frm_app_helper;
+        global $wpdb, $frmdb;
         
         if(is_numeric($limit))
             $limit = " LIMIT {$limit}";
             
-        $query = 'SELECT * FROM ' . $frmdb->forms . $frm_app_helper->prepend_and_or_where(' WHERE ', $where) . $order_by . $limit;
+        $query = 'SELECT * FROM ' . $frmdb->forms . FrmAppHelper::prepend_and_or_where(' WHERE ', $where) . $order_by . $limit;
             
         if ($limit == ' LIMIT 1' or $limit == 1){
             if(is_array($where))

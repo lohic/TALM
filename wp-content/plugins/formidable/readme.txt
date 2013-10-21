@@ -1,10 +1,10 @@
 === Formidable Forms ===
 Contributors: sswells, srwells
 Donate link: http://formidablepro.com/donate
-Tags: admin, AJAX, captcha, contact, contact form, database, email, feedback, form, forms, javascript, jquery, page, plugin, poll, Post, spam, survey, template, widget, wpmu
+Tags: admin, AJAX, captcha, contact, contact form, database, email, feedback, form, forms, javascript, jquery, page, plugin, poll, Post, spam, survey, template, widget, wpmu, form builder
 Requires at least: 3.0
-Tested up to: 3.5.1
-Stable tag: 1.06.11
+Tested up to: 3.6
+Stable tag: 1.07.01
 
 Quickly and easily build forms with a simple drag-and-drop interface and in-place editing. 
 
@@ -61,6 +61,60 @@ A. Try clearing your browser cache. As plugin modifications are made, frequent j
 [See more FAQs](http://formidablepro.com/formidable-faqs/ "Formidable Pro FAQs")
 
 == Changelog ==
+= 1.07.01 =
+* Added for attribute to labels for newly created fields
+* Fixed issue with slashes showing in content if retrieved from cache
+* Prevent multiple checks for updates when pro is authorized, but free version is installed
+* Added frm_form_fields_class hook
+* PRO: Fixed days events are shown on the calendar with months starting on Sunday and week start day set to Monday
+* PRO: Added option to not load a JQuery UI stylesheet
+* PRO: Added "Entry ID" option to the back-end entry search options
+* PRO: Added frm_csv_filename hook for changing the csv file name
+
+= 1.07.0 =
+* Submit build form in one input with ajax to prevent max_input_vars limitations
+* Load fields on the build page with ajax for long forms and other form builder page optimization
+* Added submit button to customizable HTML
+* Added clickable styling classes to form builder sidebar
+* Create entry key from first required text field
+* Set the default name of a field to the field type instead of "Untitled"
+* Added minified version of formidable.js
+* Added warning message if a non-unique value is added as a field value
+* Removed messages for strict standards
+* Fixed inline and left labels for checkboxes
+* PRO: Added back button on multi-paged forms
+* PRO: Added conditional logic on page breaks for skipping pages
+* PRO: Added loading indicator by submit button and on dependent data from entries fields
+* PRO: Switched out username and passwords for license numbers
+* PRO: Updated timestamp in CSV to adjust for WordPress timezone selection
+* PRO: Updated value in CSV for file upload fields
+* PRO: Include comments in the CSV export
+* PRO: Made dynamic default values clickable on form builder page
+* PRO: Added column in CSV for value for fields that are set to use separate values
+* PRO: Allow for quotation marks in field labels for the CSV export
+* PRO: Added frm_import_val hook for CSV importing
+* PRO: Removed border styling from the container around radio and checkbox fields
+* PRO: Added frm_order_display hook
+* PRO: Added utf8 support to sanitize_url=1 option
+* PRO: Added "confirm" option to frm-entry-links shortocode that is used before an entry is deleted
+* PRO: Copy conditional logic and field calculations into duplicated forms
+* PRO: Allow clickable=1 and images to be used with Google formresults shortcode
+* PRO: Allow [25 show="user_email"] for data from entries fields to get user info from the user ID from the linked form, and [25 show="30" show_info="user_email"] to get values from a field linked through 2 data from entries fields
+* PRO: Allow tags fields to be used with hierarchal taxonomies
+* PRO: No longer require fields in a conditionally hidden section heading
+* PRO: Added option for frmThemeOverride_frmAfterSubmit function for custom javascript after ajax submit
+* PRO: Updated star rating javascript version
+* PRO: Check field key when creating a form from a template to see if the trailing "2" can be removed
+* PRO: Don't show custom display content for password protected posts until allowed
+* PRO: Switch the cancel link to edit link after a form is submitted with in-place-edit and ajax
+* PRO: Switched front-end ajax to use hooks (frm_ajax_{controller}_{action})
+* PRO: Call ajax later on the init hook to prevent php notices when WooCommerce is active
+* PRO: Delete entries on the same page as the frm-entry-links shortcode, and added a confirmation message: confirm="Are you sure?"
+* PRO: Correctly check if jQuery on() function exists
+* PRO: Fixed calendar display for months starting on Sunday when the week start day is set to Monday
+* PRO: Removed "custom display" from the post type options on the "create posts" settings tab
+* PRO: Allow multiple values to be imported into an entry via csv in a multi-select dropdown field
+
 = 1.06.11 =
 * Added styling classes: two thirds, scroll box, columns (frm_first_two_thirds, frm_last_two_thirds, frm_scroll_box, frm_total, frm_two_col, frm_three_col, frm_four_col, )
 * Added container in default html for new check box and radio fields
@@ -76,7 +130,6 @@ A. Try clearing your browser cache. As plugin modifications are made, frequent j
 * PRO: Fixed issue preventing required multiple file upload fields from being required
 * PRO: Updated input mask script to 1.3.1
 * PRO: Added hooks for entries in the admin: frm_row_actions, frm_edit_entry_publish_box, frm_show_entry_publish_box, frm_edit_entry_sidebar
-
 
 = 1.06.10 =
 * Allow the usage of any html attributes inside the [input] tag in the customizable HTML

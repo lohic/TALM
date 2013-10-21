@@ -5,28 +5,52 @@
  
 class FrmFieldsController{
     function FrmFieldsController(){
-        add_action('wp_ajax_frm_insert_field', array(&$this, 'create') );
-        add_action('wp_ajax_frm_field_name_in_place_edit', array(&$this, 'edit_name') );
-        add_action('wp_ajax_frm_field_desc_in_place_edit', array(&$this, 'edit_description') );
-        add_action('wp_ajax_frm_mark_required', array(&$this, 'mark_required') );
-        add_action('wp_ajax_frm_update_ajax_option', array(&$this, 'update_ajax_option') );
-        add_action('wp_ajax_frm_duplicate_field', array(&$this, 'duplicate') );
-        add_action('wp_ajax_frm_delete_field', array(&$this, 'destroy') );
-        add_action('wp_ajax_frm_add_field_option', array(&$this, 'add_option'));
-        add_action('wp_ajax_frm_field_option_ipe', array(&$this, 'edit_option') );
-        add_action('wp_ajax_frm_delete_field_option', array(&$this, 'delete_option'));
-        add_action('wp_ajax_frm_import_choices', array(&$this, 'import_choices') );
-        add_action('wp_ajax_frm_import_options', array(&$this, 'import_options') );
-        add_action('wp_ajax_frm_update_field_order', array(&$this, 'update_order') );
-        add_filter('frm_field_type' ,array( &$this, 'change_type'));
-        add_filter('frm_display_field_options', array(&$this, 'display_field_options'));
-        add_action('frm_field_input_html', array(&$this, 'input_html'));
-        add_filter('frm_field_value_saved', array( &$this, 'check_value'), 50, 3);
-        add_filter('frm_field_label_seen', array( &$this, 'check_label'), 10, 3);
+        add_action('wp_ajax_frm_load_field', 'FrmFieldsController::load_field');
+        add_action('wp_ajax_frm_insert_field', 'FrmFieldsController::create');
+        add_action('wp_ajax_frm_field_name_in_place_edit', 'FrmFieldsController::edit_name');
+        add_action('wp_ajax_frm_field_desc_in_place_edit', 'FrmFieldsController::edit_description');
+        add_action('wp_ajax_frm_mark_required', 'FrmFieldsController::mark_required');
+        add_action('wp_ajax_frm_update_ajax_option', 'FrmFieldsController::update_ajax_option');
+        add_action('wp_ajax_frm_duplicate_field', 'FrmFieldsController::duplicate');
+        add_action('wp_ajax_frm_delete_field', 'FrmFieldsController::destroy');
+        add_action('wp_ajax_frm_add_field_option', 'FrmFieldsController::add_option');
+        add_action('wp_ajax_frm_field_option_ipe', 'FrmFieldsController::edit_option');
+        add_action('wp_ajax_frm_delete_field_option', 'FrmFieldsController::delete_option');
+        add_action('wp_ajax_frm_import_choices', 'FrmFieldsController::import_choices');
+        add_action('wp_ajax_frm_import_options', 'FrmFieldsController::import_options');
+        add_action('wp_ajax_frm_update_field_order', 'FrmFieldsController::update_order');
+        add_filter('frm_field_type', 'FrmFieldsController::change_type');
+        add_filter('frm_display_field_options', 'FrmFieldsController::display_field_options');
+        add_action('frm_field_input_html', 'FrmFieldsController::input_html');
+        add_filter('frm_field_value_saved', 'FrmFieldsController::check_value', 50, 3);
+        add_filter('frm_field_label_seen', 'FrmFieldsController::check_label', 10, 3);
     }
     
-    function create(){
-        global $frm_field, $frm_ajax_url;
+    public static function load_field(){
+        global $frm_field, $frm_form;
+        
+        $id = $field_id = $_POST['field_id'];
+        if(!$field_id or !is_numeric($field_id))
+            die();
+        
+        $_GET['page'] = 'formidable';
+        $field = htmlspecialchars_decode(nl2br(stripslashes_deep($_POST['field'])));
+        $field = json_decode($field, true);
+        if(!isset($field['value']))
+            $field['value'] = '';
+        
+        $field_name = "item_meta[$field_id]";
+        
+        $values = array();
+            
+        include(FRM_VIEWS_PATH .'/frm-forms/add_field.php'); 
+        include(FRM_VIEWS_PATH .'/frm-forms/new-field-js.php');
+        
+        die();
+    }
+    
+    public static function create(){
+        global $frm_field;
         $field_data = $_POST['field'];
         $form_id = $_POST['form_id'];
         $values = array();
@@ -47,9 +71,9 @@ class FrmFieldsController{
         die();
     }
     
-    function edit_name(){
+    public static function edit_name(){
         global $frm_field;
-        $id = str_replace('field_', '', $_POST['element_id']);
+        $id = str_replace('field_label_', '', $_POST['element_id']);
         $values = array('name' => trim($_POST['update_value']));
         if ($_POST['original_html'] == 'Untitled')
             $values['field_key'] = $_POST['update_value'];
@@ -59,21 +83,21 @@ class FrmFieldsController{
     }
     
 
-    function edit_description(){
+    public static function edit_description(){
         global $frm_field;
-        $id = str_replace('field_', '', $_POST['element_id']);
+        $id = str_replace('field_description_', '', $_POST['element_id']);
         $frm_field->update($id, array('description' => $_POST['update_value']));
         echo stripslashes($_POST['update_value']);
         die();
     } 
     
-    function mark_required(){
+    public static function mark_required(){
         global $frm_field;
         $frm_field->update($_POST['field'], array('required' => $_POST['required']));
         die();
     }
     
-    function update_ajax_option(){
+    public static function update_ajax_option(){
         global $frm_field;
         $field = $frm_field->getOne($_POST['field']);
         $field->field_options = maybe_unserialize($field->field_options);
@@ -93,8 +117,8 @@ class FrmFieldsController{
         die();
     }
     
-    function duplicate(){
-        global $frmdb, $frm_field, $frm_app_helper, $frm_ajax_url;
+    public static function duplicate(){
+        global $frmdb, $frm_field;
         
         $copy_field = $frm_field->getOne($_POST['field_id']);
         if (!$copy_field) return;
@@ -106,7 +130,7 @@ class FrmFieldsController{
         $values['form_id'] = $copy_field->form_id;
         foreach (array('name', 'description', 'type', 'field_options', 'required') as $col)
             $values[$col] = $copy_field->{$col};
-        $field_count = $frm_app_helper->getRecordCount("form_id='$copy_field->form_id'", $frmdb->fields);
+        $field_count = FrmAppHelper::getRecordCount("form_id='$copy_field->form_id'", $frmdb->fields);
         $values['field_order'] = $field_count + 1;
         
         $field_id = $frm_field->create($values);
@@ -123,15 +147,15 @@ class FrmFieldsController{
         die();
     }
     
-    function destroy(){
+    public static function destroy(){
         global $frm_field;
         $field_id = $frm_field->destroy($_POST['field_id']);
         die();
     }   
 
     /* Field Options */
-    function add_option(){
-        global $frm_field, $frm_ajax_url;
+    public static function add_option(){
+        global $frm_field;
 
         $id = $_POST['field_id'];
         $field = $frm_field->getOne($id);
@@ -162,12 +186,11 @@ class FrmFieldsController{
         $field['separate_value'] = isset($field_data->field_options['separate_value']) ? $field_data->field_options['separate_value'] : 0;
         $field_name = "item_meta[$id]";
         
-        require(FRM_VIEWS_PATH.'/frm-forms/new-option-js.php');
         require(FRM_VIEWS_PATH.'/frm-fields/single-option.php');
         die();
     }
 
-    function edit_option(){
+    public static function edit_option(){
         global $frm_field;
         $ids = explode('-', $_POST['element_id']);
         $id = str_replace('field_', '', $ids[0]);
@@ -201,7 +224,7 @@ class FrmFieldsController{
         die();
     }
 
-    function delete_option(){
+    public static function delete_option(){
         global $frm_field;
         $field = $frm_field->getOne($_POST['field_id']);
         $options = maybe_unserialize($field->options);
@@ -210,13 +233,13 @@ class FrmFieldsController{
         die();
     }
     
-    function import_choices(){
+    public static function import_choices(){
         if(!current_user_can('frm_edit_forms'))
             return;
         
         $field_id = $_REQUEST['field_id'];
         	
-        global $current_screen, $hook_suffix;
+        global $current_screen, $hook_suffix, $frm_field;
 
         // Catch plugins that include admin-header.php before admin.php completes.
         if (empty( $current_screen ) and function_exists('set_current_screen')){
@@ -267,17 +290,17 @@ class FrmFieldsController{
             __('Disagree', 'formidable'), __('Strongly Disagree', 'formidable'), __('N/A', 'formidable')
         );
         
-        $field = FrmField::getOne($field_id);
+        $field = $frm_field->getOne($field_id);
         
         include(FRM_VIEWS_PATH.'/frm-fields/import_choices.php');
         die();
     }
     
-    function import_options(){
+    public static function import_options(){
         if(!is_admin() or !current_user_can('frm_edit_forms'))
             return;
         
-        global $frm_field, $frm_ajax_url;
+        global $frm_field;
         
         extract($_POST);
         
@@ -322,7 +345,7 @@ class FrmFieldsController{
         die();
     }
 
-    function update_order(){
+    public static function update_order(){
         if(isset($_POST) and isset($_POST['frm_field_id'])){
             global $frm_field;
             
@@ -332,7 +355,7 @@ class FrmFieldsController{
         die();
     }
     
-    function change_type($type){
+    public static function change_type($type){
         global $frmpro_is_installed;
 
         if ($frmpro_is_installed) return $type;
@@ -350,7 +373,7 @@ class FrmFieldsController{
         return $type;
     }
     
-    function display_field_options($display){
+    public static function display_field_options($display){
         switch($display['type']){
             case 'captcha':
                 $display['required'] = false;
@@ -373,19 +396,23 @@ class FrmFieldsController{
         return $display;
     }
     
-    function input_html($field, $echo=true){
+    public static function input_html($field, $echo=true){
         global $frm_settings;
         
         $class = ''; //$field['type'];
+        
+        if(is_admin() and !in_array($field['type'], array('scale', 'radio', 'checkbox', 'data')))
+            $class .= 'dyn_default_value';
+        
         $add_html = '';
         
         if(isset($field['size']) and $field['size'] > 0){
-            if(!in_array($field['type'], array('textarea', 'select', 'data', 'time')))
+            if(!in_array($field['type'], array('textarea', 'select', 'data', 'time', 'hidden')))
                 $add_html .= ' size="'. $field['size'] .'"';
             $class .= " auto_width";
         }
         
-        if(isset($field['max']) and !in_array($field['type'], array('textarea', 'rte')) and !empty($field['max']))
+        if(isset($field['max']) and !in_array($field['type'], array('textarea', 'rte', 'hidden')) and !empty($field['max']))
             $add_html .= ' maxlength="'. $field['max'] .'"';
         
         if(!is_admin() or !isset($_GET) or !isset($_GET['page']) or $_GET['page'] == 'formidable_entries'){
@@ -419,7 +446,7 @@ class FrmFieldsController{
         
         $class = apply_filters('frm_field_classes', $class, $field);
         if(!empty($class))
-            $add_html .= ' class="'. $class .'"';
+            $add_html .= ' class="'. trim($class) .'"';
             
         if(isset($field['shortcodes']) and !empty($field['shortcodes'])){
             foreach($field['shortcodes'] as $k => $v){
@@ -436,7 +463,7 @@ class FrmFieldsController{
         return $add_html;
     }
     
-    function check_value($opt, $opt_key, $field){
+    public static function check_value($opt, $opt_key, $field){
         if(is_array($opt)){
             if(isset($field['separate_value']) and $field['separate_value']){
                 $opt = isset($opt['value']) ? $opt['value'] : (isset($opt['label']) ? $opt['label'] : reset($opt));
@@ -447,7 +474,7 @@ class FrmFieldsController{
         return $opt;
     }
     
-    function check_label($opt, $opt_key, $field){
+    public static function check_label($opt, $opt_key, $field){
         if(is_array($opt))
             $opt = (isset($opt['label']) ? $opt['label'] : reset($opt));
             

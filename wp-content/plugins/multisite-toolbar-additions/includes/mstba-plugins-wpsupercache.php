@@ -14,6 +14,16 @@
  */
 
 /**
+ * Prevent direct access to this file.
+ *
+ * @since 1.4.0
+ */
+if ( ! defined( 'ABSPATH' ) ) {
+	exit( 'Sorry, you are not allowed to access this file directly.' );
+}
+
+
+/**
  * WP Super Cache (free, by Donncha O Caoimh)
  *
  * @since 1.0.0

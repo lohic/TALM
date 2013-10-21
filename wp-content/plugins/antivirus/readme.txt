@@ -1,9 +1,9 @@
 === AntiVirus ===
 Contributors: sergej.mueller
-Tags: antivirus, malware, scanner
+Tags: antivirus, malware, scanner, phishing, safe browsing
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=5RDDW9FEHGLG6
 Requires at least: 2.8
-Tested up to: 3.5
+Tested up to: 3.6
 Stable tag: trunk
 
 
@@ -17,6 +17,7 @@ Useful plugin that will scan your theme templates for malicious injections. Auto
 = Scan & Notify =
 *AntiVirus for WordPress* is a easy and safe tool to protect your blog install against exploits, malware and spam injections. Scan your templates now!
 
+
 = Features =
 * Virus alert in the admin bar
 * Cleaning up after plugin removal
@@ -26,22 +27,40 @@ Useful plugin that will scan your theme templates for malicious injections. Auto
 * WordPress 3.x ready: both visually and technically
 * Whitelist solution: Mark suspected cases as "no virus"
 * Manual check of template files with alerts on suspected cases
+* Optional: Google Safe Browsing for malware and phishing monitoring.
+
 
 = Requirements =
 * PHP 5.1
 * WordPress 2.8
 
+
+= Donation =
+* [Flattr](https://flattr.com/t/1322865)
+* [PayPal](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=5RDDW9FEHGLG6)
+
+
 = Documentation =
 * [Sicherheit: AntiVirus für WordPress](http://playground.ebiene.de/antivirus-wordpress-plugin/ "AntiVirus für WordPress") (DE)
 
+
+= Website =
+* [wpantivirus.com](http://wpantivirus.com)
+
+
 = Author =
-* [Google+](https://plus.google.com/110569673423509816572 "Google+")
-* [Plugins](http://wpcoder.de "Plugins")
-* [Portfolio](http://ebiene.de "Portfolio")
+* [Twitter](https://twitter.com/wpSEO)
+* [Google+](https://plus.google.com/110569673423509816572)
+* [Plugins](http://wpcoder.de)
+
 
 
 
 == Changelog ==
+
+= 1.3.4 =
+* Deutsch: Benachrichtigung per E-Mail, sobald [Google Safe Browsing](http://en.wikipedia.org/wiki/Google_Safe_Browsing) Malware im Blog erkennt. [Mehr auf Google+](https://plus.google.com/110569673423509816572/posts/H72FFwvna1i)
+* English: [Google Safe Browsing](http://en.wikipedia.org/wiki/Google_Safe_Browsing) for malware and phishing monitoring.
 
 = 1.3.3 =
 * Add inspection for iFrames
@@ -114,6 +133,7 @@ Useful plugin that will scan your theme templates for malicious injections. Auto
 
 = 0.1 =
 * AntiVirus for WordPress goes online
+
 
 
 

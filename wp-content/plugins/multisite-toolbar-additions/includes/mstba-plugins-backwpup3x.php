@@ -14,6 +14,16 @@
  */
 
 /**
+ * Prevent direct access to this file.
+ *
+ * @since 1.4.0
+ */
+if ( ! defined( 'ABSPATH' ) ) {
+	exit( 'Sorry, you are not allowed to access this file directly.' );
+}
+
+
+/**
  * BackWPup v3.x - free lite version (free, by Inpsyde GmbH/ Daniel Hüsken)
  *
  * @since 1.3.0
@@ -127,3 +137,17 @@ else {
 	);
 
 }  // end-if ! multisite check
+
+
+/**
+ * Hook "New Job" into (site) 'new-content' section as well as our own
+ *    'new-content' within Network admin.
+ *
+ * @since 1.4.0
+ */
+	$mstba_tb_items[ 'newcontent_backwpup_add' ] = array(
+		'parent' => 'new-content',
+		'title'  => __( 'BackWPup Job', 'multisite-toolbar-additions' ),
+		'href'   => network_admin_url( 'admin.php?page=backwpupeditjob' ),
+		'meta'   => array( 'target' => '', 'title' => __( 'BackWPup Job', 'multisite-toolbar-additions' ) )
+	);

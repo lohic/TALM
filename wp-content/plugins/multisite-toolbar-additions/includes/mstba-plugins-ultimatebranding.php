@@ -14,19 +14,33 @@
  */
 
 /**
+ * Prevent direct access to this file.
+ *
+ * @since 1.4.0
+ */
+if ( ! defined( 'ABSPATH' ) ) {
+	exit( 'Sorry, you are not allowed to access this file directly.' );
+}
+
+
+/**
  * Ultimate Branding (premium, by Incsub Team/ WPMU DEV)
  *
  * @since 1.2.0
  */
 /** Multisite check */
 if ( is_multisite() ) {
+
 	$mstba_ubranding_pre_id = 'networkext';
 	$mstba_ubranding_parent = $networkext_ubranding;
 	$mstba_ubranding_parentfirst = $networkextgroup;
+
 } else {
+
 	$mstba_ubranding_pre_id = 'siteext';
 	$mstba_ubranding_parent = $siteext_ubranding;
 	$mstba_ubranding_parentfirst = $siteextgroup;
+	
 }  // end-if multisite check
 
 /** List the menu items */

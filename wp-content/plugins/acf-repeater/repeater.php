@@ -31,7 +31,7 @@ class acf_field_repeater extends acf_field
 		$this->settings = array(
 			'path' => apply_filters('acf/helpers/get_path', __FILE__),
 			'dir' => apply_filters('acf/helpers/get_dir', __FILE__),
-			'version' => '1.0.0'
+			'version' => '1.0.1'
 		);
 		
 		
@@ -315,7 +315,7 @@ class acf_field_repeater extends acf_field
 					</td>
 			<?php endif; ?>
 			
-			<td>
+			<td class="sub_field field_type-<?php echo $sub_field['type']; ?> field_key-<?php echo $sub_field['key']; ?>" data-field_type="<?php echo $sub_field['type']; ?>" data-field_key="<?php echo $sub_field['key']; ?>" data-field_name="<?php echo $sub_field['name']; ?>">
 				<?php
 				
 				// add value
@@ -425,7 +425,7 @@ class acf_field_repeater extends acf_field
 		
 		// get name of all fields for use in field type drop down
 		$fields_names = apply_filters('acf/registered_fields', array());
-		unset( $fields_names['tab'] );
+		unset( $fields_names[ __("Layout",'acf') ]['tab'] );
 		
 		?>
 <tr class="field_option field_option_<?php echo $this->name; ?> field_option_<?php echo $this->name; ?>_fields">

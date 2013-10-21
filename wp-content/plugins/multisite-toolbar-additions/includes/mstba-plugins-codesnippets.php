@@ -14,6 +14,16 @@
  */
 
 /**
+ * Prevent direct access to this file.
+ *
+ * @since 1.4.0
+ */
+if ( ! defined( 'ABSPATH' ) ) {
+	exit( 'Sorry, you are not allowed to access this file directly.' );
+}
+
+
+/**
  * Code Snippets (free, by Shea Bunge)
  *
  * @since 1.1.0
@@ -43,9 +53,21 @@ if ( current_user_can( 'manage_network_snippets' ) ) {
 		$mstba_tb_items[ 'networkext_codesnippets_import' ] = array(
 			'parent' => $networkext_codesnippets,
 			'title'  => __( 'Import', 'multisite-toolbar-additions' ),
-			'href'   => network_admin_url( 'admin.php?page=import-snippets' ),
+			'href'   => ! function_exists( 'cs_uninstall' ) ? network_admin_url( 'admin.php?page=import-code-snippets' ) : network_admin_url( 'admin.php?page=import-snippets' ),
 			'meta'   => array( 'target' => '', 'title' => __( 'Import', 'multisite-toolbar-additions' ) )
 		);
+
+		/** Also, hook into 'new-content' section */
+		if ( is_network_admin() ) {
+
+			$mstba_tb_items[ 'networkext_newcontent_codesnippet' ] = array(
+				'parent' => 'new-content',
+				'title'  => __( 'Code Snippet', 'multisite-toolbar-additions' ),
+				'href'   => network_admin_url( 'admin.php?page=snippet' ),
+				'meta'   => array( 'target' => '', 'title' => __( 'Add new Code Snippet', 'multisite-toolbar-additions' ) )
+			);
+
+		}  // end-if is_network_admin() check
 
 	}  // end-if cap check
 
@@ -74,9 +96,21 @@ if ( current_user_can( 'manage_snippets' ) ) {
 		$mstba_tb_items[ 'siteext_codesnippets_import' ] = array(
 			'parent' => $siteext_codesnippets,
 			'title'  => __( 'Import', 'multisite-toolbar-additions' ),
-			'href'   => admin_url( 'admin.php?page=import-snippets' ),
+			'href'   => ! function_exists( 'cs_uninstall' ) ? admin_url( 'admin.php?import=code-snippets' ) : admin_url( 'admin.php?page=import-snippets' ),
 			'meta'   => array( 'target' => '', 'title' => __( 'Import', 'multisite-toolbar-additions' ) )
 		);
+
+		/** Also, hook into 'new-content' section */
+		if ( ! is_network_admin() ) {
+
+			$mstba_tb_items[ 'siteext_newcontent_codesnippet' ] = array(
+				'parent' => 'new-content',
+				'title'  => __( 'Code Snippet', 'multisite-toolbar-additions' ),
+				'href'   => admin_url( 'admin.php?page=snippet' ),
+				'meta'   => array( 'target' => '', 'title' => __( 'Add new Code Snippet', 'multisite-toolbar-additions' ) )
+			);
+
+		}  // end-if !is_network_admin() check
 
 	}  // end-if cap check
 

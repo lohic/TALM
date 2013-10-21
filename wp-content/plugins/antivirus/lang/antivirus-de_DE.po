@@ -21,11 +21,8 @@ msgstr "Virusverdacht"
 msgid "AntiVirus for WordPress"
 msgstr "AntiVirus für WordPress"
 
-msgid "requires at least WordPress 2.8"
-msgstr "benötigt WordPress 2.8"
-
-msgid "Last check"
-msgstr "Zuletzt"
+msgid "Next check"
+msgstr "Erneuter Check"
 
 msgid "View line"
 msgstr "Zeige Zeile"
@@ -39,17 +36,20 @@ msgstr "Prüfung abgeschlossen"
 msgid "Enable the daily antivirus scan"
 msgstr "Tägliche AntiVirus-Prüfung durchführen"
 
-msgid "Alternate email address"
-msgstr "Alternative E-Mail-Adresse"
+msgid "Alternate e-mail address for notifications"
+msgstr "Alternative E-Mail-Adresse für Benachrichtigungen"
 
-msgid "Completed scan"
-msgstr "Durchgeführte Prüfung"
+msgid "If the field is empty, the blog admin will be notified"
+msgstr "Bleibt das Eingabefeld leer, wird der Blog-Admin benachrichtigt"
 
-msgid "Permalink back door check"
-msgstr "Check auf das Sicherheitsrisiko im Permalink"
+msgid "Malware and phishing detection by Google"
+msgstr "Malware-Erkennung von Google berücksichtigen"
 
-msgid "http://mashable.com/2009/09/05/wordpress-attack/"
-msgstr "http://blog.wordpress-deutschland.org/2009/09/05/aeltere-wordpress-versionen-ziel-von-angriffen.html"
+msgid "Use %s for malware monitoring"
+msgstr "Benachrichtigung bei Verdacht seitens %s"
+
+msgid "Scan via cronjob"
+msgstr "Automatische Prüfung"
 
 msgid "Manual scan"
 msgstr "Manuelle Prüfung"
@@ -60,18 +60,6 @@ msgstr "Theme-Templates jetzt prüfen"
 msgid "The daily antivirus scan of your blog suggests alarm."
 msgstr "Die tägliche AntiVirus-Prüfung des Blogs schlägt Alarm."
 
-msgid "All clear"
-msgstr "Verdachtlos"
-
-msgid "Danger"
-msgstr "Gefahr"
-
-msgid "Flattr plugin"
-msgstr "Plugin flattern"
-
-msgid "Follow on Google+"
-msgstr "Auf Google+ folgen"
-
 msgid "Security solution as a smart, effectively plugin to protect your blog against exploits and spam injections."
 msgstr "Kostenfreie Sicherheitslösung als Plugin zur Früherkennung und Warnung vor bösartigen Injektionen in Theme-Templates."
 
@@ -80,4 +68,10 @@ msgstr "Benachrichtigung von AntiVirus für WordPress"
 
 msgid "http://wpantivirus.com"
 msgstr "http://wpantivirus.de"
+
+msgid "Safe Browsing Alert"
+msgstr "Safe Browsing Alarm"
+
+msgid "Please check the Google Safe Browsing diagnostic page:"
+msgstr "Für weitere Details die Google Safe Browsing Diagnoseseite aufsuchen:"
 

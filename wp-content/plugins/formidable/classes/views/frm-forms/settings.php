@@ -79,8 +79,8 @@
                     </td>
                 </tr>
                 
-                <tr class="success_action_redirect_box success_action_box" <?php echo ($values['success_action'] == 'redirect') ? '' : 'style="display:none;"'; ?>><td valign="top" colspan="2"><label><?php _e('Redirect to URL', 'formidable') ?></label>
-                    <input type="text" name="options[success_url]" id="success_url" value="<?php if(isset($values['success_url'])) echo esc_attr($values['success_url']); ?>" size="55"></td>
+                <tr class="success_action_redirect_box success_action_box" <?php echo ($values['success_action'] == 'redirect') ? '' : 'style="display:none;"'; ?>><td valign="top" colspan="2">
+                    <input type="text" name="options[success_url]" id="success_url" value="<?php if(isset($values['success_url'])) echo esc_attr($values['success_url']); ?>" style="width:98%" placeholder="http://example.com" /></td>
                 </tr>
                 
                 <tr class="success_action_message_box success_action_box" <?php echo ($values['success_action'] == 'message') ? '' : 'style="display:none;"'; ?>><td valign="top" colspan="2"><label><?php _e('Confirmation Message', 'formidable') ?></label>
@@ -90,11 +90,20 @@
                     </div>
                     <td>
                 </tr>
+                <?php if($frmpro_is_installed){ ?>
+                <tr class="success_action_page_box success_action_box" <?php echo ($values['success_action'] == 'page') ? '' : 'style="display:none;"'; ?>><td><label><?php _e('Use Content from Page', 'formidable') ?></label></td>
+                    <td>
+                        <?php FrmAppHelper::wp_pages_dropdown( 'options[success_page_id]', $values['success_page_id'] ) ?>
+                    </td>
+                </tr>
+                <?php } ?>
+                
+                <tr><td colspan="2"><input type="checkbox" name="options[ajax_load]" id="ajax_load" value="1"<?php echo ($values['ajax_load']) ? ' checked="checked"' : ''; ?> /> <label for="ajax_load"><?php _e('Load and save form builder page with AJAX', 'formidable') ?></label><img src="<?php echo FRM_IMAGES_URL ?>/tooltip.png" alt="?" class="frm_help" title="<?php _e('Recommended for long forms.', 'formidable') ?>" /></td></tr>
 
 
                 <?php do_action('frm_additional_form_options', $values); ?> 
                 
-                <tr><td colspan="2"><input type="checkbox" name="options[no_save]" id="no_save" value="1" <?php checked($values['no_save'], 1); ?> /> <?php _e('Do not store any entries submitted from this form.', 'formidable') ?> <span class="howto"><?php _e('Warning: There is no way retrieve unsaved entries.', 'formidable') ?></span></td></tr>
+                <tr><td colspan="2"><input type="checkbox" name="options[no_save]" id="no_save" value="1" <?php checked($values['no_save'], 1); ?> /> <?php _e('Do not store any entries submitted from this form.', 'formidable') ?> <span class="howto"><?php _e('Warning: There is no way to retrieve unsaved entries.', 'formidable') ?></span></td></tr>
                 
                 <?php if (function_exists( 'akismet_http_post' )){ ?>
                 <tr><td colspan="2"><?php _e('Use Akismet to check entries for spam for', 'formidable') ?>
@@ -144,6 +153,9 @@
 
                 <p><label class="frm_primary_label"><?php _e('After Fields', 'formidable') ?></label>
                 <textarea name="options[after_html]" rows="3" id="after_html" class="frm_long_input"><?php echo FrmAppHelper::esc_textarea(stripslashes($values['after_html'])) ?></textarea></p> 
+                
+                <p><label class="frm_primary_label"><?php _e('Submit Button', 'formidable') ?></label>
+                <textarea name="options[submit_html]" rows="3" id="submit_html" class="frm_long_input"><?php echo FrmAppHelper::esc_textarea(stripslashes($values['submit_html'])) ?></textarea></p>
             </div>
         </div>
         <div id="post_settings" class="tabs-panel" style="display:none;">
@@ -188,5 +200,5 @@
 </div>
 </div>
 <script type="text/javascript">
-__FRMURL='<?php echo $frm_ajax_url ?>';
+__FRMURL='<?php echo admin_url("admin-ajax.php") ?>';
 </script>

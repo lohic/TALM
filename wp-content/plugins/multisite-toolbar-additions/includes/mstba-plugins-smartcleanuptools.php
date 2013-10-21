@@ -14,6 +14,16 @@
  */
 
 /**
+ * Prevent direct access to this file.
+ *
+ * @since 1.4.0
+ */
+if ( ! defined( 'ABSPATH' ) ) {
+	exit( 'Sorry, you are not allowed to access this file directly.' );
+}
+
+
+/**
  * Smart Cleanup Tools (premium, by Smart Plugins/ Milan Petrovic)
  *
  * @since 1.3.0
@@ -81,6 +91,13 @@ if ( is_multisite() && current_user_can( 'manage_network' ) ) {
 			'meta'   => array( 'target' => '', 'title' => __( 'About', 'multisite-toolbar-additions' ) )
 		);
 
+		$mstba_tb_items[ 'networkext_smartcleanuptools_support' ] = array(
+			'parent' => $networkext_smartcleanuptools,
+			'title'  => __( 'Support Forum', 'multisite-toolbar-additions' ),
+			'href'   => 'http://www.millan.rs/forums/forum/smart/smart-cleanup-tools/',
+			'meta'   => array( 'title' => __( 'Support Forum', 'multisite-toolbar-additions' ) )
+		);
+
 }  // end-if is_multisite() & cap check
 
 if ( current_user_can( 'activate_plugins' ) ) {
@@ -140,6 +157,13 @@ if ( current_user_can( 'activate_plugins' ) ) {
 			'title'  => __( 'About', 'multisite-toolbar-additions' ),
 			'href'   => admin_url( 'index.php?page=smart-cleanup-tools&tab=about' ),
 			'meta'   => array( 'target' => '', 'title' => __( 'About', 'multisite-toolbar-additions' ) )
+		);
+
+		$mstba_tb_items[ 'siteext_smartcleanuptools_support' ] = array(
+			'parent' => $siteext_smartcleanuptools,
+			'title'  => __( 'Support Forum', 'multisite-toolbar-additions' ),
+			'href'   => 'http://www.millan.rs/forums/forum/smart/smart-cleanup-tools/',
+			'meta'   => array( 'title' => __( 'Support Forum', 'multisite-toolbar-additions' ) )
 		);
 
 }  // end-if cap check

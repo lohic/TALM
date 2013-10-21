@@ -10,8 +10,18 @@
  * @link       http://genesisthemes.de/en/wp-plugins/multisite-toolbar-additions/
  * @link       http://deckerweb.de/twitter
  *
- * @since 1.2.0
+ * @since      1.2.0
  */
+
+/**
+ * Prevent direct access to this file.
+ *
+ * @since 1.4.0
+ */
+if ( ! defined( 'ABSPATH' ) ) {
+	exit( 'Sorry, you are not allowed to access this file directly.' );
+}
+
 
 /**
  * Snapshot (premium, by Paul Menard (Incsub)/ WPMU DEV)
@@ -33,7 +43,7 @@ if ( is_multisite() ) {
 	$mstba_snapshot_parentfirst = $siteextgroup;
 	$mstba_snapshot_parentdest  = $siteext_snapshot_destinations;
 
-}  // end-if multisite check
+}  // end-if is_multisite() check
 
 
 	/**
@@ -99,4 +109,18 @@ if ( is_multisite() ) {
 		'title'  => __( 'Settings', 'multisite-toolbar-additions' ),
 		'href'   => network_admin_url( 'admin.php?page=snapshots_settings_panel' ),
 		'meta'   => array( 'target' => '', 'title' => __( 'Settings', 'multisite-toolbar-additions' ) )
+	);
+
+
+/**
+ * Hook "New Snapshot" into (site) 'new-content' section as well as our own
+ *    'new-content' within Network admin.
+ *
+ * @since 1.4.0
+ */
+	$mstba_tb_items[ $mstba_snapshot_pre_id . '_newcontent_snapshot_add' ] = array(
+		'parent' => 'new-content',
+		'title'  => __( 'New Snapshot', 'multisite-toolbar-additions' ),
+		'href'   => network_admin_url( 'admin.php?page=snapshots_new_panel' ),
+		'meta'   => array( 'target' => '', 'title' => __( 'New Snapshot', 'multisite-toolbar-additions' ) )
 	);

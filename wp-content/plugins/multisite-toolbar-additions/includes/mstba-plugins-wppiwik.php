@@ -14,6 +14,16 @@
  */
 
 /**
+ * Prevent direct access to this file.
+ *
+ * @since 1.4.0
+ */
+if ( ! defined( 'ABSPATH' ) ) {
+	exit( 'Sorry, you are not allowed to access this file directly.' );
+}
+
+
+/**
  * WP-Piwik (free, by Andr&eacute; Br&auml;kling)
  *
  * @since 1.0.0
@@ -21,9 +31,11 @@
  * @uses  is_plugin_active_for_network()
  * @uses  current_user_can()
  * @uses  get_option()
+ * @uses  network_admin_url()
+ * @uses  admin_url()
  */
 /** If plugin is network activated - in Multisite */
-if ( is_plugin_active_for_network( 'wp-piwik/wp-piwik.php' ) ) {
+if ( function_exists( 'is_plugin_active_for_network' ) && is_plugin_active_for_network( 'wp-piwik/wp-piwik.php' ) ) {
 
 	$mstba_wppiwik_type = 'settings';
 	$mstba_wppiwik_aurl_slug = network_admin_url( 'settings.php?page=wp-piwik/wp-piwik.php&tab=piwik' );
@@ -61,6 +73,14 @@ if ( is_plugin_active_for_network( 'wp-piwik/wp-piwik.php' ) ) {
 		);
 
 	}  // end-if cap check
+
+	/** Add support item */
+	$mstba_tb_items[ 'networkext_wppiwik_support' ] = array(
+		'parent' => $networkext_wppiwik,
+		'title'  => _x( 'Support', 'Translators: Toolbar item', 'multisite-toolbar-additions' ),
+		'href'   => network_admin_url( 'settings.php?page=wp-piwik/wp-piwik.php&tab=support' ),
+		'meta'   => array( 'target' => '', 'title' => _x( 'Support', 'Translators: Toolbar item', 'multisite-toolbar-additions' ) )
+	);
 
 }  // end-if multisite check
 
@@ -101,6 +121,14 @@ elseif ( ! is_plugin_active_for_network( 'wp-piwik/wp-piwik.php' ) ) {
 		);
 
 	}  // end-if cap check
+
+	/** Add support item */
+	$mstba_tb_items[ 'siteext_wppiwik_support' ] = array(
+		'parent' => $siteext_wppiwik,
+		'title'  => _x( 'Support', 'Translators: Toolbar item', 'multisite-toolbar-additions' ),
+		'href'   => admin_url( 'options-general.php?page=wp-piwik/wp-piwik.php&tab=support' ),
+		'meta'   => array( 'target' => '', 'title' => _x( 'Support', 'Translators: Toolbar item', 'multisite-toolbar-additions' ) )
+	);
 
 }  // end-if ! multisite check
 

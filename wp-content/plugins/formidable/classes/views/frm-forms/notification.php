@@ -2,7 +2,18 @@
 <table class="form-table">
 <tr valign="top">
     <td width="100px"><label><?php _e('From/Reply to', 'formidable') ?></label> <img src="<?php echo FRM_IMAGES_URL ?>/tooltip.png" alt="?" class="frm_help" title="<?php _e('Usually the name and email of the person filling out the form. Select from Text, Email, User ID, or hidden fields for the name. &lt;br/&gt;Defaults to your site name and admin email found on the WordPress General Settings page.', 'formidable') ?>" /></td>
-    <td class="frm_email_reply_container"><span class="howto"><?php _e('Name', 'formidable') ?></span> 
+    <td class="frm_email_reply_container">
+        <div class="alignright frm_email_actions feature-filter">
+            <?php echo $email_key; ?>
+            <?php if($email_key > 0){ ?>
+            <span class="frm_email_icons">
+                <a href="javascript:frmRemoveEmailList(<?php echo $email_key ?>)">
+                <img src="<?php echo FRM_IMAGES_URL ?>/trash.png" alt="<?php _e('Remove Email', 'formidable') ?>" title="<?php _e('Remove Email', 'formidable') ?>" />
+                </a>
+            </span>
+            <?php } ?>
+        </div>
+        <span class="howto"><?php _e('Name', 'formidable') ?></span> 
         
         <select name="notification[<?php echo $email_key ?>][reply_to_name]" id="reply_to_name_<?php echo $email_key ?>" onchange="frmCheckCustomEmail(this.value,'reply_to_name',<?php echo $email_key ?>)">
         <option value=""><?php echo FrmAppHelper::truncate(get_option('blogname'), 80); ?></option>
@@ -15,7 +26,7 @@
         foreach($values['fields'] as $val_key => $fo){
             if(in_array($fo['type'], $field_select)){ ?>
                 <option value="<?php echo $fo['id'] ?>" <?php selected($notification['reply_to_name'], $fo['id']); ?>><?php echo FrmAppHelper::truncate($fo['name'], 40) ?></option>
-    <?php }else if($fo['type'] == 'data' and $fo['data_type'] != 'data'){
+    <?php }else if($fo['type'] == 'data' and isset($fo['data_type']) and $fo['data_type'] != 'data'){
             if(isset($values['fields'][$val_key]['linked'])){
                 foreach($values['fields'][$val_key]['linked'] as $linked_field){ 
                 if(!in_array($linked_field->type, $field_select)) continue; ?>
@@ -38,7 +49,7 @@
         foreach($values['fields'] as $val_key => $fo){
             if(in_array($fo['type'], $field_select)){ ?>
                 <option value="<?php echo $fo['id'] ?>" <?php selected($notification['reply_to'], $fo['id']); ?>><?php echo FrmAppHelper::truncate($fo['name'], 40) ?></option>
-        <?php }else if($fo['type'] == 'data' and $fo['data_type'] != 'data'){
+        <?php }else if($fo['type'] == 'data' and isset($fo['data_type']) and $fo['data_type'] != 'data'){
                 if(isset($values['fields'][$val_key]['linked'])){ ?>
                 <?php foreach($values['fields'][$val_key]['linked'] as $linked_field){ 
                     if(!in_array($linked_field->type, $field_select)) continue; ?>

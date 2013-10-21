@@ -58,8 +58,10 @@ class FrmEntryMeta{
       $field_id = (int)$field_id;
       
       $cached = wp_cache_get( $entry_id, 'frm_entry' );
-      if($cached and isset($cached->metas) and isset($cached->metas[$field_id]))
-            return $cached->metas[$field_id];
+      if($cached and isset($cached->metas) and isset($cached->metas[$field_id])){
+            $result = $cached->metas[$field_id];
+            return stripslashes_deep($result);
+        }
             
       if (is_numeric($field_id))
           $query = "SELECT meta_value FROM $frmdb->entry_metas WHERE field_id='$field_id' and item_id='$entry_id'";
@@ -86,8 +88,10 @@ class FrmEntryMeta{
       global $wpdb, $frmdb;
       
       $entry = wp_cache_get($entry_id, 'frm_entry');
-      if($return_var and $entry and isset($entry->metas) and isset($entry->metas[$field_id]))
-        return $entry->metas[$field_id];
+      if($return_var and $entry and isset($entry->metas) and isset($entry->metas[$field_id])){
+          $var = $entry->metas[$field_id];
+          return stripslashes_deep($var);
+      }
         
       $query_str = "SELECT meta_value FROM $frmdb->entry_metas WHERE field_id=%d and item_id=%d";
       $query = $wpdb->prepare($query_str, $field_id, $entry_id);
@@ -140,11 +144,11 @@ class FrmEntryMeta{
   }
     
   function getAll($where = '', $order_by = '', $limit = '', $stripslashes = false){
-    global $wpdb, $frmdb, $frm_field, $frm_app_helper;
+    global $wpdb, $frmdb, $frm_field;
     $query = "SELECT it.*, fi.type as field_type, fi.field_key as field_key, 
               fi.required as required, fi.form_id as field_form_id, fi.name as field_name, fi.options as fi_options 
               FROM $frmdb->entry_metas it LEFT OUTER JOIN $frmdb->fields fi ON it.field_id=fi.id" . 
-              $frm_app_helper->prepend_and_or_where(' WHERE ', $where) . $order_by . $limit;
+              FrmAppHelper::prepend_and_or_where(' WHERE ', $where) . $order_by . $limit;
 
     if ($limit == ' LIMIT 1')
         $results = $wpdb->get_row($query);
@@ -163,10 +167,10 @@ class FrmEntryMeta{
   }
   
   function getEntryIds($where = '', $order_by = '', $limit = '', $unique=true){
-    global $wpdb, $frmdb, $frm_app_helper;
+    global $wpdb, $frmdb;
     $query = "SELECT ";
     $query .= ($unique) ? "DISTINCT(it.item_id)" : "it.item_id";
-    $query .= " FROM $frmdb->entry_metas it LEFT OUTER JOIN $frmdb->fields fi ON it.field_id=fi.id". $frm_app_helper->prepend_and_or_where(' WHERE ', $where) . $order_by . $limit;
+    $query .= " FROM $frmdb->entry_metas it LEFT OUTER JOIN $frmdb->fields fi ON it.field_id=fi.id". FrmAppHelper::prepend_and_or_where(' WHERE ', $where) . $order_by . $limit;
     if ($limit == ' LIMIT 1')
         $results = $wpdb->get_var($query);
     else    
@@ -176,14 +180,14 @@ class FrmEntryMeta{
   }
   
   function getRecordCount($where=""){
-    global $wpdb, $frmdb, $frm_app_helper;
+    global $wpdb, $frmdb;
     $query = "SELECT COUNT(*) FROM $frmdb->entry_metas it LEFT OUTER JOIN  $frmdb->fields fi ON it.field_id=fi.id" .
-        $frm_app_helper->prepend_and_or_where(' WHERE ', $where);
+        FrmAppHelper::prepend_and_or_where(' WHERE ', $where);
     return $wpdb->get_var($query);
   }
   
   function search_entry_metas($search, $field_id='', $operator){
-      global $wpdb, $frmdb, $frm_app_helper;
+      global $wpdb, $frmdb;
       if (is_array($search)){
           $where = '';
             foreach ($search as $field => $value){
@@ -195,7 +199,7 @@ class FrmEntryMeta{
                   $where .= " meta_value {$operator} '%/{$value}/%' and";      
             }
             $where .= " field_id='{$field_id}'";
-            $query = "SELECT DISTINCT item_id FROM $frmdb->entry_metas". $frm_app_helper->prepend_and_or_where(' WHERE ', $where);
+            $query = "SELECT DISTINCT item_id FROM $frmdb->entry_metas". FrmAppHelper::prepend_and_or_where(' WHERE ', $where);
         }else{
             if ($operator == 'LIKE')
                 $search = "%{$search}%";

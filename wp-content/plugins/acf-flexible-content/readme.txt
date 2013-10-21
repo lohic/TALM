@@ -7,7 +7,7 @@ Requires at least: 3.0
 Tested up to: 3.5.1
 Stable tag: trunk
 Homepage: http://www.advancedcustomfields.com/add-ons/flexible-content-field/
-Version: 1.0.1
+Version: 1.0.2
 
 
 == Copyright ==
@@ -57,6 +57,9 @@ function my_register_fields()
 
 
 == Changelog ==
+
+= 1.0.2 =
+* [Fixed] Fixed JS error appearing if repeater field add-on is not activated
 
 = 1.0.1 =
 * [Updated] Updated sub field type list to remove 'Tab' and 'Flexible Content' as these do not work as sub fields

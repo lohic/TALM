@@ -2,8 +2,8 @@
 /*
 Plugin Name: Advanced Custom Fields: Options Page
 Plugin URI: http://www.advancedcustomfields.com/
-Description: Adds the options page
-Version: 1.0.1
+Description: This premium Add-on creates a static menu item for the Advanced Custom Fields plugin
+Version: 1.2.0
 Author: Elliot Condon
 Author URI: http://www.elliotcondon.com/
 License: GPL
@@ -27,28 +27,17 @@ class acf_options_page_plugin
 	{
 		// vars
 		$this->settings = array(
-			'title' => __('Options','acf'), // title / menu name ('Site Options')
-			'capability' => 'edit_posts', // capability to view options page
-			'pages' => array(), // an array of sub pages ('Header, Footer, Home, etc')
+			'title' 		=> __('Options','acf'),
+			'menu'			=> __('Options','acf'),
+			'slug' 			=> 'acf-options',
+			'capability'	=> 'edit_posts',
+			'pages' 		=> array(),
 		);
 		
 		
-		// create remote update
-		if( is_admin() )
-		{
-			$update_settings = array(
-				'version' => '1.0.1',
-				'remote' => 'http://download.advancedcustomfields.com/OPN8-FA4J-Y2LW-81LS/info/',
-				'basename' => plugin_basename(__FILE__),
-			);
-			
-			if( !class_exists('acf_remote_update') )
-			{
-				include_once('acf-remote-update.php');
-			}
-			
-			new acf_remote_update( $update_settings );
-		}
+		// set text domain
+		//load_plugin_textdomain('acf', false, basename(dirname(__FILE__)) . '/lang' );
+		load_textdomain('acf', dirname(__FILE__) . '/lang/acf-options-page-' . get_locale() . '.mo');
 		
 		
 		// actions
@@ -65,9 +54,13 @@ class acf_options_page_plugin
 	/*
 	*  init
 	*
-	*  @description: 
-	*  @since: 3.6
-	*  @created: 12/02/13
+	*  Allow the user to customize the settings array and also format all added sub pages
+	*
+	*  @type	action
+	*  @date	12/02/13
+	*
+	*  @param	N/A
+	*  @return	N/A
 	*/
 	
 	function init()
@@ -76,19 +69,131 @@ class acf_options_page_plugin
 		$this->settings = apply_filters('acf/options_page/settings', $this->settings);
 		
 		
-		if( isset($GLOBALS['acf_options_pages']) && !empty($GLOBALS['acf_options_pages']) )
+		// extra settings (not editable by the user)
+		$this->settings['show_parent'] = true;
+		
+				
+		// format the sub pages
+		if( !empty($this->settings['pages']) )
 		{
-			$this->settings['pages'] = array_merge( $this->settings['pages'], $GLOBALS['acf_options_pages'] );
+			// defaults
+			$defaults = array(
+				'title'			=>	'',
+				'menu'			=>	'',
+				'slug'			=>	'',
+				'parent'		=>	'',
+				'capability'	=>	''
+			);
+			
+			
+			// vars
+			$slug_changed = false;
+			
+			foreach( $this->settings['pages'] as $k => $page )
+			{
+			
+				// standardize
+				if( is_string($page) )
+				{
+					$title = $page;
+					$page = $defaults;
+					$page['title'] = $title;
+				}
+				elseif( is_array($page) )
+				{
+					$page = array_merge($defaults, $page);
+				}
+				else
+				{
+					// error
+					unset( $this->settings['pages'][ $k ] );
+					continue;
+				}
+				
+				
+				// menu
+				if( ! $page['menu'] )
+				{
+					$page['menu'] = $page['title'];
+				}
+				
+				
+				// slug
+				if( ! $page['slug'] )
+				{
+					$page['slug'] = 'acf-options-' . sanitize_title( $page['title'] );
+				}
+				
+
+				// parent
+				if( ! $page['parent'] )
+				{
+					$page['parent'] = $this->settings['slug'];
+				}
+				
+				
+				// update parent?
+				if( $page['parent'] == $this->settings['slug'] )
+				{
+					// this sub page DOES sit under the default options page menu item.
+					// we will use this sub page slug as the parent slug (make the parent redirect to this sub page).
+					if( ! $slug_changed )
+					{
+						$slug_changed = true;
+						
+						$this->settings['slug'] = $page['slug'];
+						
+						// solidate the parent menu
+						$this->settings['menu'] = $this->settings['title'];
+						
+						// update the parent title
+						$this->settings['title'] = $page['title'];
+						
+						$page['parent'] = $page['slug'];
+					}
+				}
+				else
+				{
+					// this sub page DOES NOT sit under the default options page menu item
+				}
+				
+				
+				// parent
+				if( ! $page['capability'] )
+				{
+					$page['capability'] = $this->settings['capability'];
+				}
+				
+				
+				// update
+				$this->settings['pages'][ $k ] = $page;
+				
+			}
+			
+			
+			// update parent slug
+			if( !$slug_changed )
+			{
+				// no sub pages sit under the default options page menu item
+				$this->settings['show_parent'] = false;
+			}
+			
+			
 		}
+
 	}
-	
+		
 	
 	/*
 	*  acf_location_rules_types
 	*
-	*  @description: 
-	*  @since: 3.6
-	*  @created: 2/02/13
+	*  this function will add "Options Page" to the ACF location rules
+	*
+	*  @type	function
+	*  @date	2/02/13
+	*
+	*  @param	{array}	$choices
+	*  @return	{array}	$choices
 	*/
 	
 	function acf_location_rules_types( $choices )
@@ -102,25 +207,32 @@ class acf_options_page_plugin
 	/*
 	*  acf_location_rules_values_options_page
 	*
-	*  @description: 
-	*  @since: 3.6
-	*  @created: 2/02/13
+	*  this function will populate the available pages in the ACF location rules
+	*
+	*  @type	function
+	*  @date	2/02/13
+	*
+	*  @param	{array}	$choices
+	*  @return	{array}	$choices
 	*/
+	
 	function acf_location_rules_values_options_page( $choices )
-	{			
-		$choices = array(
-			'acf-options' => $this->settings['title']
-		);
+	{
+		// default
+		$choices = array();
 		
-		$titles = $this->settings['pages'];
-		if( !empty($titles) )
+		
+		// populate choices
+		if( !empty( $this->settings['pages'] ) )
 		{
-			$choices = array();
-			foreach( $titles as $title )
+			foreach( $this->settings['pages'] as $page )
 			{
-				$slug = 'acf-options-' . sanitize_title( $title );
-				$choices[ $slug ] = $title;
+				$choices[ $page['slug'] ] = $page['title'];
 			}
+		}
+		else
+		{
+			$choices[ $this->settings['slug'] ] = $this->settings['title'];
 		}
 		
 		
@@ -138,37 +250,29 @@ class acf_options_page_plugin
 	
 	function admin_menu() 
 	{
-		// vars
-		$parent_slug = 'acf-options';
-		$parent_title = $this->settings['title'];
-		$parent_menu = $this->settings['title'];
-		
-		
-		// redirect to first child
-		if( !empty($this->settings['pages']) )
-		{	
-			$parent_title = $this->settings['pages'][0];
-			$parent_slug = 'acf-options-' . sanitize_title( $parent_title );
+		// parent
+		if( $this->settings['show_parent'] )
+		{
+			// menu
+			if( ! $this->settings['menu'] )
+			{
+				$this->settings['menu'] = $this->settings['title'];
+			}
+			
+			
+			$parent_page = add_menu_page( $this->settings['title'], $this->settings['menu'], $this->settings['capability'], $this->settings['slug'], array($this, 'html'));
+			
+			// actions
+			add_action('load-' . $parent_page, array($this,'admin_load'));
 		}
 		
 		
-		// Parent
-		$parent_page = add_menu_page($parent_title, $parent_menu, $this->settings['capability'], $parent_slug, array($this, 'html'));	
-		
-		
-		// actions
-		add_action('load-' . $parent_page, array($this,'admin_load'));
-		
-		
-		
-		if( !empty($this->settings['pages']) )
+		// sub pages
+		if( !empty( $this->settings['pages'] ) )
 		{
-			foreach($this->settings['pages'] as $c)
+			foreach( $this->settings['pages'] as $page )
 			{
-				$sub_title = $c;
-				$sub_slug = 'acf-options-' . sanitize_title( $sub_title );
-				
-				$child_page = add_submenu_page($parent_slug, $sub_title, $sub_title, $this->settings['capability'], $sub_slug, array($this, 'html'));
+				$child_page = add_submenu_page( $page['parent'], $page['menu'], $page['title'], $page['capability'], $page['slug'], array($this, 'html'));
 			
 				
 				// actions
@@ -422,34 +526,134 @@ class acf_options_page_plugin
 	
 }
 
-new acf_options_page_plugin();
+$GLOBALS['acf_options_page'] = new acf_options_page_plugin();
+
+
+/*
+*  Update
+*
+*  if update file exists, allow this add-on to connect and recieve updates.
+*  all ACF premium Add-ons which are distributed within a plugin or theme, must have the update file removed.
+*
+*  @type	file
+*  @date	13/07/13
+*
+*  @param	N/A
+*  @return	N/A
+*/
+
+if( file_exists(  dirname( __FILE__ ) . '/acf-options-page-update.php' ) )
+{
+	include_once( dirname( __FILE__ ) . '/acf-options-page-update.php' );
+}
+
+
+
+/*
+*  acf_set_options_page_title
+*
+*  this function is used to customize the options page admin menu title
+*
+*  @type	function
+*  @date	13/07/13
+*
+*  @param	{string}	$title
+*  @return	N/A
+*/
+
+function acf_set_options_page_title( $title = 'Options' )
+{
+	$GLOBALS['acf_options_page']->settings['title'] = $title;
+}
+
+
+/*
+*  acf_set_options_page_menu
+*
+*  this function is used to customize the options page admin menu name
+*
+*  @type	function
+*  @date	13/07/13
+*
+*  @param	{string}	$title
+*  @return	N/A
+*/
+
+function acf_set_options_page_menu( $menu = 'Options' )
+{
+	$GLOBALS['acf_options_page']->settings['menu'] = $menu;
+}
+
+
+/*
+*  acf_set_options_page_capability
+*
+*  this function is used to customize the options page capability. Defaults to 'edit_posts'
+*  Read more: http://codex.wordpress.org/Roles_and_Capabilities
+*
+*  @type	function
+*  @date	13/07/13
+*
+*  @param	{string}	$capability
+*  @return	N/A
+*/
+
+function acf_set_options_page_capability( $capability = 'edit_posts' )
+{
+	$GLOBALS['acf_options_page']->settings['capability'] = $capability;
+}
+
+
+/*
+*  acf_add_options_sub_page
+*
+*  this function is used to add a sub page to the options page menu
+*
+*  @type	function
+*  @date	13/07/13
+*
+*  @param	{mixed}	$page	either a string for the sub page title, or an array with more information. 
+*							The array can contain the following args:
+*							+ {string} title - required
+*							+ {string} menu - not required
+*							+ {string} slug - not required
+*							+ {string} parent - not required
+*							+ {string} capability - not required
+*  @return	N/A
+*/
+
+function acf_add_options_sub_page( $page = false )
+{
+	// validate
+	if( !$page )
+	{
+		return false;
+	}
+	
+	$GLOBALS['acf_options_page']->settings['pages'][] = $page;
+}
 
 
 /*
 *  register_options_page()
 *
-*  This function is used to register an options page
+*  This is an old function which is now referencing the new 'acf_add_options_sub_page' function
 *
 *  @type	function
 *  @since	3.0.0
 *  @date	29/01/13
 *
-*  @param	$title - the page title
-*
-*  @return
+*  @param	{string}	$title
+*  @return	N/A
 */
 
 
 if( !function_exists('register_options_page') )
 {
-
-$GLOBALS['acf_options_pages'] = array();
-
-function register_options_page( $title = "" )
-{
-	$GLOBALS['acf_options_pages'][] = $title;
-}
-
+	function register_options_page( $title = false )
+	{
+		acf_add_options_sub_page( $title );
+	}
 }
 
 
