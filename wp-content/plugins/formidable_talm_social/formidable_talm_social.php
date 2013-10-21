@@ -13,12 +13,17 @@ class talm_social {
 	function  __construct() {
 		// Rien pour l’instant
 		//
-		add_action('wp_head','talm_menu_head',99);
 		
-		wp_enqueue_style('talm_social', '/wp-content/plugins/formidable_talm_social/style.css');
-		wp_enqueue_script('talm_social_js','/wp-content/plugins/formidable_talm_social/script.js',array('jquery'),false,true);
+		// on ne charge les dépendances que si on est pas en admin
+		if(!is_admin()){
+
+			add_action('wp_head','talm_menu_head',99);
+			wp_enqueue_style('talm_social', '/wp-content/plugins/formidable_talm_social/style.css');
+			wp_enqueue_script('talm_social_js','/wp-content/plugins/formidable_talm_social/script.js',array('jquery'),false,true);
+			add_action('wp_footer','talm_social_html');
+
+		}
 		
-		add_action('wp_footer','talm_social_html');
 	}  
 }
 

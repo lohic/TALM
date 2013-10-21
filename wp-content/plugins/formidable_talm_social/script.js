@@ -1,5 +1,7 @@
 /* SCRIPT TALM SOCIAL */
 $(document).ready(function(){
+	console.log("TALM SOCIAL READY");
+
 	$(".fluxcontent ul").width($(".social_item").length*$(".social_item").outerWidth(true));
 	//$("#flux").css("width", "0%");
    	//$("#fluxmenu").css("width", "130px");
