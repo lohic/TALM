@@ -9,6 +9,10 @@ add_action( 'after_setup_theme', 'talm_setup' );
 	
 if ( ! function_exists( 'talm_setup' ) ){
 
+	/**
+	 * Fonction d'initialisation du theme
+	 * @return [type] [description]
+	 */
 	function talm_setup() {
 		
 		// pour inclure le fichier ACF uniquement quand on n'est pas sur la plateforme de dev		
@@ -54,6 +58,10 @@ if ( ! function_exists( 'talm_setup' ) ){
 }
 
 if( ! function_exists ( 'register_my_menus') ) {
+	/**
+	 * [register_my_menus description]
+	 * @return [type] [description]
+	 */
 	function register_my_menus(){
 		register_nav_menus(
 			array(
@@ -72,6 +80,10 @@ function custom_excerpt_length( $length ) {
 
 
 if( ! function_exists ( 'update_newsletter_user') ) {
+	/**
+	 * [update_newsletter_user description]
+	 * @return [type] [description]
+	 */
 	function update_newsletter_user(){
 		if(isset($_POST['item_meta'][91]) && isset($_POST['item_meta'][90])) {
 			// RIEN
@@ -79,10 +91,13 @@ if( ! function_exists ( 'update_newsletter_user') ) {
 	}
 }
 
-
-// LOIC
-// pour signaler les entêtes avec la balise more
+ 
 if( ! function_exists ( 'use_more_as_header') ) {
+	/**
+	 * pour signaler les entêtes avec la balise more
+	 * @param  [type] $content [description]
+	 * @return [type]          [description]
+	 */
 	function use_more_as_header($content) {
 		// on verifie qu'il y a un <span> correspondant au tag more
 		$test = preg_match('/<span id\=\"(more\-\d+)"><\/span>/', $content);
@@ -97,6 +112,11 @@ if( ! function_exists ( 'use_more_as_header') ) {
 }
 
 if( ! function_exists ( 'get_the_content_by_id' ) ) {
+	/**
+	 * [get_the_content_by_id description]
+	 * @param  [type] $id [description]
+	 * @return [type]     [description]
+	 */
 	function get_the_content_by_id($id) {
 		
 		$content_post = get_post($id);
@@ -127,14 +147,13 @@ if( ! function_exists ( 'get_the_content_by_id' ) ) {
 	}
 }*/
 		
-/**
- * Crée une gallerie avec toutes les images uploadées.
- *
- * @
- * @param $size ref corresponding to the image size needed.
- * @return html
- */
+
 if( ! function_exists ( 'create_gallery') ) {
+	/**
+	 * Crée une gallerie avec toutes les images uploadées.
+	 * @param  [type] $size ref corresponding to the image size needed.
+	 * @return html       
+	 */
 	function create_gallery($size = large){
 		if ( $images = get_children ( array (
 			'post_parent'	=> get_the_ID(),
@@ -178,6 +197,12 @@ if( ! function_exists ( 'create_gallery') ) {
 }
  
 if( ! function_exists ( 'create_attachement_list') ) {
+	/**
+	 * [create_attachement_list description]
+	 * @param  string $identifiant [description]
+	 * @param  string $titre       [description]
+	 * @return [type]              [description]
+	 */
 	function create_attachement_list($identifiant = '', $titre = ''){
 		if($identifiant == ''){
 			$identifiant = get_the_ID();
@@ -210,7 +235,7 @@ if( ! function_exists ( 'create_attachement_list') ) {
 			$media_count = 0;
 			
 			foreach ( $list_documents as $document ){
-				echo '<li class="telechargement">' . wp_get_attachment_link ( $document->ID , '', false , false ) . '</li>'."\n";
+				echo '<li class="telechargement">' . wp_get_attachment_link ( $document->ID , '', true , false ) . '</li>'."\n";
 				//echo '<li class="telechargement">' . wp_get_attachment_url ( $document->ID  ) . '</li>'."\n";
 			}
 		
@@ -219,8 +244,23 @@ if( ! function_exists ( 'create_attachement_list') ) {
 	}
 }
 
+/**
+ * Pour ajouter un attribut target="_blank" aux liens des fichiers attachés
+ * @param  [type] $markup [description]
+ * @return [type]         [description]
+ */
+function modify_attachment_link($markup) {
+    return preg_replace('/^<a([^>]+)>(.*)$/', '<a\\1 target="_blank">\\2', $markup);
+}
+add_filter( 'wp_get_attachment_link', 'modify_attachment_link', 10, 6 );
+
 
 if( ! function_exists ( 'the_excerpt_max_charlength') ) {
+	/**
+	 * [the_excerpt_max_charlength description]
+	 * @param  [type] $charlength [description]
+	 * @return [type]             [description]
+	 */
 	function the_excerpt_max_charlength($charlength) {
 		$contenu_resume = get_the_content();
 		$charlength++;
@@ -242,6 +282,12 @@ if( ! function_exists ( 'the_excerpt_max_charlength') ) {
 }
 
 if( ! function_exists ( 'the_excerpt_max_charlength_by_param') ) {
+	/**
+	 * [the_excerpt_max_charlength_by_param description]
+	 * @param  [type] $charlength [description]
+	 * @param  [type] $pageID     [description]
+	 * @return [type]             [description]
+	 */
 	function the_excerpt_max_charlength_by_param($charlength, $pageID) {
 		$contenu_resume = get_the_content_by_id($pageID);
 		$contenu_resume = strip_tags($contenu_resume);
@@ -263,6 +309,11 @@ if( ! function_exists ( 'the_excerpt_max_charlength_by_param') ) {
 	}
 }
 
+/**
+ * [WordLimiter description]
+ * @param [type]  $text  [description]
+ * @param integer $limit [description]
+ */
 function WordLimiter($text,$limit=20){ 
     $explode = explode(' ',$text); 
     $string  = ''; 
@@ -278,9 +329,15 @@ function WordLimiter($text,$limit=20){
     return $string.$dots; 
 } 
 
+/**
+ * [CharacterLimiter description]
+ * @param [type]  $text  [description]
+ * @param integer $limit [description]
+ */
 function CharacterLimiter($text,$limit=50){ 
     $string  = '';         
-    $dots = '...'; 
+    $dots = '...';
+    $text = html_entity_decode($text);
     if(strlen($text) <= $limit){ 
         $dots = ''; 
     } 
@@ -289,6 +346,10 @@ function CharacterLimiter($text,$limit=50){
     return $string.$dots; 
 }
 
+/**
+ * [getBlogSlug description]
+ * @return [type] [description]
+ */
 function getBlogSlug(){
 	$slug = "";
 	
