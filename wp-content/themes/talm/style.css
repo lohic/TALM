@@ -2273,7 +2273,8 @@ article.element, section{
 	}
 	
 	/* loic */
-	.contentslider-std .sliderkit-panels, .photoslider-mini .sliderkit-panels{
+	.contentslider-std .sliderkit-panels, .photoslider-mini .sliderkit-panels,
+	.contentslider-std .sliderkit-panel, .photoslider-mini .sliderkit-panel{
 	    height: 360px;
 	}
 	.photoslider-mini .sliderkit-go-prev, .photoslider-mini .sliderkit-go-next {
@@ -2760,7 +2761,8 @@ article.element, section{
 	}
 
 	/* loic */
-	.contentslider-std .sliderkit-panels, .photoslider-mini .sliderkit-panels{
+	.contentslider-std .sliderkit-panels, .photoslider-mini .sliderkit-panels,
+	.contentslider-std .sliderkit-panel, .photoslider-mini .sliderkit-panel{
 	    height: 240px;
 	}
 	.photoslider-mini .sliderkit-go-prev, .photoslider-mini .sliderkit-go-next {
