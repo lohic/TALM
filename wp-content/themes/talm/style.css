@@ -1919,6 +1919,7 @@ article.element, section{
 }
 
 /* Panel */
+/* loic */ 
 .contentslider-std .sliderkit-panels, .photoslider-mini .sliderkit-panels{
 	background: none repeat scroll 0 0 transparent;
     float: left;
@@ -2270,6 +2271,15 @@ article.element, section{
 	.photoslider-mini .sliderkit-go-next {
 	    right: 35px;
 	}
+	
+	/* loic */
+	.contentslider-std .sliderkit-panels, .photoslider-mini .sliderkit-panels{
+	    height: 360px;
+	}
+	.photoslider-mini .sliderkit-go-prev, .photoslider-mini .sliderkit-go-next {
+		top: 150px;
+	}
+
 
 
 	#page #menu {
@@ -2747,6 +2757,14 @@ article.element, section{
 
 	.photoslider-mini .sliderkit-go-next {
 	    right: 20px;
+	}
+
+	/* loic */
+	.contentslider-std .sliderkit-panels, .photoslider-mini .sliderkit-panels{
+	    height: 240px;
+	}
+	.photoslider-mini .sliderkit-go-prev, .photoslider-mini .sliderkit-go-next {
+		top: 93px;
 	}
 
 	h1.titre_recherche{
