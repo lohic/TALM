@@ -29,6 +29,10 @@
 <?php
 		
 		$posts_per_page = get_sub_field('nbr_articles');
+
+		$order_by = get_sub_field('order_by');
+		$order_direction = get_sub_field('order_direction');
+
 		//$my_query_listing = new WP_Query( array('category_name'=>$liste_categories, 'meta_key'=>'date_de_debut', 'order' => 'ASC','orderby' => 'meta_value', 'posts_per_page'=>-1));
 		
 		//$paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
@@ -36,7 +40,14 @@
 		elseif ( get_query_var('page') ) { $paged = get_query_var('page'); }
 		else { $paged = 1; }
 		
-		$my_query_listing = new WP_Query( array('post_status'=>array('publish','future'),'category_name'=>$liste_categories, 'order' => 'DESC','orderby' => 'date', 'posts_per_page'=>$posts_per_page, 'paged' => $paged));
+		$my_query_listing = new WP_Query( array('post_status'=>array('publish','future'),
+												'category_name'=>$liste_categories,
+												'meta_key'=> $order_by == 'date' ? '' : $order_by,
+												'orderby' => $order_by == 'date' ? 'date' : 'meta_value_num',
+												//'orderby' => 'date',
+												'order' => $order_direction,
+												'posts_per_page'=>$posts_per_page,
+												'paged' => $paged));
 		
 		if($my_query_listing->max_num_pages>1){
 ?>

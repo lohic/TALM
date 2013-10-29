@@ -372,7 +372,7 @@ $(window).load(function(){
 
     $(".photoslider-mini").sliderkit({
 		auto:true,
-		autospeed:15000,
+		autospeed:12000,
 		panelfxspeed:2000,
 		panelfxeasing:"easeInOutExpo",
 		panelbtnshover:true,

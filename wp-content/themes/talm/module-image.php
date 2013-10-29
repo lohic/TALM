@@ -1,7 +1,12 @@
 <div class="full image">
 <?php
 
-$id = get_sub_field("image");					
+$id = get_sub_field("image");	
+$url = get_sub_field("url");
+
+$startURL = !empty($url) ? '<a href='.$url.'>' : '';
+$endURL   = !empty($url) ? '</a>' : '';
+
 if(get_post_mime_type($id) == 'image/svg+xml'){
 	
 ?>
@@ -40,7 +45,7 @@ if(get_post_mime_type($id) == 'image/svg+xml'){
 }else{
 	
 ?>
-	<img src="<?php echo wp_get_attachment_url($id); ?>" alt="Image"/>
+	<?php echo $startURL;?><img src="<?php echo wp_get_attachment_url($id); ?>" alt="Image"/><?php echo $endURL;?>
 <?php
 
 }

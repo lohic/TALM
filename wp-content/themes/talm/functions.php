@@ -17,6 +17,7 @@ if ( ! function_exists( 'talm_setup' ) ){
 		
 		// pour inclure le fichier ACF uniquement quand on n'est pas sur la plateforme de dev		
 		if(is_file(dirname(__File__) . '/fields/acf.php') && network_site_url() != 'http://talm.dev/'){
+			define( 'ACF_LITE', true );
 			include(dirname(__File__) . '/fields/acf.php');	
 		}
 		include(dirname(__File__) . '/inc/ariane.php');
@@ -235,7 +236,7 @@ if( ! function_exists ( 'create_attachement_list') ) {
 			$media_count = 0;
 			
 			foreach ( $list_documents as $document ){
-				echo '<li class="telechargement">' . wp_get_attachment_link ( $document->ID , '', true , false ) . '</li>'."\n";
+				echo '<li class="telechargement">' . wp_get_attachment_link ( $document->ID , '', false , false ) . '</li>'."\n";
 				//echo '<li class="telechargement">' . wp_get_attachment_url ( $document->ID  ) . '</li>'."\n";
 			}
 		
