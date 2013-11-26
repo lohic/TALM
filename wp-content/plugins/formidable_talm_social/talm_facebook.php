@@ -8,6 +8,8 @@ $secret = '1ac74e96030d56d62370ec7b7cf9479f';
 $pageid = '457169121002559';
 
 
+//http://stackoverflow.com/questions/6214535/what-is-the-difference-between-feed-posts-and-statuses-in-facebook-graph-api
+
 get_facebook_feed($appid,$secret,$pageid);
 
 //var_dump( $json->data[0] );
@@ -15,7 +17,7 @@ get_facebook_feed($appid,$secret,$pageid);
 function get_facebook_feed($appid,$secret,$pageid){
 	$token = file_get_contents('https://graph.facebook.com/oauth/access_token?grant_type=client_credentials&client_id='.$appid.'&client_secret='.$secret);
 		
-	$feed = file_get_contents('https://graph.facebook.com/'.$pageid.'/feed?'.$token);
+	$feed = file_get_contents('https://graph.facebook.com/'.$pageid.'/posts?'.$token);
 		
 	$json = json_decode($feed);
 	
@@ -31,12 +33,16 @@ function get_facebook_feed($appid,$secret,$pageid){
 
 
 function format_facebook_event($data){
-	$etc = strlen($data->message)<100?'':'…';
-	if($data->message !=''){
+	if(isset($data->message) && !empty($data->message)){
+		$etc = strlen($data->message)<100?'':'…';
+
 		echo '<li class="social_item facebook">'."\n";
 		echo '<p class="date">'.format_facebook_date($data->created_time).'</p>'."\n";
 		echo '<p class="texte">'.substr($data->message,0,100).$etc.'<p>'."\n";
-		echo '<p class="auteur"><a href="'.$data->link.'">'.$data->name.'</a></p>'."\n";
+
+		if(isset($data->name)){
+			echo '<p class="auteur"><a href="'.$data->link.'">'.$data->name.'</a></p>'."\n";
+		}
 		echo '</li>'."\n";
 	}
 }

@@ -17,22 +17,25 @@ Access token secret						mkkXobWibTSL7NPu9By42JZTOoLbJTWbnrGvdVwdrQ
 //// REF
 // https://github.com/dg/twitter-php
 // https://dev.twitter.com/docs/platform-objects/users
+// http://phpfashion.com/twitter-for-php
 
 include('lib/twitter.class.php');
 
 $twitter = new Twitter('iQysfyQJutw2AOVrY601w', 'qRpDjFZkeU8qDdo9mnty2KK5DHBIEm3DrCQlmeNdYo', '859331623-e4uVcGQdQYuRlLXbcT44usrSQYemB4GBKDxNKc1f', 'mkkXobWibTSL7NPu9By42JZTOoLbJTWbnrGvdVwdrQ');
 $channel = $twitter->load(Twitter::ME);
 
-foreach ($channel->status as $status) {
+
+foreach ($channel as $status) {
 	setlocale(LC_TIME, "fr_FR");
 	echo '<li class="social_item tweet">'."\n";
 	//echo '<p class="date">le '.date("j F Y à H\hi", strtotime($status->created_at)).'</p>'."\n";
 	echo '<p class="date">le '.strftime("%d %B %Y à %Hh%M", strtotime($status->created_at)).'</p>'."\n";
 	//echo '<p class="date">'.format_twitter_date($status->created_at).'</p>'."\n";
     echo '<p class="auteur"><a href="http://twitter.com/'.$status->user->screen_name.'" target="_blank">@'.htmlspecialchars($status->user->screen_name).'</a></p>'."\n";
-    echo '<p class="texte">'.Twitter::clickable($status->text).'</p>'."\n";
+    echo '<p class="texte">'.Twitter::clickable($status).'</p>'."\n";
     echo '</li>'."\n";
 }
+
 
 ?>
 
