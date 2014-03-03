@@ -1,35 +1,38 @@
 <?php
 
+if(!defined('ABSPATH')) die(__('You are not allowed to call this page directly.', 'formidable'));
+
+if(class_exists('FrmEntriesHelper'))
+    return;
+
 class FrmEntriesHelper{
 
     public static function setup_new_vars($fields, $form='', $reset=false){
-        global $frm_form, $frm_settings, $frm_sidebar_width;
+        global $frm_settings, $frm_vars;
         $values = array();
         foreach (array('name' => '', 'description' => '', 'item_key' => '') as $var => $default)
             $values[$var] = FrmAppHelper::get_post_param($var, $default);
-            
+        
         $values['fields'] = array();
-        if ($fields){
-            foreach($fields as $field){
+        if (!empty($fields)){
+            foreach((array)$fields as $field){
                 $field->field_options = maybe_unserialize($field->field_options);
                 $default = $field->default_value;
               
                 if ($reset)
                     $new_value = $default;
                 else
-                    $new_value = ($_POST and isset($_POST['item_meta'][$field->id]) and $_POST['item_meta'][$field->id] != '') ? stripslashes_deep($_POST['item_meta'][$field->id]) : $default;
+                    $new_value = ($_POST and isset($_POST['item_meta'][$field->id]) and $_POST['item_meta'][$field->id] != '') ? stripslashes_deep($_POST['item_meta'][$field->id]) : ((isset($field->field_options['clear_on_focus']) and $field->field_options['clear_on_focus'] ) ? '' : $default );
                 
                 $is_default = ($new_value == $default) ? true : false;
-                    
-                if (!is_array($new_value))
-                    $new_value = apply_filters('frm_get_default_value', $new_value, $field);
                 
-                $new_value = str_replace('"', '&quot;', $new_value);
-                if($is_default)
-                    $field->default_value = $new_value;
-                else
-                    $field->default_value = apply_filters('frm_get_default_value', $field->default_value, $field);
-                    
+                $field->default_value = apply_filters('frm_get_default_value', $field->default_value, $field);
+                
+                if (!is_array($new_value)){
+                    $new_value = $is_default ? $field->default_value : apply_filters('frm_filter_default_value', $new_value, $field);
+                    $new_value = str_replace('"', '&quot;', $new_value);
+                }
+                
                 $field_array = array(
                     'id' => $field->id,
                     'value' => $new_value,
@@ -56,7 +59,7 @@ class FrmEntriesHelper{
                 unset($opt_defaults);
                 
                 if ($field_array['size'] == '')
-                    $field_array['size'] = $frm_sidebar_width;
+                    $field_array['size'] = isset($frm_vars['sidebar_width']) ? $frm_vars['sidebar_width'] : '';
             
                 
                 if ($field_array['custom_html'] == '')
@@ -73,8 +76,10 @@ class FrmEntriesHelper{
                 
                 $values['fields'][] = $field_array;
              
-                if (!$form or !isset($form->id))
+                if (!$form or !isset($form->id)){
+                    $frm_form = new FrmForm();
                     $form = $frm_form->getOne($field->form_id);
+                }
             }
 
             $form->options = maybe_unserialize($form->options);
@@ -115,6 +120,7 @@ class FrmEntriesHelper{
         //$values['description'] = maybe_unserialize( $record->description );
         $values['item_key'] = ($_POST and isset($_POST['item_key'])) ? $_POST['item_key'] : $record->item_key;
         $values['form_id'] = $record->form_id;
+        $values['is_draft'] = $record->is_draft;
         return apply_filters('frm_setup_edit_entry_vars', $values, $record);
     }
 
@@ -123,7 +129,7 @@ class FrmEntriesHelper{
 
         $entries = $frmdb->get_records($frmdb->entries, array('form_id' => $form_id), 'name', 999, 'id,item_key,name');
         ?>
-        <select name="<?php echo $field_name; ?>" id="<?php echo $field_name; ?>" class="frm-dropdown" <?php if ($onchange) echo 'onchange="'.$onchange.'"'; ?>>
+        <select name="<?php echo $field_name; ?>" id="<?php echo $field_name; ?>" <?php if ($onchange) echo 'onchange="'. $onchange .'"'; ?>>
             <?php if ($blank){ ?>
             <option value=""><?php echo $blank_label; ?></option>
             <?php } ?>

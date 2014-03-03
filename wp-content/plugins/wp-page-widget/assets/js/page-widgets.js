@@ -24,7 +24,7 @@ wpPWidgets = {
 		sidebars.not('#wp_inactive_widgets').each(function(){
 			var h = 50, H = $(this).children('.widget').length;
 			h = h + parseInt(H * 48, 10);
-			$(this).css( 'minHeight', h + 'px' );
+			//$(this).css( 'minHeight', 50 + 'px' ); // Why h? CHO changed to 50
 		});
 
 		$('a.widget-action').live('click', function(){
@@ -100,9 +100,15 @@ wpPWidgets = {
 				ui.item.children('.widget-inside').hide();
 				ui.item.css({'marginLeft':'','width':''});
 			},
-			stop: function(e,ui) {
-				if ( ui.item.hasClass('ui-draggable') && ui.item.data('draggable') )
-					ui.item.draggable('destroy');
+			stop: function(e,ui) {				
+				if ( ui.item.hasClass('ui-draggable') && ui.item.data('draggable') ) {
+					ui.item.draggable('destroy');					
+				}
+				
+				// Remove style: display=block
+				if ( ui.item.hasClass('ui-draggable') ) {
+					ui.item.removeAttr('style');
+				}
 				
 				if ( ui.item.hasClass('deleting') ) { // nay roi
 					wpPWidgets.save( ui.item, 1, 0, 1 ); // delete widget
@@ -169,6 +175,8 @@ wpPWidgets = {
 	saveOrder : function(sb) {
 		if ( sb )
 			$('#' + sb).closest('div.widgets-holder-wrap').find('img.ajax-feedback').css('visibility', 'visible');
+			// WP 3.8
+			$('#' + sb).closest('div.widgets-holder-wrap').find('.spinner').css('display', 'inline-block');
 
 		if($('#post_ID').length){
 			var a = {
@@ -205,6 +213,7 @@ wpPWidgets = {
 
 		$.post( ajaxurl, a, function() {
 			$('img.ajax-feedback').css('visibility', 'hidden');
+			$('.spinner').css('display', 'none');
 		});
 
 		this.resize();
@@ -222,6 +231,7 @@ wpPWidgets = {
 		}
 		widget = $(widget);
 		$('.ajax-feedback', widget).css('visibility', 'visible');
+		$('.spinner', widget).css('display', 'inline-block');
 		if($('#post_ID').length){
 			a = {
 				action: 'pw-save-widget',
@@ -281,6 +291,8 @@ wpPWidgets = {
 				}
 			} else {
 				$('.ajax-feedback').css('visibility', 'hidden');
+				// WP 3.8
+				$('.spinner').css('display', 'none');
 				if ( r && r.length > 2 ) {
 					$('div.widget-content', widget).html(r);
 					wpPWidgets.appendTitle(widget);
@@ -305,7 +317,7 @@ wpPWidgets = {
 		$('div.widgets-sortables').not('#wp_inactive_widgets').each(function(){
 			var h = 50, H = $(this).children('.widget').length;
 			h = h + parseInt(H * 48, 10);
-			$(this).css( 'minHeight', h + 'px' );
+			//$(this).css( 'minHeight', h + 'px' );
 		});
 	},
 

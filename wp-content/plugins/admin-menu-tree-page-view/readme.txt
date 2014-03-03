@@ -2,9 +2,9 @@
 Contributors: eskapism, MarsApril
 Donate link: http://eskapism.se/sida/donate/
 Tags: admin, page, pages, page tree, hierarchy, cms, tree, view, admin menu, menu, change order, drag and drop
-Requires at least: 3.0
-Tested up to: 3.5.1
-Stable tag: 2.6.5
+Requires at least: 3.8
+Tested up to: 3.8.1
+Stable tag: 2.6.8
 
 Get a tree view of all your pages directly in the admin menu. Search, edit, view, re-order/sort and add pages – all is just one click away!
 
@@ -29,6 +29,16 @@ Works perfect in CMS-like WordPress installations with lots of pages in a tree h
 If you want a tree with all your pages, but don't want it visible all the time, please check out my other plugin
 [CMS Tree Page View](http://wordpress.org/extend/plugins/cms-tree-page-view/).
 
+#### Languages/translations
+
+The plugin is translated into these languages:
+
+- Spanish (thanks to Andrew Kurtis/[WebHostingHub](http://www.webhostinghub.com/))
+- Slovak translation (thanks Branco)
+- Italian
+- Dutch
+- Swedish 
+
 #### Donation and more plugins
 * If you like this plugin don't forget to [donate to support further development](http://eskapism.se/sida/donate/).
 * Check out some [more WordPress CMS Plugins](http://wordpress.org/extend/plugins/profile/eskapism) by the same author.
@@ -49,6 +59,15 @@ Now the tree with the pages will be visible in the admin menu to the left.
 
 
 == Changelog ==
+
+= 2.6.8 =
+- Added German translation. Thanks [Michael Thielemann](http://www.thielemann.eu).
+
+= 2.6.7 =
+- Added Spanish translation. Thanks Andrew Kurtis/[WebHostingHub](http://www.webhostinghub.com/).
+
+= 2.6.6 =
+- CSS fixes for new admin theme in WordPress 3.8. Thanks to Américo Cruces for making most of the the nice changes.
 
 = 2.6.5 =
 - Fixed a bug that caused errors when bulk editing posts

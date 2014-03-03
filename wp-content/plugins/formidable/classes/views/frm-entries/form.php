@@ -1,11 +1,11 @@
 <?php 
-global $frm_forms_loaded, $frm_load_css, $frm_css_loaded, $frm_settings;
-$frm_forms_loaded[] = $form; 
-if($values['custom_style']) $frm_load_css = true;
+global $frm_vars, $frm_settings;
+$frm_vars['forms_loaded'][] = $form; 
+if($values['custom_style']) $frm_vars['load_css'] = true;
 
-if(!$frm_css_loaded and $frm_load_css){
+if((!isset($frm_vars['css_loaded']) || !$frm_vars['css_loaded']) && $frm_vars['load_css']){
 echo FrmAppController::footer_js('header');
-$frm_css_loaded = true;
+$frm_vars['css_loaded'] = true;
 }
 
 echo FrmFormsHelper::replace_shortcodes($values['before_html'], $form, $title, $description); ?>
@@ -15,6 +15,8 @@ echo FrmFormsHelper::replace_shortcodes($values['before_html'], $form, $title, $
 <input type="hidden" name="frm_action" value="<?php echo esc_attr($form_action) ?>" />
 <input type="hidden" name="form_id" value="<?php echo esc_attr($form->id) ?>" />
 <input type="hidden" name="form_key" value="<?php echo esc_attr($form->form_key) ?>" />
+<?php wp_nonce_field('frm_submit_entry_nonce', 'frm_submit_entry'); ?>
+
 <?php if (isset($id)){ ?><input type="hidden" name="id" value="<?php echo esc_attr($id) ?>" /><?php } ?>
 <?php if (isset($controller) && isset($plugin)){ ?>
 <input type="hidden" name="controller" value="<?php echo esc_attr($controller); ?>" />
@@ -29,11 +31,11 @@ foreach($values['fields'] as $field){
     else
         do_action('frm_show_other_field_type', $field, $form);
     
-    do_action('frm_get_field_scripts', $field);
+    do_action('frm_get_field_scripts', $field, $form);
 }    
 }
 
-if (is_admin() && !$frm_settings->lock_keys){ ?>
+if ((is_admin() and !defined('DOING_AJAX')) and !$frm_settings->lock_keys){ ?>
 <div class="frm_form_field form-field">
 <label class="frm_primary_label"><?php _e('Entry Key', 'formidable') ?></label>   
 <input type="text" name="item_key" value="<?php echo esc_attr($values['item_key']) ?>" />
@@ -44,10 +46,10 @@ if (is_admin() && !$frm_settings->lock_keys){ ?>
 
 do_action('frm_entry_form', $form, $form_action, $errors);
 
-global $frm_div;
-if($frm_div){
+global $frm_vars;
+if(isset($frm_vars['div']) and $frm_vars['div']){
     echo "</div>\n";
-    $frm_div = false;
+    $frm_vars['div'] = false;
 } ?>
 </div>
 </fieldset>
@@ -60,6 +62,8 @@ if(isset($wp_filter['frm_entries_footer_scripts']) and !empty($wp_filter['frm_en
 <?php do_action('frm_entries_footer_scripts', $values['fields'], $form); ?>
 </script><?php } ?>
 
-<?php if (!$form->is_template and $form->status == 'published' and !is_admin())
-    FrmFormsHelper::get_custom_submit($values['submit_html'], $form, $submit, $form_action);
+<?php if (!$form->is_template and $form->status == 'published' and (!is_admin() or defined('DOING_AJAX'))){
+    unset($values['fields']);
+    FrmFormsHelper::get_custom_submit($values['submit_html'], $form, $submit, $form_action, $values);
+}
 ?>

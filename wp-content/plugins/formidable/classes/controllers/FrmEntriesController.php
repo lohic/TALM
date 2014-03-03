@@ -3,27 +3,32 @@
  * @package Formidable
  */
  
+if(!defined('ABSPATH')) die(__('You are not allowed to call this page directly.', 'formidable'));
+
+if(class_exists('FrmEntriesController'))
+    return;
+
 class FrmEntriesController{
     
     function FrmEntriesController(){
-        add_action('admin_menu', 'FrmEntriesController::menu', 20);
+        add_action('admin_menu', 'FrmEntriesController::menu', 11);
         add_action('wp', 'FrmEntriesController::process_entry', 10, 0);
         add_action('frm_wp', 'FrmEntriesController::process_entry', 10, 0);
-        add_filter('frm_redirect_msg', 'FrmEntriesController::delete_entry_before_redirect', 50, 3);
-        add_filter('frm_redirect_url', 'FrmEntriesController::delete_entry_before_wpredirect', 50, 3);
+        add_filter('frm_redirect_url', 'FrmEntriesController::delete_entry_before_redirect', 50, 3);
         add_action('frm_after_entry_processed', 'FrmEntriesController::delete_entry_after_save', 100);
         add_filter('frm_email_value', 'FrmEntriesController::filter_email_value', 10, 3);
     }
     
     public static function menu(){
-        global $frmpro_is_installed;
-        if(!$frmpro_is_installed){
+        global $frm_vars;
+        if(!$frm_vars['pro_is_installed']){
             add_submenu_page('formidable', 'Formidable |'. __('Entries', 'formidable'), '<span style="opacity:.5;filter:alpha(opacity=50);">'. __('Entries', 'formidable') .'</span>', 'administrator', 'formidable-entries', 'FrmEntriesController::list_entries');
         }
     }
     
     public static function list_entries(){
-        global $frm_form, $frm_entry;
+        global $frm_entry;
+        $frm_form = new FrmForm();
         $form_select = $frm_form->getAll("is_template=0 AND (status is NULL OR status = '' OR status = 'published')", ' ORDER BY name');
         $form_id = FrmAppHelper::get_param('form', false);
         if($form_id)
@@ -34,16 +39,19 @@ class FrmEntriesController{
         if($form)
             $entry_count = $frm_entry->getRecordCount($form->id);
             
-        include(FRM_VIEWS_PATH.'/frm-entries/list.php');
+        include(FrmAppHelper::plugin_path() .'/classes/views/frm-entries/list.php');
     }
     
     public static function show_form($id='', $key='', $title=false, $description=false){
-        global $frm_form, $user_ID, $frm_settings, $post;
+        global $frm_settings, $post;
+        
+        $frm_form = new FrmForm();
         if ($id) $form = $frm_form->getOne((int)$id);
         else if ($key) $form = $frm_form->getOne($key);
         else $form = false;
 
         $form = apply_filters('frm_pre_display_form', $form);
+        $user_ID = get_current_user_id();
         
         if(!$form or 
             (($form->is_template or $form->status == 'draft') and !isset($_GET) and !isset($_GET['form']) and 
@@ -57,13 +65,13 @@ class FrmEntriesController{
 
         if($form->logged_in and $user_ID and isset($form->options['logged_in_role']) and $form->options['logged_in_role'] != ''){
             if(FrmAppHelper::user_has_permission($form->options['logged_in_role'])){
-                return FrmEntriesController::get_form(FRM_VIEWS_PATH.'/frm-entries/frm-entry.php', $form, $title, $description);
+                return FrmEntriesController::get_form(FrmAppHelper::plugin_path() .'/classes/views/frm-entries/frm-entry.php', $form, $title, $description);
             }else{
                 global $frm_settings;
                 return do_shortcode($frm_settings->login_msg);
             }
         }else    
-            return FrmEntriesController::get_form(FRM_VIEWS_PATH.'/frm-entries/frm-entry.php', $form, $title, $description);
+            return FrmEntriesController::get_form(FrmAppHelper::plugin_path() .'/classes/views/frm-entries/frm-entry.php', $form, $title, $description);
     }
     
     public static function get_form($filename, $form, $title, $description) {
@@ -72,57 +80,51 @@ class FrmEntriesController{
             include $filename;
             $contents = ob_get_contents();
             ob_end_clean();
+            // TODO: check if minimizing is turned on
+            //$contents = preg_replace('(\r|\n|\t)', '', $contents);
             return $contents;
         }
         return false;
     }
     
-    public static function process_entry($errors=''){
-        if(is_admin() or !isset($_POST) or !isset($_POST['form_id']) or !is_numeric($_POST['form_id']) or !isset($_POST['item_key']))
+    public static function process_entry($errors='', $ajax=false){
+        if((is_admin() and !defined('DOING_AJAX')) or !isset($_POST) or !isset($_POST['form_id']) or !is_numeric($_POST['form_id']) or !isset($_POST['item_key']))
             return;
 
-        global $frm_entry, $frm_form, $frm_created_entry, $frm_form_params;
+        global $frm_entry, $frm_vars;
         
+        $frm_form = new FrmForm();
         $form = $frm_form->getOne($_POST['form_id']);
         if(!$form)
             return;
         
-        if(!$frm_form_params)
-            $frm_form_params = array();
         $params = FrmEntriesController::get_params($form);
-        $frm_form_params[$form->id] = $params;
         
-        if(!$frm_created_entry)
-            $frm_created_entry = array();
-          
-        if(isset($frm_created_entry[$_POST['form_id']]))
+        if(!isset($frm_vars['form_params']))
+            $frm_vars['form_params'] = array();
+        $frm_vars['form_params'][$form->id] = $params;
+        
+        if(isset($frm_vars['created_entries'][$_POST['form_id']]))
             return;
-            
+           
         if($errors == '')
             $errors = $frm_entry->validate($_POST);
-        $frm_created_entry[$_POST['form_id']] = array('errors' => $errors);
+        $frm_vars['created_entries'][$_POST['form_id']] = array('errors' => $errors);
         
         if( empty($errors) ){
             $_POST['frm_skip_cookie'] = 1;
             if($params['action'] == 'create'){
-                if (apply_filters('frm_continue_to_create', true, $_POST['form_id']) and !isset($frm_created_entry[$_POST['form_id']]['entry_id']))
-                    $frm_created_entry[$_POST['form_id']]['entry_id'] = $frm_entry->create( $_POST );
+                if (apply_filters('frm_continue_to_create', true, $_POST['form_id']) and !isset($frm_vars['created_entries'][$_POST['form_id']]['entry_id']))
+                    $frm_vars['created_entries'][$_POST['form_id']]['entry_id'] = $frm_entry->create( $_POST );
             }
             
-            do_action('frm_process_entry', $params, $errors, $form);
+            do_action('frm_process_entry', $params, $errors, $form, array('ajax' => $ajax));
             unset($_POST['frm_skip_cookie']);
         }
     }
     
-    //Delete entry if it shouldn't be saved before redirect
-    public static function delete_entry_before_redirect($redirect_msg, $atts){
-        self::_delete_entry($atts['entry_id'], $atts['form']);
-        return $redirect_msg;
-    }
-    
-    public static function delete_entry_before_wpredirect($url, $form, $atts){
-        if(!defined('DOING_AJAX'))
-            self::_delete_entry($atts['id'], $form);
+    public static function delete_entry_before_redirect($url, $form, $atts){
+        self::_delete_entry($atts['id'], $form);
         return $url;
     }
     
@@ -143,8 +145,7 @@ class FrmEntriesController{
     }
     
     public static function &filter_email_value($value, $meta, $entry, $atts=array()){
-        global $frm_field;
-        
+        $frm_field = new FrmField();
         $field = $frm_field->getOne($meta->field_id);
         if(!$field)
             return $value; 
@@ -195,13 +196,16 @@ class FrmEntriesController{
     }
     
     public static function get_params($form=null){
-        global $frm_form, $frm_form_params;
-
+        global $frm_vars;
+        
+        $frm_form = new FrmForm();
         if(!$form)
             $form = $frm_form->getAll(array(), 'name', 1);
-            
-        if($frm_form_params and isset($frm_form_params[$form->id]))
-            return $frm_form_params[$form->id];
+        else if(!is_object($form))
+            $form = $frm_form->getOne($form);
+        
+        if(isset($frm_vars['form_params']) && is_array($frm_vars['form_params']) && isset($frm_vars['form_params'][$form->id]))
+            return $frm_vars['form_params'][$form->id];
            
         $action_var = isset($_REQUEST['frm_action']) ? 'frm_action' : 'action';
         $action = apply_filters('frm_show_new_entry_page', FrmAppHelper::get_param($action_var, 'new'), $form);

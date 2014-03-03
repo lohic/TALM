@@ -3,30 +3,52 @@
 *	Flexible Content
 *	
 *---------------------------------------------------------------------------------------------*/
-table.acf_input table.acf_cf_meta {
+table.acf_input table.acf-fc-meta {
 	width: 100%;
 	border: 0 none;
+	table-layout: fixed;
+	margin: 0 0 10px;
+	padding: 0;
 }
 
-table.acf_input table.acf_cf_meta td {
+table.acf_input table.acf-fc-meta tr td {
 	border: 0 none;
-	width: 33%;
+	padding: 0 0 10px 10px;
 }
 
-table.acf_input table.acf_cf_meta label {
-	width: 20%;
-	color: #333333;
-	font-weight: bold;
+table.acf_input table.acf-fc-meta tr td:first-child {
+	padding-left: 0;
 }
 
-table.acf_input table.acf_cf_meta input {
-	width: 80%;
+.acf-input-wrap.select {
+	border-radius: 0 3px 3px 0 !important;
+	height: 25px;
+	border: #DFDFDF solid 1px;
 }
 
-table.acf_input table.acf_cf_meta select {
-	width: 75%;
+
+.acf-input-wrap.select select {
+    margin: 1px 0 0;
+    border: 0 none;
+    padding: 3px;
+    height: 25px;
 }
 
-.acf_fc_reorder {
+.acf-fc-reorder {
 	cursor: move;
 }
+
+.acf-fc-meta-label .acf-input-prepend,
+.acf-fc-meta-name .acf-input-prepend,
+.acf-fc-meta-display .acf-input-prepend {
+	min-width: 45px;
+}
+
+.field_option_flexible_content .desription {
+	visibility: hidden;
+}
+
+.field_option_flexible_content:hover .desription {
+	visibility: visible;
+}
+

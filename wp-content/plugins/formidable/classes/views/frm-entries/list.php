@@ -1,15 +1,17 @@
-<div class="wrap">
-    <div id="icon-edit-pages" class="icon32"><br/></div>
-    <h2><?php echo ($form) ? (FrmAppHelper::truncate($form->name, 25) .' ') : ''; _e('Entries', 'formidable'); ?></h2>
-
-    <?php require(FRM_VIEWS_PATH.'/shared/errors.php'); ?>
+<div id="form_entries_page" class="wrap">
+    <div class="frmicon icon32"><br/></div>
+    <h2>
+		<?php _e('Entries', 'formidable'); ?>
+		<a href="#" class="add-new-h2" style="visibility:hidden;"><?php _e('Add New'); ?></a>
+	</h2>
 
     <?php if($form) FrmAppController::get_form_nav($form->id, true); ?>
-
+	
+	<?php require(FrmAppHelper::plugin_path() .'/classes/views/shared/errors.php'); ?>
     <?php FrmAppController::update_message('view, search, export, and bulk delete your saved entries'); ?>
 
     <?php if(!$form or $entry_count){ ?>
-    <img src="<?php echo FRM_URL ?>/screenshot-3.png" alt="Entries List" style="max-width:100%"/>
+    <img src="<?php echo FrmAppHelper::plugin_url() ?>/screenshot-5.png" alt="Entries List" style="max-width:100%"/>
     <?php }else{ ?>
     <table class="wp-list-table widefat post fixed" cellspacing="0">
         <thead>
@@ -17,7 +19,7 @@
         </thead>
         <tbody>
             <tr><td>
-            <?php include(FRM_VIEWS_PATH .'/frm-entries/no_entries.php'); ?>
+            <?php include(FrmAppHelper::plugin_path() .'/classes/views/frm-entries/no_entries.php'); ?>
             </td></tr>
         </tbody>
         <tfoot>

@@ -1,11 +1,16 @@
 <?php
+if(!defined('ABSPATH')) die(__('You are not allowed to call this page directly.', 'formidable'));
+
+if(class_exists('FrmEntry'))
+    return;
+
 class FrmEntry{
 
     function create( $values ){
-        global $wpdb, $frmdb, $frm_entry_meta;
+        global $wpdb, $frm_entry_meta;
         
         $new_values = array();
-        $new_values['item_key'] = FrmAppHelper::get_unique_key($values['item_key'], $frmdb->entries, 'item_key');
+        $new_values['item_key'] = FrmAppHelper::get_unique_key($values['item_key'], $wpdb->prefix .'frm_items', 'item_key');
         $new_values['name'] = isset($values['name']) ? $values['name'] : $values['item_key'];
         if(is_array($new_values['name']))
             $new_values['name'] = reset($new_values['name']);
@@ -20,45 +25,55 @@ class FrmEntry{
                                                         'referrer' => $referrerinfo));
         }
         
+        if(isset($values['frm_saving_draft']) and $values['frm_saving_draft'] == 1)
+            $new_values['is_draft'] = 1;
+        
         $new_values['form_id'] = isset($values['form_id']) ? (int)$values['form_id']: null;
-        $new_values['created_at'] = $new_values['updated_at'] = isset($values['created_at']) ? $values['created_at'] : current_time('mysql', 1);
+        $new_values['created_at'] = isset($values['created_at']) ? $values['created_at'] : current_time('mysql', 1);
+        $new_values['updated_at'] = isset($values['updated_at']) ? $values['updated_at'] : $new_values['created_at'];
         
         //if(isset($values['id']) and is_numeric($values['id']))
         //    $new_values['id'] = $values['id'];
             
-        if(isset($values['frm_user_id']) and is_numeric($values['frm_user_id'])){
-            $new_values['user_id'] = $new_values['updated_by'] = $values['frm_user_id'];
+        if(isset($values['frm_user_id']) and (is_numeric($values['frm_user_id']) or (is_admin() and !defined('DOING_AJAX')))){
+            $new_values['user_id'] = $values['frm_user_id'];
         }else{
-            global $user_ID;
-            if($user_ID)
-                $new_values['user_id'] = $new_values['updated_by'] = $user_ID;
+            $user_ID = get_current_user_id();
+            $new_values['user_id'] = $user_ID ? $user_ID : 0;
         }
+        
+        $new_values['updated_by'] = isset($values['updated_by']) ? $values['updated_by'] : $new_values['user_id'];
         
         //check for duplicate entries created in the last 5 minutes
         $create_entry = true;
         if(!defined('WP_IMPORTING')){
             $check_val = $new_values;
-            $check_val['created_at >'] = date('Y-m-d H:i:s', (strtotime($new_values['created_at']) - (60*60*5))); 
+            $check_val['created_at >'] = date('Y-m-d H:i:s', (strtotime($new_values['created_at']) - (60*5))); 
             unset($check_val['created_at']);
+            unset($check_val['updated_at']);
+            unset($check_val['is_draft']);
             unset($check_val['id']);
             unset($check_val['item_key']);
             if($new_values['item_key'] == $new_values['name'])
                 unset($check_val['name']);
 
 
-            $entry_exists = $frmdb->get_records($frmdb->entries, $check_val, 'created_at DESC', '', 'id');
+            global $frmdb;
+            $entry_exists = $frmdb->get_records($wpdb->prefix .'frm_items', $check_val, 'created_at DESC', '', 'id');
+            unset($frmdb);
+            
             if($entry_exists and !empty($entry_exists)){
                 foreach($entry_exists as $entry_exist){
                     if($create_entry){
                         $create_entry = false;
                         //add more checks here to make sure it's a duplicate
                         if (isset($values['item_meta'])){
-                            $metas = FrmEntryMeta::get_entry_meta_info($entry_exist->id);
+                            $metas = $frm_entry_meta->get_entry_meta_info($entry_exist->id);
                             $field_metas = array();
                             foreach($metas as $meta)
                                 $field_metas[$meta->field_id] = $meta->meta_value;
 
-                            $diff = array_diff_assoc($field_metas, $values['item_meta']);
+                            $diff = array_diff_assoc($field_metas, array_map('maybe_serialize', $values['item_meta']));
                             foreach($diff as $field_id => $meta_value){
                                 if(!empty($meta_value) and !$create_entry)
                                     $create_entry = true;
@@ -70,13 +85,15 @@ class FrmEntry{
         }
         
         if($create_entry)
-            $query_results = $wpdb->insert( $frmdb->entries, $new_values );
+            $query_results = $wpdb->insert( $wpdb->prefix .'frm_items', $new_values );
 
         if(isset($query_results) and $query_results){
             $entry_id = $wpdb->insert_id;
             
-            global $frm_saved_entries;
-            $frm_saved_entries[] = (int)$entry_id;
+            global $frm_vars;
+            if(!isset($frm_vars['saved_entries']))
+                $frm_vars['saved_entries'] = array();
+            $frm_vars['saved_entries'][] = (int)$entry_id;
             
             if (isset($values['item_meta']))
                 $frm_entry_meta->update_entry_metas($entry_id, $values['item_meta']);
@@ -85,27 +102,30 @@ class FrmEntry{
             do_action('frm_after_create_entry_'. $new_values['form_id'], $entry_id);
             return $entry_id;
         }else
-           return false;
+            return false;
     }
     
     function duplicate( $id ){
-        global $wpdb, $frmdb, $frm_entry, $frm_entry_meta;
+        global $wpdb, $frm_entry, $frm_entry_meta;
 
         $values = $frm_entry->getOne( $id );
 
         $new_values = array();
-        $new_values['item_key'] = FrmAppHelper::get_unique_key('', $frmdb->entries, 'item_key');
+        $new_values['item_key'] = FrmAppHelper::get_unique_key('', $wpdb->prefix .'frm_items', 'item_key');
         $new_values['name'] = $values->name;
+        $new_values['is_draft'] = $values->is_draft;
         $new_values['user_id'] = $new_values['updated_by'] = (int)$values->user_id;
-        $new_values['form_id'] = ($values->form_id)?(int)$values->form_id: null;
+        $new_values['form_id'] = $values->form_id ? (int)$values->form_id: null;
         $new_values['created_at'] = $new_values['updated_at'] = current_time('mysql', 1);
 
-        $query_results = $wpdb->insert( $frmdb->entries, $new_values );
+        $query_results = $wpdb->insert( $wpdb->prefix .'frm_items', $new_values );
         if($query_results){
             $entry_id = $wpdb->insert_id;
             
-            global $frm_saved_entries;
-            $frm_saved_entries[] = (int)$entry_id;
+            global $frm_vars;
+            if(!isset($frm_vars['saved_entries']))
+                $frm_vars['saved_entries'] = array();
+            $frm_vars['saved_entries'][] = (int)$entry_id;
             
             $frm_entry_meta->duplicate_entry_metas($id, $entry_id);
             return $entry_id;
@@ -114,28 +134,35 @@ class FrmEntry{
     }
 
     function update( $id, $values ){
-        global $wpdb, $frmdb, $frm_entry_meta, $frm_field, $frm_saved_entries;
-        if(in_array((int)$id, (array)$frm_saved_entries))
+        global $wpdb, $frm_entry_meta, $frm_field, $frm_vars;
+        if(isset($frm_vars['saved_entries']) && is_array($frm_vars['saved_entries']) && in_array((int)$id, (array)$frm_vars['saved_entries']))
             return;
 
         $new_values = array();
 
         if (isset($values['item_key']))
-            $new_values['item_key'] = FrmAppHelper::get_unique_key($values['item_key'], $frmdb->entries, 'item_key', $id);
+            $new_values['item_key'] = FrmAppHelper::get_unique_key($values['item_key'], $wpdb->prefix .'frm_items', 'item_key', $id);
 
-        $new_values['name'] = isset($values['name'])?$values['name']:'';
+        $new_values['name'] = isset($values['name']) ? $values['name'] : '';
         $new_values['form_id'] = isset($values['form_id']) ? (int)$values['form_id'] : null;
         $new_values['updated_at'] = current_time('mysql', 1);
         if(isset($values['frm_user_id']) and is_numeric($values['frm_user_id']))
             $new_values['user_id'] = $values['frm_user_id'];
+            
+        $new_values['is_draft'] = (isset($values['frm_saving_draft']) and $values['frm_saving_draft'] == 1) ? 1 : 0;
 
-        global $user_ID;
+        $user_ID = get_current_user_id();
         $new_values['updated_by'] = $user_ID;
 
-        $query_results = $wpdb->update( $frmdb->entries, $new_values, compact('id') );
+        $new_values = apply_filters('frm_update_entry', $new_values, $id);
+        $query_results = $wpdb->update( $wpdb->prefix .'frm_items', $new_values, compact('id') );
         if($query_results)
             wp_cache_delete( $id, 'frm_entry');
-        $frm_saved_entries[] = (int)$id;
+        
+        if(!isset($frm_vars['saved_entries']))
+            $frm_vars['saved_entries'] = array();
+        
+        $frm_vars['saved_entries'][] = (int)$id;
         
         if (isset($values['item_meta']))
             $frm_entry_meta->update_entry_metas($id, $values['item_meta']);
@@ -145,35 +172,35 @@ class FrmEntry{
     }
 
     function &destroy( $id ){
-      global $wpdb, $frmdb;
-      $id = (int)$id;
+        global $wpdb;
+        $id = (int)$id;
       
-      do_action('frm_before_destroy_entry', $id);
+        do_action('frm_before_destroy_entry', $id);
       
-      wp_cache_delete( $id, 'frm_entry');
-      $wpdb->query('DELETE FROM ' . $frmdb->entry_metas .  ' WHERE item_id=' . $id);
-      $result = $wpdb->query('DELETE FROM ' . $frmdb->entries .  ' WHERE id=' . $id);
-      return $result;
+        wp_cache_delete( $id, 'frm_entry');
+        $wpdb->query('DELETE FROM ' . $wpdb->prefix .'frm_item_metas WHERE item_id=' . $id);
+        $result = $wpdb->query('DELETE FROM ' . $wpdb->prefix .'frm_items WHERE id=' . $id);
+        return $result;
     }
     
     function &update_form( $id, $value, $form_id ){
-      global $wpdb, $frmdb;
-      $form_id = isset($value) ? $form_id : NULL;
-      $result = $wpdb->update( $frmdb->entries, array('form_id' => $form_id), array( 'id' => $id ) );
-      if($result)
-          wp_cache_delete( $id, 'frm_entry');
-      return $result;
+        global $wpdb;
+        $form_id = isset($value) ? $form_id : NULL;
+        $result = $wpdb->update( $wpdb->prefix .'frm_items', array('form_id' => $form_id), array( 'id' => $id ) );
+        if($result)
+            wp_cache_delete( $id, 'frm_entry');
+        return $result;
     }
     
     function getOne( $id, $meta=false){
-        global $wpdb, $frmdb;
+        global $wpdb;
       
         $entry = wp_cache_get( $id, 'frm_entry' );
         if($entry)
-            return $entry;
+            return stripslashes_deep($entry);
 
-        $query = "SELECT it.*, fr.name as form_name, fr.form_key as form_key FROM $frmdb->entries it 
-                  LEFT OUTER JOIN $frmdb->forms fr ON it.form_id=fr.id WHERE ";
+        $query = "SELECT it.*, fr.name as form_name, fr.form_key as form_key FROM {$wpdb->prefix}frm_items it 
+                  LEFT OUTER JOIN {$wpdb->prefix}frm_forms fr ON it.form_id=fr.id WHERE ";
         if(is_numeric($id))
             $query .= $wpdb->prepare('it.id=%d', $id);
         else
@@ -185,8 +212,12 @@ class FrmEntry{
             global $frm_entry_meta;
             $metas = $frm_entry_meta->getAll("item_id=$entry->id and field_id != 0");
             $entry_metas = array();
-            foreach($metas as $meta_val)
+            
+            foreach($metas as $meta_val){
                 $entry_metas[$meta_val->field_id] = $entry_metas[$meta_val->field_key] = maybe_unserialize($meta_val->meta_value);
+                unset($meta_val);
+            }
+            unset($metas);
 
             $entry->metas = $entry_metas;
 
@@ -197,37 +228,34 @@ class FrmEntry{
     }
     
     function &exists( $id ){
-        global $wpdb, $frmdb;
+        global $wpdb;
         
         if(wp_cache_get( $id, 'frm_entry' )){
             $exists = true;
             return $exists;
         }
             
-        if (is_numeric($id))
-            $where = array('id' => $id);
-        else
-            $where = array('item_key' => $id);
+        $where = (is_numeric($id)) ? 'id=%d' : 'item_key=%s';
 
-        $id = $frmdb->get_var($frmdb->entries, $where);
+        $id = $wpdb->get_var($wpdb->prepare("SELECT id FROM {$wpdb->prefix}frm_items WHERE $where", $id));
           
         $exists = ($id && $id > 0) ? true : false;
         return $exists;
     }
 
     function getAll($where = '', $order_by = '', $limit = '', $meta=false, $inc_form=true){
-        global $wpdb, $frmdb;
+        global $wpdb;
         
         if(is_numeric($limit))
             $limit = " LIMIT {$limit}";
             
         if($inc_form){
             $query = "SELECT it.*, fr.name as form_name,fr.form_key as form_key
-                FROM $frmdb->entries it LEFT OUTER JOIN $frmdb->forms fr ON it.form_id=fr.id" .
+                FROM {$wpdb->prefix}frm_items it LEFT OUTER JOIN {$wpdb->prefix}frm_forms fr ON it.form_id=fr.id" .
                 FrmAppHelper::prepend_and_or_where(' WHERE ', $where) . $order_by . $limit;
         }else{
             $query = "SELECT it.id, it.item_key, it.name, it.ip, it.form_id, it.post_id, it.user_id, it.updated_by,
-                it.created_at, it.updated_at FROM $frmdb->entries it" .
+                it.created_at, it.updated_at, it.is_draft FROM {$wpdb->prefix}frm_items it" .
                 FrmAppHelper::prepend_and_or_where(' WHERE ', $where) . $order_by . $limit;
         }
         $entries = $wpdb->get_results($query, OBJECT_K);
@@ -242,8 +270,8 @@ class FrmEntry{
                 $meta_where = "item_id in (". implode(',', array_keys($entries)) .")";
             }
             $query = $wpdb->prepare("SELECT item_id, meta_value, field_id, 
-                fi.field_key as field_key FROM $frmdb->entry_metas it 
-                LEFT OUTER JOIN $frmdb->fields fi ON it.field_id=fi.id 
+                fi.field_key as field_key FROM {$wpdb->prefix}frm_item_metas it 
+                LEFT OUTER JOIN {$wpdb->prefix}frm_fields fi ON it.field_id=fi.id 
                 WHERE $meta_where and field_id != %d", 0);
             
             $metas = $wpdb->get_results($query);
@@ -288,11 +316,11 @@ class FrmEntry{
 
     // Pagination Methods
     function getRecordCount($where=''){
-        global $wpdb, $frmdb;
+        global $wpdb;
         if(is_numeric($where)){
-            $query = "SELECT COUNT(*) FROM $frmdb->entries WHERE form_id=". $where;
+            $query = "SELECT COUNT(*) FROM {$wpdb->prefix}frm_items WHERE form_id=". $where;
         }else{
-            $query = "SELECT COUNT(*) FROM $frmdb->entries it LEFT OUTER JOIN $frmdb->forms fr ON it.form_id=fr.id" .
+            $query = "SELECT COUNT(*) FROM {$wpdb->prefix}frm_items it LEFT OUTER JOIN {$wpdb->prefix}frm_forms fr ON it.form_id=fr.id" .
                 FrmAppHelper::prepend_and_or_where(' WHERE ', $where);
         }
         return $wpdb->get_var($query);
@@ -306,24 +334,25 @@ class FrmEntry{
     }
 
     function getPage($current_p, $p_size, $where = '', $order_by = ''){
-      global $wpdb, $frmdb;
-      $end_index = $current_p * $p_size;
-      $start_index = $end_index - $p_size;
-      $results = $this->getAll($where, $order_by, " LIMIT $start_index,$p_size;", true);
-      return $results;
+        global $wpdb;
+        $end_index = $current_p * $p_size;
+        $start_index = $end_index - $p_size;
+        $results = $this->getAll($where, $order_by, " LIMIT $start_index,$p_size;", true);
+        return $results;
     }
 
-    function validate( $values, $exclude=false ){
-        global $wpdb, $frmdb, $frm_field, $frm_entry_meta, $frm_settings;
-
+    function validate( $values, $exclude=false, $api=false ){
+        global $wpdb, $frm_field, $frm_entry_meta, $frm_settings;
+        
         $errors = array();
-        if(!isset($values['form_id']) or !isset($values['item_meta'])){
+        if(!isset($values['form_id']) or !isset($values['item_meta']) or (!$api and isset($_POST) and (!isset($_POST['frm_submit_entry']) or !wp_verify_nonce($_POST['frm_submit_entry'], 'frm_submit_entry_nonce')))){
             $errors['form'] = __('There was a problem with your submission. Please try again.', 'formidable');
-            return $errors;
+            if(!isset($values['form_id']) or !isset($values['item_meta']))
+                return $errors;
         }
         
         if( !isset($values['item_key']) or $values['item_key'] == '' ){
-            $_POST['item_key'] = $values['item_key'] = FrmAppHelper::get_unique_key('', $frmdb->entries, 'item_key');
+            $_POST['item_key'] = $values['item_key'] = FrmAppHelper::get_unique_key('', $wpdb->prefix .'frm_items', 'item_key');
             $gen_key = true;
         }
         
@@ -353,7 +382,7 @@ class FrmEntry{
             }else if ($posted_field->type == 'text' and !isset($_POST['name'])){
                 $_POST['name'] = $value;
                 if(isset($gen_key) and $gen_key){
-                    $_POST['item_key'] = $values['item_key'] = FrmAppHelper::get_unique_key($value, $frmdb->entries, 'item_key');
+                    $_POST['item_key'] = $values['item_key'] = FrmAppHelper::get_unique_key($value, $wpdb->prefix .'frm_items', 'item_key');
                     $gen_key = false;
                 }
             }
@@ -364,7 +393,7 @@ class FrmEntry{
                 global $frm_settings;
 
                 if(!function_exists('recaptcha_check_answer'))
-                    require_once(FRM_PATH.'/classes/recaptchalib.php');
+                    require(FrmAppHelper::plugin_path().'/classes/recaptchalib.php');
 
                 $response = recaptcha_check_answer($frm_settings->privkey,
                                                 $_SERVER['REMOTE_ADDR'],
@@ -384,7 +413,7 @@ class FrmEntry{
         
         global $wpcom_api_key;
         if (isset($values['item_meta']) and !empty($values['item_meta']) and empty($errors) and function_exists( 'akismet_http_post' ) and ((get_option('wordpress_api_key') or $wpcom_api_key)) and $this->akismet($values)){
-            global $frm_form;
+            $frm_form = new FrmForm();
             $form = $frm_form->getOne($values['form_id']);
             $form->options = maybe_unserialize($form->options);
             
@@ -397,7 +426,7 @@ class FrmEntry{
     
     //Check entries for spam -- returns true if is spam
     function akismet($values) {
-	    global $akismet_api_host, $akismet_api_port, $frm_siteurl;
+	    global $akismet_api_host, $akismet_api_port;
 
 		$content = '';
 		foreach ( $values['item_meta'] as $val ) {
@@ -412,7 +441,7 @@ class FrmEntry{
 		    return false;
         
         $datas = array();
-		$datas['blog'] = $frm_siteurl;
+		$datas['blog'] = FrmAppHelper::site_url();
 		$datas['user_ip'] = preg_replace( '/[^0-9., ]/', '', $_SERVER['REMOTE_ADDR'] );
 		$datas['user_agent'] = $_SERVER['HTTP_USER_AGENT'];
 		$datas['referrer'] = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : false;

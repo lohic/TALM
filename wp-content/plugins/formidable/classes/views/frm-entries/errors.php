@@ -1,7 +1,7 @@
 <?php global $frm_settings; 
 if (isset($message) && $message != ''){ 
-    if(is_admin()){ 
-        ?><div id="message" class="updated fade" style="padding:5px;"><?php echo $message ?></div><?php 
+    if(is_admin() and !defined('DOING_AJAX')){ 
+        ?><div id="message" class="frm_message updated" style="padding:5px;"><?php echo $message ?></div><?php 
     }else{ 
         echo $message; 
     }
@@ -10,10 +10,11 @@ if (isset($message) && $message != ''){
 if( isset($errors) && is_array($errors) && !empty($errors) ){
     global $frm_settings;
 ?>
-<div class="<?php echo (is_admin()) ? 'error' : 'frm_error_style' ?>"> 
-<?php 
-if(!is_admin()){ 
-    $img = apply_filters('frm_error_icon', '');
+<div class="frm_error_style"> 
+<?php
+$img = '';
+if(!is_admin() or defined('DOING_AJAX')){ 
+    $img = apply_filters('frm_error_icon', $img);
     if($img and !empty($img)){
     ?><img src="<?php echo $img ?>" alt="" />
 <?php 
@@ -23,7 +24,7 @@ if(!is_admin()){
 if(empty($frm_settings->invalid_msg)){
     $show_img = false;
     foreach( $errors as $error ){
-        if($show_img and isset($img) and !empty($img)){ 
+        if($show_img and !empty($img)){ 
             ?><img src="<?php echo $img ?>" alt="" /><?php 
         }else{
             $show_img = true;
@@ -35,11 +36,11 @@ if(empty($frm_settings->invalid_msg)){
 
     $show_img = true;
     foreach( $errors as $err_key => $error ){
-        if(!is_numeric($err_key) and ($err_key == 'cptch_number' or $err_key == 'form' or strpos($err_key, 'field') === 0 or strpos($err_key, 'captcha') === 0 ))
+        if(!is_numeric($err_key) and ($err_key == 'cptch_number' or strpos($err_key, 'field') === 0 or strpos($err_key, 'captcha') === 0 ))
             continue;
           
         echo '<br/>'; 
-        if($show_img and $img and !empty($img)){ 
+        if($show_img and !empty($img)){ 
             ?><img src="<?php echo $img ?>" alt="" /><?php 
         }else{
             $show_img = true;

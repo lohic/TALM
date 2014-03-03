@@ -2,9 +2,9 @@
 Contributors: sswells, srwells
 Donate link: http://formidablepro.com/donate
 Tags: admin, AJAX, captcha, contact, contact form, database, email, feedback, form, forms, javascript, jquery, page, plugin, poll, Post, spam, survey, template, widget, wpmu, form builder
-Requires at least: 3.0
-Tested up to: 3.6
-Stable tag: 1.07.01
+Requires at least: 3.3
+Tested up to: 3.8
+Stable tag: 1.07.04
 
 Quickly and easily build forms with a simple drag-and-drop interface and in-place editing. 
 
@@ -34,9 +34,12 @@ There are dozens of form-building plugins out there to create forms, but most ar
 4. Use shortcode [formidable id=x] in pages, posts, or text widgets.
 
 == Screenshots ==
-1. Form creation page
-2. Form Widget
-3. Entry Management page
+1. Create beautiful forms without any code.
+2. Form creation page
+3. Field Options and CSS Layout Classes
+4. Field Options for checkbox fields
+5. Entry Management page
+6. Form Widget
 
 == Frequently Asked Questions ==
 = Q. Why aren't I getting any emails? =
@@ -61,6 +64,87 @@ A. Try clearing your browser cache. As plugin modifications are made, frequent j
 [See more FAQs](http://formidablepro.com/formidable-faqs/ "Formidable Pro FAQs")
 
 == Changelog ==
+= 1.07.04 =
+* Minor back-end styling fixes
+* PRO: Added frm_show_delete_all hook to hide the "delete all entries" button, and show by default for those with back-end entry editing capabilities
+* PRO: Fixed inserting conditional examples from the sidebar box
+* PRO: Fixed viewing single post with some view configurations
+* PRO: Fixed detailed view for calendar displays when entries are not posts
+* PRO: Fixed conditional logic on page load for radio buttons
+* PRO: Make sure entries aren't deleted in another form if using the form switcher right after deleting all entries in a form
+* PRO: Fixed error when saving a field with conditional logic with no field selected
+* PRO: Allow subscribers and below to add custom taxonomies to posts
+* PRO: Fixed conditional data from entries fields across multiple pages in an ajax form
+
+= 1.07.03 =
+* Removed auto updating from free version
+* PRO: Added secondary ordering options in Views
+* PRO: Allow newly added custom fields on the "Create posts" tab to be selected from existing options
+* PRO: Allow html=1 and show_filename=1 to be used together for showing a filename linking to the file
+* PRO: If not using show_filename=1, default to show the file type icon or non-image file types
+* PRO: Fixed ordering in a view set to show a single entry
+* PRO: Fixed adding new filters to views
+* PRO: Allow a low-level user to edit entries submitted by another user when the setting is turned on, even if they have not submitted an entry themselves
+* PRO: Fixed data from entries fields across multiple pages
+* PRO: Added [updated-by] shortcode for use in views
+* PRO: Send the detail page of a view through any set filters
+* PRO: In a view, use limit over page size if limit is lower
+* PRO: Fixed going backwards in a multi-paged form, when 2 or more pages are skipped at a time
+
+= 1.07.02 =
+* Added form switcher to nav and other UI enhancements
+* Remove slashes from a single entry retrieved from cache
+* Remove slashes added by ajax before saving to db
+* Fixed naming so plugin info and change log links are correct on plugins page
+* Updated default submit button HTML to include [frmurl] for a dynamic url
+* Added nonce fields and checking for increased security
+* Switched to placeholder with IE fallback for those using HTML5
+* Updated duplicate entry checking for more accuracy
+* Improved long form load time and usability
+* Added French translation
+* Removed unnecessary definitions: FRM_IMAGES_URL, IS_WPMU, FRMPRO_IMAGES_URL
+* Dropped support for < jQuery 1.7 (< WP 3.3)
+* Added frm_radio_class, frm_checkbox_class, and frm_submit_button_class hooks
+* Moved radio and checkbox inputs inside the label tags
+* Updated default styling
+* Added frm_text_block and frm_clearfix styling classes
+* Added force_balance_tags on the in-place-editing fields on the form builder page to prevent issues with adding bad HTML
+* PRO: Switch field IDs in email settings in duplicated form
+* PRO: Added option to save drafts
+* PRO: Added phone format option, including an input mask if format is not a regular expression
+* PRO: Added exclude_fields to the form shortcode. Ex [formidable id=2 exclude_fields="25,26"]
+* PRO: Added styling reset button on styling page
+* PRO: Switch "Custom Display" terminology to "View"
+* PRO: Allow any values in the form shortcode to set $_GET values. [formidable id=x get="something"]. Then use [get param="get"] in a field
+* PRO: Allow the field value to be used to filter data from entries values in custom displays, statistics, and graphs
+* PRO: Increased CSV export efficiency
+* PRO: Allow for quotation marks in values used to get stats in the frm-stats shortcode
+* PRO: Fixed entry listing widget to get values from stats for more accuracy
+* PRO: Updated template export to include all form settings
+* PRO: Drop WP_List_Table fallback for < WP 3.1
+* PRO: Make custom display pagination unique to allow multiple paginated displays on a single page
+* PRO: Remove WPML-related translating options, and move to the add-on
+* PRO: Added [entry_count] for use in custom displays
+* PRO: Allow a blank option for multiselect data from entries fields when set to autocomplete
+* PRO: Adjust imported created and updated times from server setting to UTC
+* PRO: Switch time field generation from javascript to php
+* PRO: Allow [if created-at less_than="-1 month"]
+* PRO: Added frm_default_field_opts hook
+* PRO: Added frm_send_to_not_email hook for notifications that are triggered on non-emails
+* PRO: Updated file uploading progress bar with frm_uploading_files hook added to text
+* PRO: Only show "create entry in form" box if user has permission to create entries
+* PRO: Removed icons from error message
+* PRO: Fixed collapsable entry list bullets
+* PRO: Fixed dependent multi-select data from entries fields on edit
+* PRO: Added frm_back_button_class hook
+* PRO: Fixed quotation marks in conditional logic
+* PRO: Allow filtering by a field value in graphs
+* PRO: Make x_axis=created_at work in graphs
+* PRO: Added if statements to Default HTML button in email message
+* PRO: Added show_filename option to file upload fields
+* PRO: Allow dropdown data from entries fields to be set as read only
+
+
 = 1.07.01 =
 * Added for attribute to labels for newly created fields
 * Fixed issue with slashes showing in content if retrieved from cache
@@ -70,6 +154,9 @@ A. Try clearing your browser cache. As plugin modifications are made, frequent j
 * PRO: Added option to not load a JQuery UI stylesheet
 * PRO: Added "Entry ID" option to the back-end entry search options
 * PRO: Added frm_csv_filename hook for changing the csv file name
+* PRO: Allow siteurl and sitename in after content box in custom display
+* PRO: Allow autocomplete selection to be unselected on front-end
+* PRO: Fixed conditional validation for fields in a conditional section heading beyond page 1
 
 = 1.07.0 =
 * Submit build form in one input with ajax to prevent max_input_vars limitations

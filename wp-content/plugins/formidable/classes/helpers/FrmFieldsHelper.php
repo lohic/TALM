@@ -1,5 +1,10 @@
 <?php
 
+if(!defined('ABSPATH')) die(__('You are not allowed to call this page directly.', 'formidable'));
+
+if(class_exists('FrmFieldsHelper'))
+    return;
+
 class FrmFieldsHelper{
     
     public static function field_selection(){
@@ -10,7 +15,6 @@ class FrmFieldsHelper{
             'radio' => __('Radio Buttons', 'formidable'),
             'select' => __('Dropdown', 'formidable'),
             'captcha' => __('reCAPTCHA', 'formidable')
-            //'nucaptcha' => __('NuCaptcha (SPAM Control)', 'formidable')
         ));
         
         return $fields;
@@ -89,11 +93,15 @@ class FrmFieldsHelper{
     }
     
     public static function setup_edit_vars($record, $doing_ajax=false){
-        global $frm_entry_meta, $frm_form;
+        global $frm_entry_meta;
         
         $values = array('id' => $record->id, 'form_id' => $record->form_id);
         $defaults = array('name' => $record->name, 'description' => $record->description);
-        $default_opts = array('field_key' => $record->field_key, 'type' => $record->type, 'default_value'=> $record->default_value, 'field_order' => $record->field_order, 'required' => $record->required);
+        $default_opts = array(
+            'field_key' => $record->field_key, 'type' => $record->type, 
+            'default_value'=> $record->default_value, 'field_order' => $record->field_order, 
+            'required' => $record->required
+        );
         
         if($doing_ajax){
             $values = $values + $defaults + $default_opts;
@@ -111,7 +119,9 @@ class FrmFieldsHelper{
                 unset($default);
             }
             
+            $frm_form = new FrmForm();
             $values['form_name'] = ($record->form_id) ? $frm_form->getName( $record->form_id ) : '';
+            unset($frm_form);
         }
         
         unset($defaults);
@@ -149,12 +159,12 @@ class FrmFieldsHelper{
         if($limit)
             return $field_options;
         
-        global $frmdb, $frm_settings;
+        global $wpdb, $frm_settings;
         
         $form_id = (is_numeric($field)) ? $field : $field->form_id;
         
-        $key = is_numeric($field) ? FrmAppHelper::get_unique_key('', $frmdb->fields, 'field_key') : $field->field_key;
-        $field_count = FrmAppHelper::getRecordCount("form_id='$form_id'", $frmdb->fields);
+        $key = is_numeric($field) ? FrmAppHelper::get_unique_key('', $wpdb->prefix .'frm_fields', 'field_key') : $field->field_key;
+        $field_count = FrmAppHelper::getRecordCount(array('form_id' => $form_id), $wpdb->prefix .'frm_fields');
         
         return array(
             'name' => __('Untitled', 'formidable'), 'description' => '', 
@@ -197,8 +207,6 @@ DEFAULT_HTML;
     }
     
     public static function replace_shortcodes($html, $field, $errors=array(), $form=false){
-        global $frm_readonly;
-        
         $html = stripslashes($html);
         $html = apply_filters('frm_before_replace_shortcodes', $html, $field, $errors, $form);
         
@@ -257,6 +265,7 @@ DEFAULT_HTML;
         
         //replace [input]
         preg_match_all("/\[(input|deletelink)\b(.*?)(?:(\/))?\]/s", $html, $shortcodes, PREG_PATTERN_ORDER);
+        global $frm_vars;
 
         foreach ($shortcodes[0] as $short_key => $tag){
             $atts = shortcode_parse_atts( $shortcodes[2][$short_key] );
@@ -279,7 +288,7 @@ DEFAULT_HTML;
                     unset($atts['class']);
                 $field['shortcodes'] = $atts;
                 ob_start();
-                include(FRM_VIEWS_PATH.'/frm-fields/input.php');
+                include(FrmAppHelper::plugin_path() .'/classes/views/frm-fields/input.php');
                 $replace_with = ob_get_contents();
                 ob_end_clean();
             }else if($tag == 'deletelink' and class_exists('FrmProEntriesController'))
@@ -303,19 +312,18 @@ DEFAULT_HTML;
     }
     
     public static function display_recaptcha($field, $error=null){
-    	global $frm_settings;
+    	global $frm_settings, $frm_vars;
     	
     	if(!function_exists('recaptcha_get_html'))
-            require_once(FRM_PATH.'/classes/recaptchalib.php');
+            require(FrmAppHelper::plugin_path().'/classes/recaptchalib.php');
         
         $lang = apply_filters('frm_recaptcha_lang', $frm_settings->re_lang, $field);
         
-        if(defined('DOING_AJAX')){ 
-            global $frm_recaptcha_loaded;
-            if(!$frm_recaptcha_loaded)
-                $frm_recaptcha_loaded = '';
+        if(defined('DOING_AJAX') and (!isset($frm_vars['preview']) or !$frm_vars['preview'])){
+            if(!isset($frm_vars['recaptcha_loaded']) or !$frm_vars['recaptcha_loaded'])
+                $frm_vars['recaptcha_loaded'] = '';
             
-            $frm_recaptcha_loaded .= "Recaptcha.create('". $frm_settings->pubkey ."','field_". $field['field_key'] ."',{theme:'". $frm_settings->re_theme ."',lang:'". $lang ."'". apply_filters('frm_recaptcha_custom', '', $field) ."});";
+            $frm_vars['recaptcha_loaded'] .= "Recaptcha.create('". $frm_settings->pubkey ."','field_". $field['field_key'] ."',{theme:'". $frm_settings->re_theme ."',lang:'". $lang ."'". apply_filters('frm_recaptcha_custom', '', $field) ."});";
 ?>
 <div id="field_<?php echo $field['field_key'] ?>"></div>
 <?php   }else{ ?>
@@ -325,7 +333,7 @@ DEFAULT_HTML;
     }
     
     public static function dropdown_categories($args){
-        global $frmpro_is_installed;
+        global $frm_vars;
         
         $defaults = array('field' => false, 'name' => false, 'show_option_all' => ' ');
         extract(wp_parse_args($args, $defaults));
@@ -367,7 +375,7 @@ DEFAULT_HTML;
 
         $add_html = FrmFieldsController::input_html($field, false);
         
-        if($frmpro_is_installed)
+        if($frm_vars['pro_is_installed'])
             $add_html .= FrmProFieldsController::input_html($field, false);
         
         $dropdown = str_replace("<select name='$name' id='$id' class='$class'", "<select name='$name' id='$id' ". $add_html, $dropdown);
@@ -387,13 +395,51 @@ DEFAULT_HTML;
         return $dropdown;
     }
     
+    public static function get_field_types($type){
+        $frm_field_selection = FrmFieldsHelper::field_selection();    
+        $field_types = array();
+        $single_input = array(
+            'text', 'textarea', 'rte', 'number', 'email', 'url', 
+            'image', 'file', 'date', 'phone', 'hidden', 'time', 
+            'user_id', 'tag', 'password'
+        );
+        $multiple_input = array('radio', 'checkbox', 'select', 'scale');
+        $other_type = array('divider', 'html', 'break');
+        $frm_pro_field_selection = FrmFieldsHelper::pro_field_selection();
+        
+        if (in_array($type, $single_input)){
+            foreach($single_input as $input){
+                if (isset($frm_pro_field_selection[$input]))
+                    $field_types[$input] = $frm_pro_field_selection[$input];
+                else
+                    $field_types[$input] = $frm_field_selection[$input];
+            }
+        }else if (in_array($type, $multiple_input)){
+            foreach($multiple_input as $input){
+                if (isset($frm_pro_field_selection[$input]))
+                    $field_types[$input] = $frm_pro_field_selection[$input];
+                else
+                    $field_types[$input] = $frm_field_selection[$input];
+            }
+        }else if (in_array($type, $other_type)){
+            foreach($other_type as $input){
+                if (isset($frm_pro_field_selection[$input]))
+                    $field_types[$input] = $frm_pro_field_selection[$input];
+                else
+                    $field_types[$input] = $frm_field_selection[$input];
+            }
+        }
+        
+        return $field_types;
+    }
+    
     public static function show_onfocus_js($field_id, $clear_on_focus){ ?>
-    <a href="javascript:frm_clear_on_focus(<?php echo $field_id; ?>,<?php echo $clear_on_focus; ?>)" class="<?php echo ($clear_on_focus) ?'':'frm_inactive_icon '; ?>frm_default_val_icons frm_action_icon frm_reload_icon" id="clear_field_<?php echo $field_id; ?>" title="<?php printf(__('%1$sclear default value when field is clicked', 'formidable'), ($clear_on_focus) ? '': __('Do not', 'formidable').' ' ); ?>"></a>
+    <a class="frm_bstooltip <?php echo ($clear_on_focus) ? '' : 'frm_inactive_icon '; ?>frm_default_val_icons frm_action_icon frm_reload_icon frm_icon_font" id="clear_field_<?php echo $field_id; ?>" title="<?php echo esc_attr($clear_on_focus ? __('Clear default value when typing', 'formidable') : __('Do not clear default value when typing', 'formidable')); ?>"></a>
     <?php
     }
     
     public static function show_default_blank_js($field_id, $default_blank){ ?>
-    <a href="javascript:frm_default_blank(<?php echo $field_id; ?>,<?php echo $default_blank ?>)" class="<?php echo ($default_blank) ?'':'frm_inactive_icon '; ?>frm_default_val_icons frm_action_icon frm_error_icon" id="default_blank_<?php echo $field_id; ?>" title="<?php printf(__('Default value will %1$spass form validation', 'formidable'), ($default_blank) ? __('not', 'formidable').' ' :'' ); ?>"></a>
+    <a class="frm_bstooltip <?php echo ($default_blank) ? '' :'frm_inactive_icon '; ?>frm_default_val_icons frm_action_icon frm_error_icon frm_icon_font" id="default_blank_<?php echo $field_id; ?>" title="<?php echo $default_blank ? __('Default value will NOT pass form validation', 'formidable') : __('Default value will pass form validation', 'formidable'); ?>"></a>
     <?php
     }
     

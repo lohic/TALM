@@ -7,7 +7,7 @@ Requires at least: 3.0
 Tested up to: 3.5.1
 Stable tag: trunk
 Homepage: http://www.advancedcustomfields.com/add-ons/flexible-content-field/
-Version: 1.0.2
+Version: 1.1.1
 
 
 == Copyright ==
@@ -45,18 +45,26 @@ However, only when activated as a plugin will updates be available/
 2. Edit your functions.php file and add the following code to include the field:
 
 `
-add_action('acf/register_fields', 'my_register_fields');
-
-function my_register_fields()
-{
-	include_once('acf-flexible-content/flexible-content.php');
-}
+include_once('acf-flexible-content/acf-flexible-content.php');
 `
-
-3. Make sure the path is correct to include the flexible-content.php file
+3. Make sure the path is correct to include the acf-flexible-content.php file
+4. Remove the acf-flexible-content-update.php file from the folder.
 
 
 == Changelog ==
+
+= 1.1.1 =
+* Fixed bug causing a sub field default_value of "0" to be ignored
+* Updated CSS for WP 3.8 compatibility
+* Added filter to customize the no_value_message text
+
+= 1.1.0 =
+* Added Support for sub field conditional logic
+* Added Support for sub field required validation
+* Updated UI for each layout when editing the field group
+* Added new options for min / max layouts
+* Updated JS to use .on function instead of .live
+* Added new update script allowing distribution in premium plugins / themes
 
 = 1.0.2 =
 * [Fixed] Fixed JS error appearing if repeater field add-on is not activated

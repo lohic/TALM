@@ -16,9 +16,9 @@
                 $field_val = apply_filters('frm_field_value_saved', $opt, $opt_key, $field);
                 $opt = apply_filters('frm_field_label_seen', $opt, $opt_key, $field);
             ?>
-<div class="frm_radio"><input type="radio" name="<?php echo $field_name ?>" id="field_<?php echo $field['id'] ?>-<?php echo $opt_key ?>" value="<?php echo esc_attr($field_val) ?>" <?php echo (FrmAppHelper::check_selected($field['value'], $field_val)) ? 'checked="checked"' : ''; ?> <?php do_action('frm_field_input_html', $field) ?>/><?php if(!isset($atts) or !isset($atts['label']) or $atts['label']){ ?><label for="field_<?php echo $field['id'] ?>-<?php echo $opt_key ?>"><?php echo $opt ?></label><?php } 
-?></div>
-    <?php   }  
+<div class="<?php echo apply_filters('frm_radio_class', 'frm_radio', $field, $field_val)?>"><label for="field_<?php echo $field['id'] ?>-<?php echo $opt_key ?>"><input type="radio" name="<?php echo $field_name ?>" id="field_<?php echo $field['id'] ?>-<?php echo $opt_key ?>" value="<?php echo esc_attr($field_val) ?>" <?php echo (FrmAppHelper::check_selected($field['value'], $field_val)) ? 'checked="checked"' : ''; ?> <?php do_action('frm_field_input_html', $field) ?>/><?php if(!isset($atts) or !isset($atts['label']) or $atts['label']){ echo ' '. $opt; } 
+?></label></div>
+<?php       }  
         }
     }
 
@@ -26,7 +26,7 @@
     if(isset($field['post_field']) and $field['post_field'] == 'post_category'){
         echo FrmFieldsHelper::dropdown_categories(array('name' => $field_name, 'field' => $field) );
     }else{ 
-        if($field['read_only'] and $frm_readonly != 'disabled' and (!is_super_admin() or !is_admin())){ ?>
+        if (isset($field['read_only']) && $field['read_only'] && (!isset($frm_vars['readonly']) || $frm_vars['readonly'] != 'disabled') && (!is_super_admin() || (!is_admin() && !defined('DOING_AJAX')))) { ?>
 <input type="hidden" value="<?php echo esc_attr($field['value']) ?>" name="<?php echo $field_name ?>" id="field_<?php echo $field['field_key'] ?>" />
 <select disabled="disabled" <?php do_action('frm_field_input_html', $field) ?>>
 <?php   }else{ ?>        
@@ -54,14 +54,14 @@ if (FrmAppHelper::check_selected($field['value'], $field_val)) echo ' selected="
             $opt = apply_filters('frm_field_label_seen', $opt, $opt_key, $field);
             $checked = (FrmAppHelper::check_selected($checked_values, $field_val)) ? ' checked="checked"' : '';
             ?>
-<div class="frm_checkbox" id="frm_checkbox_<?php echo $field['id']?>-<?php echo $opt_key ?>"><input type="checkbox" name="<?php echo $field_name ?>[]" id="field_<?php echo $field['id']?>-<?php echo $opt_key ?>" value="<?php echo esc_attr($field_val) ?>" <?php echo $checked ?> <?php do_action('frm_field_input_html', $field) ?>/><?php if(!isset($atts) or !isset($atts['label']) or $atts['label']){ ?><label for="field_<?php echo $field['id']?>-<?php echo $opt_key ?>"><?php echo $opt ?></label><?php }
- ?></div>
+<div class="<?php echo apply_filters('frm_checkbox_class', 'frm_checkbox', $field, $field_val)?>" id="frm_checkbox_<?php echo $field['id']?>-<?php echo $opt_key ?>" ><label for="field_<?php echo $field['id']?>-<?php echo $opt_key ?>"><input type="checkbox" name="<?php echo $field_name ?>[]" id="field_<?php echo $field['id']?>-<?php echo $opt_key ?>" value="<?php echo esc_attr($field_val) ?>" <?php echo $checked ?> <?php do_action('frm_field_input_html', $field) ?>/><?php if(!isset($atts) or !isset($atts['label']) or $atts['label']){ echo ' '. $opt; }
+?></label></div>
 <?php
         }
         }
     }
 
-}else if ($field['type'] == 'captcha' and !is_admin()){
+}else if ($field['type'] == 'captcha' and (!is_admin() or defined('DOING_AJAX'))){
         global $frm_settings;
         $error_msg = null;
         if(!empty($errors)){

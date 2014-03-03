@@ -1,233 +1,312 @@
-/*
-*  Flexible Content
-*
-*  @description: 
-*  @since: 3.5.8
-*  @created: 17/01/13
-*/
+acf_fc = {};
 
 (function($){
 	
-	// vars
-	acf.text.flexible_content_no_fields = 'Flexible Content requires at least 1 layout';
-	
-
-	/*----------------------------------------------------------------------
-	*
-	*	Add Layout Option
-	*
-	*---------------------------------------------------------------------*/
-	
-	$('#acf_fields .acf_fc_add').live('click', function(){
+	acf_fc = {
 		
-		// vars
-		var tr = $(this).closest('tr.field_option_flexible_content'),
-			new_tr = tr.clone(false),
-			id = new_tr.attr('data-id'),
-			new_id = acf.helpers.uniqid();
+		$el : null,
 		
-		
-		// remove sub fields
-		new_tr.find('.field:not(.field_key-field_clone)').remove();
-		
-		// show add new message
-		new_tr.find('.no_fields_message').show();
-		
-		// reset layout meta values
-		new_tr.find('.acf_cf_meta input[type="text"]').val('');
-		
-		
-		// update id / names
-		new_tr.find('[name]').each(function(){
-		
-			var name = $(this).attr('name').replace('[layouts]['+id+']','[layouts]['+new_id+']');
-			$(this).attr('name', name);
-			$(this).attr('id', name);
+		init : function(){
 			
-		});
-		
-		// update data-id
-		new_tr.attr('data-id', new_id);
-		
-		// add new tr
-		tr.after(new_tr);
-		
-		// display
-		new_tr.find('.acf_cf_meta select').val('row').trigger('change');
-		
-		
-		return false;
-	});
-	
-	
-	/*----------------------------------------------------------------------
-	*
-	*	Duplicate Layout
-	*
-	*---------------------------------------------------------------------*/
-	
-	$('#acf_fields .acf_fc_duplicate').live('click', function(){
-		
-		// vars
-		var tr = $(this).closest('tr.field_option_flexible_content'),
-			new_tr = null,
-			id = tr.attr('data-id'),
-			new_id = acf.helpers.uniqid();
-		
+			// reference
+			var _this = this;
 			
-		// save select values
-		tr.find('select').each(function(){
-			$(this).attr( 'data-val', $(this).val() );
-		});
-		
-		
-		// clone tr
-		new_tr = tr.clone(false);
-		
-		
-		// update id / names
-		new_tr.find('[name]').each(function(){
-		
-			var name = $(this).attr('name').replace('[layouts]['+id+']','[layouts]['+new_id+']');
-			$(this).attr('name', name);
-			$(this).attr('id', name);
 			
-		});
+			// vars
+			this.$el = $('#acf_fields');
+			
+			
+			// events
+			this.$el.on('click', '.acf-fc-add', function( e ){
+				
+				e.preventDefault();
+				
+				_this.add( $(this).closest('.field_option') );
+				
+			});
+			
+			
+			this.$el.on('click', '.acf-fc-duplicate', function( e ){
+				
+				e.preventDefault();
+				
+				_this.duplicate( $(this).closest('.field_option') );
+				
+			});
+			
+			
+			this.$el.on('click', '.acf-fc-delete', function( e ){
+				
+				e.preventDefault();
+				
+				_this.remove( $(this).closest('.field_option') );
+				
+			});
+			
+			
+			this.$el.on('change', '.acf-fc-meta-label input', function( e ){
+					
+				var $label = $(this);
+				var $name = $(this).closest('.acf-fc-meta').find('.acf-fc-meta-name input');
+				
+				if( $name.val() == '' )
+				{
+					// thanks to https://gist.github.com/richardsweeney/5317392 for this code!
+					var val = $label.val(),
+						replace = {
+							'ä': 'a',
+							'æ': 'a',
+							'å': 'a',
+							'ö': 'o',
+							'ø': 'o',
+							'é': 'e',
+							'ë': 'e',
+							'ü': 'u',
+							'ó': 'o',
+							'ő': 'o',
+							'ú': 'u',
+							'é': 'e',
+							'á': 'a',
+							'ű': 'u',
+							'í': 'i',
+							' ' : '_',
+							'\'' : ''
+						};
+					
+					$.each( replace, function(k, v){
+						var regex = new RegExp( k, 'g' );
+						val = val.replace( regex, v );
+					});
+					
+					
+					val = val.toLowerCase();
+					$name.val( val );
+					$name.trigger('keyup');
+				}
+		
+			});
+			
+			
+			this.$el.on('mouseenter', '.acf-fc-reorder', function( e ){
+				
+				// vars
+				var $table = $(this).closest('.acf_field_form_table');
+				
+				
+				// only once
+				if( $table.hasClass('sortable') )
+				{
+					return;
+				}
+				
+				$table.addClass('sortable');
+				
+				
+				// init sortable
+				$table.children('tbody').sortable({
+					items					: '.field_option_flexible_content',
+					handle					: '.acf-fc-reorder',
+					helper					: acf.helpers.sortable,
+					forceHelperSize			: true,
+					forcePlaceholderSize	: true,
+					scroll					: true,
+					start					: function (event, ui) {
+						
+		        		ui.placeholder.html('<td colspan="2"></td>');
+		        		
+		   			}
+				});
+				
+			});
+			
+			
+			this.$el.on('change', '.acf-fc-meta-display select', function( e ){
+				
+				// vars
+				var $repeater = $(this).closest('.acf-fc-meta').siblings('.repeater');
+				
+				
+				// Set class
+				$repeater.removeClass('layout-row').removeClass('layout-table').addClass( 'layout-' + $(this).val() );
+				
+			});
+			
+		},
 		
 		
-		// update data-id
-		new_tr.attr('data-id', new_id);
+		add : function( $tr ){
+			
+			// vars
+			var $new_tr = $tr.clone( false );
 		
 		
-		// update field names
-		new_tr.find('.field:not(.field_key-field_clone)').each(function(){
-			$(this).update_names();
-		});
-		
-		
-		// add new tr
-		tr.after(new_tr);
-		
-		
-		// set select values
-		new_tr.find('select').each(function(){
-			$(this).val( $(this).attr('data-val') ).trigger('change');
-		});
-		
-		
-		// update new_field label / name
-		var label = new_tr.find('.acf_fc_label input[type="text"]'),
-			name = new_tr.find('.acf_fc_name input[type="text"]');
-		
-		
-		name.val('');
-		label.val( label.val() + ' (' + acf.text.copy + ')' );
-		label.trigger('blur');
-		
-		
-		return false;
-	});
+			// remove sub fields
+			$new_tr.find('.field:not(.field_key-field_clone)').remove();
 	
-	
-	/*----------------------------------------------------------------------
-	*
-	*	Delete Layout Option
-	*
-	*---------------------------------------------------------------------*/
-	
-	$('#acf_fields .acf_fc_delete').live('click', function(){
-
-		var tr = $(this).closest('tr.field_option_flexible_content'),
-			tr_count = tr.siblings('tr.field_option.field_option_flexible_content').length;
-
-		if( tr_count <= 1 )
-		{
-			alert( acf.text.flexible_content_no_fields );
-			return false;
+			
+			// show add new message
+			$new_tr.find('.no_fields_message').show();
+			
+			
+			// reset layout meta values
+			$new_tr.find('.acf-fc-meta input').val('');
+			
+			
+			this.wipe_layout( $new_tr );
+			
+			
+			// add new tr
+			$tr.after( $new_tr );
+			
+			
+			// display
+			$new_tr.find('.acf-fc-meta select').val('row').trigger('change');
+			
+		},
+		
+		
+		duplicate : function( $tr ){
+			
+			// save select values
+			$tr.find('select').each(function(){
+			
+				$(this).attr( 'data-val', $(this).val() );
+				
+			});
+			
+			
+			// vars
+			var $new_tr = $tr.clone( false );
+			
+			
+			this.wipe_layout( $new_tr );
+			
+			
+			// update field names
+			$new_tr.find('.field:not(.field_key-field_clone)').each(function(){
+			
+				$(this).update_names();
+				
+			});
+			
+			
+			// add new tr
+			$tr.after( $new_tr );
+			
+			
+			// set select values
+			$new_tr.find('select').each(function(){
+			
+				$(this).val( $(this).attr('data-val') ).trigger('change');
+				
+			});
+			
+			
+			// focus on new label
+			$new_tr.find('.acf-fc-meta-label input').focus();
+			
+		},
+		
+		
+		remove : function( $tr ){
+			
+			if( $tr.siblings('.field_option_flexible_content[data-id]').length == 0 )
+			{
+				alert( acf.l10n.flexible_content_delete );
+				return false;
+			}
+			
+			
+			// set layout
+			$tr.css({
+				height		: $tr.height(),
+				width		: $tr.width(),
+				position	: 'absolute'
+			});
+			
+			
+			// fade $tr
+			$tr.animate({ opacity : 0 }, 250, function(){
+				
+				$(this).remove();
+				
+			});
+			
+			
+			// create blank space
+			$blank = $('<tr style="height:' + $tr.height() + 'px"><td colspan="2"></td></tr>');
+			
+			
+			$tr.after( $blank );
+			
+			$blank.animate({ height : 0 }, 250, function(){
+				
+				$(this).remove();
+				
+			});
+						
+		},
+		
+		
+		render : function( $el ){
+			
+			
+			
+		},
+		
+		
+		wipe_layout : function( $el ){
+			
+			// vars
+			var old_id = $el.attr('data-id'),
+				new_id = acf.helpers.uniqid();
+			
+			
+			// give field a new id
+			$el.attr('data-id', new_id);
+			
+			
+			// update attributes
+			$el.find('[name]').each(function(){
+			
+				var name = $(this).attr('name').replace('[layouts][' + old_id + ']','[layouts][' + new_id + ']');
+				
+				$(this).attr('name', name);
+				$(this).attr('id', name);
+				
+			});
+						
 		}
 		
-		tr.animate({'left' : '50px', 'opacity' : 0}, 250, function(){
-			tr.remove();
-		});
-		
-	});
-	
-	
-	/*----------------------------------------------------------------------
-	*
-	*	Sortable Layout Option
-	*
-	*---------------------------------------------------------------------*/
-	
-	$('#acf_fields .acf_fc_reorder').live('mouseover', function(){
-		
-		var table = $(this).closest('table.acf_field_form_table');
-		
-		if(table.hasClass('sortable')) return false;
-		
-		table.addClass('sortable').children('tbody').sortable({
-			items: ".field_option_flexible_content",
-			handle: 'a.acf_fc_reorder',
-			helper: acf.sortable_helper,
-			forceHelperSize : true,
-			forcePlaceholderSize : true,
-			scroll : true,
-			start : function (event, ui) {
-
-				// add markup to the placeholder
-				var td_count = ui.item.children('td').length;
-        		ui.placeholder.html('<td colspan="' + td_count + '"></td>');
-        		
-   			}
-		});
-		
-	});
-	
-	
-	/*----------------------------------------------------------------------
-	*
-	*	Label update name
-	*
-	*---------------------------------------------------------------------*/
-	
-	$('#acf_fields .acf_fc_label input[type="text"]').live('blur', function(){
-		
-		var label = $(this);
-		var name = $(this).parents('td').siblings('td.acf_fc_name').find('input[type="text"]');
-
-		if(name.val() == '')
-		{
-			var val = label.val().toLowerCase().split(' ').join('_').split('\'').join('');
-			name.val(val);
-			name.trigger('keyup');
-		}
-
-	});
+	};
 	
 	
 	/*
-	*  Flexible Content CHange layout display (Row | Table)
+	*  Document Ready
 	*
-	*  @description: 
-	*  @since 3.5.2
-	*  @created: 18/11/12
+	*  initialize
+	*
+	*  @type	event
+	*  @date	15/10/12
+	*  @since	1.1.0
+	*
+	*  @param	n/a
+	*  @return	n/a
 	*/
 	
-	$('#acf_fields .acf_fc_display select').live('change', function(){
+	$(document).on('ready', function(){
 		
-		// vars
-		var select = $(this);
-		
-		
-		// Set class
-		select.closest('.repeater').removeClass('layout-row').removeClass('layout-table').addClass( 'layout-' + select.val() );
-		
+		acf_fc.init();
+			
 	});
+	
 	
 	$(document).live('acf/field_form-open', function(e, field){
 		
-		$(field).find('.acf_fc_display select').each(function(){
+		$(field).find('.acf-fc-meta-display select').each(function(){
+		
 			$(this).trigger('change');
+			
 		});
 		
 	});

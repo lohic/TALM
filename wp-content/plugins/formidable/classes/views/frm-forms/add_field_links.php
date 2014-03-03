@@ -2,7 +2,7 @@
     <?php if(!isset($hide_preview) or !$hide_preview){ 
         if (!$values['is_template']){ ?>
     <p class="howto" style="margin-top:0;"><?php _e('Insert into a post, page, display or text widget', 'formidable') ?>:
-    <input type="text" style="text-align:center;font-weight:bold;width:100%;" readonly="true" onclick="this.select();" onfocus='this.select();' value='[formidable id=<?php echo $id; ?>]' /></p>
+    <input type="text" readonly="true" class="frm_select_box" value='[formidable id=<?php echo $id; ?>]' /></p>
     <?php } ?>
     
     <?php if(isset($values['form_key'])){ ?>
@@ -24,11 +24,9 @@
     		<li class="tabs" ><a href="#frm-insert-fields" id="frm_insert_fields_tab"><?php _e( 'Fields', 'formidable' ); ?></a></li>
     		<li class="hide-if-no-js"><a href="#frm-layout-classes" id="frm_layout_classes_tab"><?php _e( 'Layout', 'formidable' ); ?></a></li>
     		<?php do_action('frm_extra_form_instruction_tabs'); ?>
-    		<li class="hide-if-no-js"><a href="#frm-keys-and-actions"><?php _e( 'Key', 'formidable' ); ?></a></li>
     	</ul>
 
     	<div id="frm-insert-fields" class="tabs-panel" style="max-height:none;overflow:visible;">
-    	    <p class="howto"><?php _e('Click or drag to add a field into your form', 'formidable') ?></p>
 			<ul class="field_type_list">
             <?php 
             $col_class = 'frm_col_one';
@@ -90,7 +88,7 @@
     	            $title = (!empty($d) and is_array($d) and isset($d['title'])) ? $d['title'] : '';
     	        ?>
     	        <li class="frm_col_<?php echo $col ?>">
-                    <a class="frmbutton button show_frm_classes<?php if(!empty($title)) echo ' frm_help'; ?>" onclick="frmInsertFieldCode(jQuery(this),'<?php echo $c ?>');return false;" href="#" <?php if(!empty($title)){ ?>title="<?php echo esc_attr($title); ?>"<?php } ?>>
+                    <a class="frmbutton frm_insert_code button show_frm_classes<?php if(!empty($title)) echo ' frm_help'; ?>" data-code="<?php echo esc_attr($c) ?>" href="javascript:void(0)" <?php if(!empty($title)){ ?>title="<?php echo esc_attr($title); ?>"<?php } ?>>
                         <?php 
                         if(empty($d))
                             echo $c;
@@ -110,30 +108,6 @@
     	    </ul>
     	</div>
     	
-    	<div id="frm-keys-and-actions" class="tabs-panel" style="display:none;max-height:none;">
-		        
-            <ul class="frm_key_icons">
-                <li><span class="frm_action_icon frm_required_icon"></span> 
-                    = <?php _e('required field', 'formidable') ?></li>
-                <li><span class="frm_inactive_icon frm_action_icon frm_required_icon"></span> 
-                    = <?php _e('not required', 'formidable') ?></li>
-                <li><span class="frm_action_icon frm_reload_icon"></span> 
-                    = <?php _e('clear default text on click', 'formidable') ?></li>
-                <li><span class="frm_inactive_icon frm_action_icon frm_reload_icon"></span> 
-                    = <?php _e('do not clear default text on click', 'formidable') ?></li>
-                <li><span class="frm_action_icon frm_error_icon"></span> 
-                    = <?php _e('default value will NOT pass validation', 'formidable') ?></li>
-                <li><span class="frm_inactive_icon frm_action_icon frm_error_icon"></span> 
-                    = <?php _e('default value will pass validation', 'formidable') ?></li>
-                <li><span><img src="<?php echo FRM_IMAGES_URL ?>/trash.png" alt="<?php echo esc_attr(__('Delete', 'formidable')) ?>" /></span> 
-                    = <?php _e('delete field and all inputed data', 'formidable') ?></li>
-                <li><span><img src="<?php echo FRM_IMAGES_URL ?>/duplicate.png" alt="<?php echo esc_attr(__('Move', 'formidable')) ?>" /></span> 
-                    = <?php _e('duplicate field', 'formidable') ?></li>
-                <li><span><img src="<?php echo FRM_IMAGES_URL ?>/move.png" alt="<?php echo esc_attr(__('Move', 'formidable')) ?>" /></span> 
-                    = <?php _e('move field', 'formidable') ?></li>
-            </ul>
-
-    	</div>
     	<?php 
     	$action = isset($_REQUEST['frm_action']) ? 'frm_action' : 'action';
         $action = FrmAppHelper::get_param($action);

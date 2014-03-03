@@ -1,10 +1,13 @@
-<div class="wrap">
-    <div id="icon-themes" class="icon32"><br/></div>
-    <h2><?php _e('Custom Displays', 'formidable'); ?></h2>
+<div id="form_views_page" class="wrap">
+    <div class="frmicon icon32"><br/></div>
+    <h2>
+        <?php _e('Views', 'formidable'); ?>
+        <a href="#" class="add-new-h2" style="visibility:hidden;"><?php _e('Add New'); ?></a>
+    </h2>
 
     <?php 
-        require(FRM_VIEWS_PATH.'/shared/errors.php');
         if($form) FrmAppController::get_form_nav($form);
+		require(FrmAppHelper::plugin_path() .'/classes/views/shared/errors.php');
         FrmAppController::update_message('display collected data in lists, calendars, and other formats'); 
     ?>
 

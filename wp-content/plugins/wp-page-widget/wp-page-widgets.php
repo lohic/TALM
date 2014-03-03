@@ -4,11 +4,11 @@
   Plugin URI: http://www.codeandmore.com/products/wordpress-plugins/wp-page-widget/
   Description: Allow users to customize Widgets per page.
   Author: CodeAndMore
-  Version: 2.1
+  Version: 2.2
   Author URI: http://www.codeandmore.com/
  */
 
-define('PAGE_WIDGET_VERSION', '2.1');
+define('PAGE_WIDGET_VERSION', '2.2');
 
 /* Hooks */
 add_action('admin_init', 'pw_init');
@@ -89,6 +89,10 @@ function pw_init() {
 		// do nothing
 		$upgraded = true;
 	}
+	if (version_compare($current_version, '2.2', '<')) {
+		// do nothing
+		$upgraded = true;
+	}
 	if ($upgraded) {
 		update_option('page_widget_version', PAGE_WIDGET_VERSION);
 	}
@@ -111,7 +115,7 @@ function pw_print_scripts() {
 			'button_title' => __( 'Insert Into Widget', 'image_widget' ),
 			) );
 		}
-		wp_enqueue_script('pw-widgets', plugin_dir_url(__FILE__) . 'assets/js/page-widgets.js', array('jquery', 'jquery-ui-sortable', 'jquery-ui-draggable', 'jquery-ui-droppable'), '1.1', true);
+		wp_enqueue_script('pw-widgets', plugin_dir_url(__FILE__) . 'assets/js/page-widgets.js', array('jquery', 'jquery-ui-sortable', 'jquery-ui-draggable', 'jquery-ui-droppable'), PAGE_WIDGET_VERSION, true);
 	}
 }
 
@@ -128,10 +132,17 @@ function pw_print_styles() {
 		if (is_plugin_active('custom-field-list-widget/widget_custom_field_list.php')) {
 			wp_enqueue_style('pw-widgets3', WP_PLUGIN_URL . '/custom-field-list-widget/widget_custom_field_list_widgetsettings.css', array());
 		}
-		wp_enqueue_style('pw-widgets', plugin_dir_url(__FILE__) . 'assets/css/page-widgets.css', array(), '1.0');
+		if ( version_compare( get_bloginfo('version'), '3.8', '<' ) ) {
+			wp_enqueue_style('pw-widgets', plugin_dir_url(__FILE__) . 'assets/css/page-widgets.css', array(), PAGE_WIDGET_VERSION);
+		}
 	}
 
-	wp_enqueue_style('pw-style', plugin_dir_url(__FILE__) . 'assets/css/style.css', array(), '1.5');
+	if ( version_compare( get_bloginfo('version'), '3.8', '<' ) ) {
+		wp_enqueue_style('pw-style', plugin_dir_url(__FILE__) . 'assets/css/style.css', array(), PAGE_WIDGET_VERSION);
+	} else {
+		wp_enqueue_style('pw-style', plugin_dir_url(__FILE__) . 'assets/css/style-3.8.css', array(), PAGE_WIDGET_VERSION);
+	}
+	
 }
 
 function pw_admin_menu() {
@@ -314,7 +325,18 @@ function pw_search_page() {
 								<div class="sidebar-name">
 									<div class="sidebar-name-arrow"><br /></div>
 									<h3><?php _e('Inactive Widgets'); ?>
-										<span><img src="<?php echo esc_url(admin_url('images/wpspin_light.gif')); ?>" class="ajax-feedback" title="" alt="" /></span></h3>
+                  	<?php
+                    if ( version_compare( get_bloginfo('version'), '3.8', '<' ) ) {	
+										?>
+											<span><img src="<?php echo esc_url(admin_url('images/wpspin_light.gif')); ?>" class="ajax-feedback" title="" alt="" /></span>
+										<?php
+										} else {
+										?>
+											<span class="spinner"></span>
+										<?php
+										}
+										?>
+									</h3>
 								</div>
 								<div class="widget-holder inactive">
 									<p class="description"><?php _e('Drag widgets here to remove them from the sidebar but keep their settings.'); ?></p>
@@ -340,7 +362,17 @@ function pw_search_page() {
 									<div class="sidebar-name">
 										<div class="sidebar-name-arrow"><br /></div>
 										<h3><?php echo esc_html($registered_sidebar['name']); ?>
-											<span><img src="<?php echo esc_url(admin_url('images/wpspin_dark.gif')); ?>" class="ajax-feedback" title="" alt="" /></span></h3>
+											<?php
+											if ( version_compare( get_bloginfo('version'), '3.8', '<' ) ) {	
+											?>
+												<span><img src="<?php echo esc_url(admin_url('images/wpspin_light.gif')); ?>" class="ajax-feedback" title="" alt="" /></span>
+											<?php
+											} else {
+											?>
+												<span class="spinner"></span>
+											<?php
+											}
+											?></h3>
 									</div>
 									<?php wp_list_widget_controls($sidebar); // Show the control forms for each of the widgets in this sidebar ?>
 								</div>
@@ -480,7 +512,17 @@ function pw_metabox_content($post) {
 					<div class="sidebar-name">
 						<div class="sidebar-name-arrow"><br /></div>
 						<h3><?php _e('Inactive Widgets'); ?>
-							<span><img src="<?php echo esc_url(admin_url('images/wpspin_light.gif')); ?>" class="ajax-feedback" title="" alt="" /></span></h3>
+							<?php
+							if ( version_compare( get_bloginfo('version'), '3.8', '<' ) ) {	
+							?>
+								<span><img src="<?php echo esc_url(admin_url('images/wpspin_light.gif')); ?>" class="ajax-feedback" title="" alt="" /></span>
+							<?php
+							} else {
+							?>
+								<span class="spinner"></span>
+							<?php
+							}
+							?></h3>
 					</div>
 					<div class="widget-holder inactive">
 						<p class="description"><?php _e('Drag widgets here to remove them from the sidebar but keep their settings.'); ?></p>
@@ -506,7 +548,18 @@ function pw_metabox_content($post) {
 						<div class="sidebar-name">
 							<div class="sidebar-name-arrow"><br /></div>
 							<h3><?php echo esc_html($registered_sidebar['name']); ?>
-								<span><img src="<?php echo esc_url(admin_url('images/wpspin_dark.gif')); ?>" class="ajax-feedback" title="" alt="" /></span></h3>
+								<?php
+								if ( version_compare( get_bloginfo('version'), '3.8', '<' ) ) {	
+								?>
+									<span><img src="<?php echo esc_url(admin_url('images/wpspin_light.gif')); ?>" class="ajax-feedback" title="" alt="" /></span>
+								<?php
+								} else {
+								?>
+									<span class="spinner"></span>
+								<?php
+								}
+								?>
+              </h3>
 						</div>
 						<?php wp_list_widget_controls($sidebar); // Show the control forms for each of the widgets in this sidebar  ?>
 					</div>
@@ -601,7 +654,17 @@ function pw_showTaxonomyWidget($tag, $taxonomy) {
 							<div class="sidebar-name">
 								<div class="sidebar-name-arrow"><br /></div>
 								<h3><?php _e('Inactive Widgets'); ?>
-									<span><img src="<?php echo esc_url(admin_url('images/wpspin_light.gif')); ?>" class="ajax-feedback" title="" alt="" /></span></h3>
+									<?php
+											if ( version_compare( get_bloginfo('version'), '3.8', '<' ) ) {	
+											?>
+												<span><img src="<?php echo esc_url(admin_url('images/wpspin_light.gif')); ?>" class="ajax-feedback" title="" alt="" /></span>
+											<?php
+											} else {
+											?>
+												<span class="spinner"></span>
+											<?php
+											}
+											?></h3>
 							</div>
 							<div class="widget-holder inactive">
 								<p class="description"><?php _e('Drag widgets here to remove them from the sidebar but keep their settings.'); ?></p>
@@ -627,7 +690,17 @@ function pw_showTaxonomyWidget($tag, $taxonomy) {
 								<div class="sidebar-name">
 									<div class="sidebar-name-arrow"><br /></div>
 									<h3><?php echo esc_html($registered_sidebar['name']); ?>
-										<span><img src="<?php echo esc_url(admin_url('images/wpspin_dark.gif')); ?>" class="ajax-feedback" title="" alt="" /></span></h3>
+										<?php
+											if ( version_compare( get_bloginfo('version'), '3.8', '<' ) ) {	
+											?>
+												<span><img src="<?php echo esc_url(admin_url('images/wpspin_light.gif')); ?>" class="ajax-feedback" title="" alt="" /></span>
+											<?php
+											} else {
+											?>
+												<span class="spinner"></span>
+											<?php
+											}
+											?></h3>
 								</div>
 								<?php wp_list_widget_controls($sidebar); // Show the control forms for each of the widgets in this sidebar  ?>
 							</div>
@@ -725,7 +798,17 @@ function pw_returnTaxonomyWidget() {
 							<div class="sidebar-name">
 								<div class="sidebar-name-arrow"><br /></div>
 								<h3><?php _e('Inactive Widgets'); ?>
-									<span><img src="<?php echo esc_url(admin_url('images/wpspin_light.gif')); ?>" class="ajax-feedback" title="" alt="" /></span></h3>
+									<?php
+									if ( version_compare( get_bloginfo('version'), '3.8', '<' ) ) {	
+									?>
+										<span><img src="<?php echo esc_url(admin_url('images/wpspin_light.gif')); ?>" class="ajax-feedback" title="" alt="" /></span>
+									<?php
+									} else {
+									?>
+										<span class="spinner"></span>
+									<?php
+									}
+									?></h3>
 							</div>
 							<div class="widget-holder inactive">
 								<p class="description"><?php _e('Drag widgets here to remove them from the sidebar but keep their settings.'); ?></p>
@@ -751,7 +834,17 @@ function pw_returnTaxonomyWidget() {
 								<div class="sidebar-name">
 									<div class="sidebar-name-arrow"><br /></div>
 									<h3><?php echo esc_html($registered_sidebar['name']); ?>
-										<span><img src="<?php echo esc_url(admin_url('images/wpspin_dark.gif')); ?>" class="ajax-feedback" title="" alt="" /></span></h3>
+										<?php
+										if ( version_compare( get_bloginfo('version'), '3.8', '<' ) ) {	
+										?>
+											<span><img src="<?php echo esc_url(admin_url('images/wpspin_light.gif')); ?>" class="ajax-feedback" title="" alt="" /></span>
+										<?php
+										} else {
+										?>
+											<span class="spinner"></span>
+										<?php
+										}
+										?></h3>
 								</div>
 								<?php wp_list_widget_controls($sidebar); // Show the control forms for each of the widgets in this sidebar  ?>
 							</div>
@@ -1020,7 +1113,7 @@ function pw_ajax_save_widget() {
 		} else {
 			pw_set_sidebars_widgets($sidebars, $tag_id, $taxonomy);
 		}
-		echo "deleted:$widget_id";
+		// echo "deleted:$widget_id";
 		die();
 	}
 
@@ -1029,7 +1122,7 @@ function pw_ajax_save_widget() {
 
 	if ($form = $wp_registered_widget_controls[$widget_id])
 		call_user_func_array($form['callback'], $form['params']);
-	print 'Updated ajax save widget.';
+	// print 'Updated ajax save widget.';
 	die();
 }
 
@@ -1238,8 +1331,7 @@ function getTaxonomyAccess() {
 
 	if (!is_admin() && (is_tax() || is_tag() || is_category() ) ) { //&& isset($objRequested)) { 
 		$objRequested = $wp_query->queried_object;
-		
-		if (is_object($objRequested)) {
+		if (isset($objRequested) && is_object($objRequested)) {
 			$return['term_id'] = isset($objRequested->term_id) ? $objRequested->term_id : "";
 			$return['taxonomy'] = isset($objRequested->taxonomy) ? $objRequested->taxonomy : "";
 		}

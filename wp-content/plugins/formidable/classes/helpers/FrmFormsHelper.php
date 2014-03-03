@@ -1,9 +1,12 @@
 <?php
+if(!defined('ABSPATH')) die(__('You are not allowed to call this page directly.', 'formidable'));
+
+if(class_exists('FrmFormsHelper'))
+    return;
 
 class FrmFormsHelper{
     public static function get_direct_link($key, $prli_link_id=false){
-        global $frm_siteurl;
-        $target_url = esc_url($frm_siteurl . '/index.php?plugin=formidable&controller=forms&frm_action=preview&form='.$key);
+        $target_url = esc_url(admin_url('admin-ajax.php') . '?action=frm_forms_preview&form='. $key);
         if ($prli_link_id && class_exists('PrliLink')){
             $prli = prli_get_pretty_link_url($prli_link_id);
             if ($prli) $target_url = $prli;
@@ -13,7 +16,7 @@ class FrmFormsHelper{
     
     public static function get_template_dropdown($templates){ ?>
         <select id="select_form" name="select_form" onChange="frmAddNewForm(this.value,'duplicate')">
-            <option value="">- <?php _e('Create Form from Template', 'formidable') ?> -</option>
+            <option value="">&mdash; <?php _e('Create Form from Template', 'formidable') ?> &mdash;</option>
             <?php foreach ($templates as $temp){ ?>
                 <option value="<?php echo $temp->id ?>"><?php echo FrmAppHelper::truncate($temp->name, 40) ?></option>
             <?php }?>
@@ -22,14 +25,14 @@ class FrmFormsHelper{
     }
     
     public static function forms_dropdown( $field_name, $field_value='', $blank=true, $field_id=false, $onchange=false ){
-        global $frm_form;
         if (!$field_id)
             $field_id = $field_name;
         
         $where = apply_filters('frm_forms_dropdown', "is_template=0 AND (status is NULL OR status = '' OR status = 'published')", $field_name);
+        $frm_form = new FrmForm();
         $forms = $frm_form->getAll($where, ' ORDER BY name');
         ?>
-        <select name="<?php echo $field_name; ?>" id="<?php echo $field_id ?>" class="frm-dropdown" <?php if ($onchange) echo 'onchange="'.$onchange.'"'; ?>>
+        <select name="<?php echo $field_name; ?>" id="<?php echo $field_id ?>" <?php if ($onchange) echo 'onchange="'. $onchange .'"'; ?>>
             <?php if ($blank){ ?>
             <option value=""><?php echo ($blank == 1) ? '' : '- '. $blank .' -'; ?></option>
             <?php } ?>
@@ -39,6 +42,48 @@ class FrmFormsHelper{
         </select>
         <?php
     }
+	
+    public static function form_switcher(){
+        $where = apply_filters('frm_forms_dropdown', "is_template=0 AND (status is NULL OR status = '' OR status = 'published')", '');
+        
+        $frm_form = new FrmForm();
+        $forms = $frm_form->getAll($where, ' ORDER BY name');
+        unset($frm_form);
+        
+        $args = array('id' => 0, 'form' => 0);
+        if(isset($_GET['id']) and !isset($_GET['form']))
+            unset($args['form']);
+        else if(isset($_GET['form']) and !isset($_GET['id']))
+            unset($args['id']);
+        
+        if(isset($_GET['page']) and $_GET['page'] == 'formidable-entries' and isset($_GET['frm_action']) and in_array($_GET['frm_action'], array('edit', 'show', 'destroy_all'))){
+            $args['frm_action'] = 'list';
+            $args['form'] = 0;
+        }else if(isset($_GET['page']) and $_GET['page'] == 'formidable' and isset($_GET['frm_action']) and $_GET['frm_action'] == 'new'){
+            $args['frm_action'] = 'edit';
+        }else if(isset($_GET['post'])){
+            $args['form'] = 0;
+            $base = admin_url('edit.php?post_type=frm_display');
+        }
+
+        ?>
+		<li class="dropdown last" id="frm_bs_dropdown">
+			<a href="#" id="frm-navbarDrop" class="frm-dropdown-toggle" data-toggle="dropdown"><?php _e('Switch Form', 'formidable') ?> <b class="caret"></b></a>
+		    <ul class="frm-dropdown-menu" role="menu" aria-labelledby="frm-navbarDrop">
+			<?php foreach($forms as $form){
+			    if(isset($args['id']))
+			        $args['id'] = $form->id;
+			    if(isset($args['form']))
+			        $args['form'] = $form->id;
+                ?>
+				<li><a href="<?php echo isset($base) ? add_query_arg($args, $base) : add_query_arg($args); ?>" tabindex="-1"><?php echo empty($form->name) ? __('(no title)') : FrmAppHelper::truncate($form->name, 33); ?></a></li>
+			<?php
+			        unset($form);
+			    } ?>
+			</ul>
+		</li>
+        <?php
+    }
     
     public static function get_sortable_classes($col, $sort_col, $sort_dir){
         echo ($sort_col == $col) ? 'sorted' : 'sortable'; 
@@ -46,7 +91,7 @@ class FrmFormsHelper{
     }
     
     public static function setup_new_vars($values=array()){
-        global $frmdb, $frm_settings;
+        global $wpdb, $frmdb, $frm_settings;
         
         if(!empty($values)){
             $post_values = $values;
@@ -55,13 +100,13 @@ class FrmFormsHelper{
             $post_values = $_POST;
         }
         
-        foreach (array('name' => __('Untitled Form', 'formidable'), 'description' => '') as $var => $default){
+        foreach (array('name' => '', 'description' => '') as $var => $default){
             if(!isset($values[$var]))
                 $values[$var] = FrmAppHelper::get_param($var, $default);
         }
         
         if(apply_filters('frm_use_wpautop', true))
-            $values['description'] = wpautop($values['description']);
+            $values['description'] = wpautop(str_replace( '<br>', '<br />', $values['description']));
         
         foreach (array('form_id' => '', 'logged_in' => '', 'editable' => '', 'default_template' => 0, 'is_template' => 0) as $var => $default){
             if(!isset($values[$var]))
@@ -69,7 +114,7 @@ class FrmFormsHelper{
         }
             
         if(!isset($values['form_key']))
-            $values['form_key'] = ($post_values and isset($post_values['form_key'])) ? $post_values['form_key'] : FrmAppHelper::get_unique_key('', $frmdb->forms, 'form_key');
+            $values['form_key'] = ($post_values and isset($post_values['form_key'])) ? $post_values['form_key'] : FrmAppHelper::get_unique_key('', $wpdb->prefix .'frm_forms', 'form_key');
         
         $defaults = FrmFormsHelper::get_default_opts();
         foreach ($defaults as $var => $default){
@@ -99,8 +144,6 @@ class FrmFormsHelper{
     }
     
     public static function setup_edit_vars($values, $record, $post_values=array()){
-        global $frm_form;
-        
         if(empty($post_values))
             $post_values = $_POST;
 
@@ -128,12 +171,14 @@ class FrmFormsHelper{
     public static function get_default_html($loc){
         if($loc == 'submit'){
             $sending = __('Sending', 'formidable');
-            $img = FRM_IMAGES_URL .'/ajax_loader.gif';
+            $draft_link = self::get_draft_link();
+            $img = '[frmurl]/images/ajax_loader.gif';
             $default_html = <<<SUBMIT_HTML
 <div class="frm_submit">
-[if back_button]<input type="submit" value="[back_label]" name="frm_prev_page" formnovalidate="formnovalidate" [back_hook] />[/if back_button]
+[if back_button]<input type="button" value="[back_label]" name="frm_prev_page" formnovalidate="formnovalidate" class="frm_prev_page" [back_hook] />[/if back_button]
 <input type="submit" value="[button_label]" [button_action] />
 <img class="frm_ajax_loading" src="$img" alt="$sending" style="visibility:hidden;" />
+$draft_link
 </div>
 SUBMIT_HTML;
         }else if ($loc == 'before'){
@@ -148,24 +193,33 @@ BEFORE_HTML;
         return $default_html;
     }
     
-    public static function get_custom_submit($html, $form, $submit, $form_action){
-        $button = FrmFormsHelper::replace_shortcodes($html, $form, $submit, $form_action);
+    public static function get_draft_link(){
+        $link = '[if save_draft]<a class="frm_save_draft" [draft_hook]>[draft_label]</a>[/if save_draft]';
+        return $link;
+    }
+    
+    public static function get_custom_submit($html, $form, $submit, $form_action, $values){
+        $button = FrmFormsHelper::replace_shortcodes($html, $form, $submit, $form_action, $values);
         if(strpos($button, '[button_action]')){
             $button_parts = explode('[button_action]', $button);
             echo $button_parts[0];
             //echo ' id="frm_submit_"';
+            $classes = apply_filters('frm_submit_button_class', array(), $form);
+            if(!empty($classes))
+                echo ' class="'. implode(' ', $classes) .'"';
+            
             do_action('frm_submit_button_action', $form, $form_action);
             echo $button_parts[1];
         }
     }
     
-    public static function replace_shortcodes($html, $form, $title=false, $description=false){
+    public static function replace_shortcodes($html, $form, $title=false, $description=false, $values=array()){
         foreach (array('form_name' => $title, 'form_description' => $description, 'entry_key' => true) as $code => $show){
             if ($code == 'form_name'){
                 $replace_with = $form->name;
             }else if ($code == 'form_description'){
                 if(apply_filters('frm_use_wpautop', true))
-                    $replace_with = wpautop($form->description);
+                    $replace_with = wpautop(str_replace( '<br>', '<br />', $form->description));
                 else
                     $replace_with = $form->description;
             }else if($code == 'entry_key' and isset($_GET) and isset($_GET['entry'])){
@@ -184,15 +238,21 @@ BEFORE_HTML;
         //replace [form_key]
         $html = str_replace('[form_key]', $form->form_key, $html);
         
+        //replace [frmurl]
+        $html = str_replace('[frmurl]', FrmAppHelper::plugin_url(), $html);
+        
         if(strpos($html, '[button_label]')){
             $replace_with = apply_filters('frm_submit_button', $title, $form);
             $html = str_replace('[button_label]', $replace_with, $html);
         }
         
-        $html = apply_filters('frm_form_replace_shortcodes', stripslashes($html), $form);
+        $html = apply_filters('frm_form_replace_shortcodes', stripslashes($html), $form, $values);
         
         if(strpos($html, '[if back_button]'))
             $html = preg_replace('/(\[if\s+back_button\])(.*?)(\[\/if\s+back_button\])/mis', '', $html);
+            
+        if(strpos($html, '[if save_draft]'))
+            $html = preg_replace('/(\[if\s+save_draft\])(.*?)(\[\/if\s+save_draft\])/mis', '', $html);
         
         return $html;
     }

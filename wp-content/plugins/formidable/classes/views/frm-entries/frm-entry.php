@@ -1,7 +1,8 @@
 <?php
-global $frm_form, $frm_field, $frm_entry, $frm_entry_meta, $user_ID, $frm_settings, $frm_created_entry, $frm_form_params;
+global $frm_field, $frm_entry, $frm_entry_meta, $user_ID, $frm_settings, $frm_vars;
 $form_name = $form->name;
 
+$frm_form = new FrmForm();
 $submit = isset($form->options['submit_value']) ? $form->options['submit_value'] : $frm_settings->submit_value;
 $saved_message = isset($form->options['success_msg']) ? $form->options['success_msg'] : $frm_settings->success_msg;
 
@@ -12,34 +13,37 @@ $message = $errors = '';
 FrmEntriesHelper::enqueue_scripts($params);
 
 if($params['action'] == 'create' and $params['posted_form_id'] == $form->id and isset($_POST)){
-    $errors = $frm_created_entry[$form->id]['errors'];
+    $errors = isset($frm_vars['created_entries'][$form->id]) ? $frm_vars['created_entries'][$form->id]['errors'] : array();
 
     if( !empty($errors) ){
         $fields = FrmFieldsHelper::get_form_fields($form->id, true);
-        $values = FrmEntriesHelper::setup_new_vars($fields, $form);
-        require(FRM_VIEWS_PATH .'/frm-entries/new.php'); 
+        $values = $fields ? FrmEntriesHelper::setup_new_vars($fields, $form) : array();
+        require(FrmAppHelper::plugin_path() .'/classes/views/frm-entries/new.php'); 
 ?>
-<script type="text/javascript">jQuery(document).ready(function($){ var frm_pos=jQuery('#form_<?php echo $form->form_key ?>').offset();var cOff=document.documentElement.scrollTop || document.body.scrollTop;if(frm_pos) window.scrollTo(frm_pos.left,frm_pos.top);})</script><?php        
+<script type="text/javascript">jQuery(document).ready(function($){frmScrollMsg(<?php echo $form->id ?>);})</script><?php        
     }else{
         $fields = FrmFieldsHelper::get_form_fields($form->id);
         do_action('frm_validate_form_creation', $params, $fields, $form, $title, $description);
         if (apply_filters('frm_continue_to_create', true, $form->id)){
             $values = FrmEntriesHelper::setup_new_vars($fields, $form, true);
-            $created = $frm_created_entry[$form->id]['entry_id'];
+            $created = (isset($frm_vars['created_entries']) and isset($frm_vars['created_entries'][$form->id])) ? $frm_vars['created_entries'][$form->id]['entry_id'] : 0;
             $saved_message = apply_filters('frm_content', $saved_message, $form, $created);
             $conf_method = apply_filters('frm_success_filter', 'message', $form, $form->options);
             if (!$created or !is_numeric($created) or $conf_method == 'message'){
-                $message = '<div class="frm_message" id="message">'.(($created and is_numeric($created)) ? wpautop(do_shortcode($saved_message)) : $frm_settings->failed_msg).'</div>';
+                if($created and is_numeric($created))
+                    $message = '<div class="frm_message" id="message">'. wpautop(do_shortcode($saved_message)) .'</div>';
+                else
+                    $message = '<div class="frm_error_style">'. $frm_settings->failed_msg .'</div>';
                 if (!isset($form->options['show_form']) or $form->options['show_form']){
-                    require(FRM_VIEWS_PATH .'/frm-entries/new.php');
+                    require(FrmAppHelper::plugin_path() .'/classes/views/frm-entries/new.php');
                 }else{ 
-                    global $frm_forms_loaded, $frm_load_css, $frm_css_loaded;
-                    $frm_forms_loaded[] = $form; 
-                    if($values['custom_style']) $frm_load_css = true;
+                    global $frm_vars;
+                    $frm_vars['forms_loaded'][] = $form; 
+                    if($values['custom_style']) $frm_vars['load_css'] = true;
 
-                    if(!$frm_css_loaded and $frm_load_css){
+                    if((!isset($frm_vars['css_loaded']) || !$frm_vars['css_loaded']) && $frm_vars['load_css']){
                         echo FrmAppController::footer_js('header');
-                        $frm_css_loaded = true;
+                        $frm_vars['css_loaded'] = true;
                     }
 ?>
 <div class="frm_forms<?php echo ($values['custom_style']) ? ' with_frm_style' : ''; ?>" id="frm_form_<?php echo $form->id ?>_container"><?php echo $message ?></div>
@@ -56,7 +60,7 @@ if($params['action'] == 'create' and $params['posted_form_id'] == $form->id and 
     do_action('frm_display_form_action', $params, $fields, $form, $title, $description);
     if (apply_filters('frm_continue_to_new', true, $form->id, $params['action'])){
         $values = FrmEntriesHelper::setup_new_vars($fields, $form);
-        require(FRM_VIEWS_PATH .'/frm-entries/new.php');
+        require(FrmAppHelper::plugin_path() .'/classes/views/frm-entries/new.php');
     }
 }
 

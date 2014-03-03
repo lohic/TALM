@@ -1,0 +1,4 @@
+/*	Fix widget width when moving to sort	*/
+.widget {
+	width: 100%;
+}

@@ -1,11 +1,16 @@
 <?php
+if(!defined('ABSPATH')) die(__('You are not allowed to call this page directly.', 'formidable'));
+
+if(class_exists('FrmForm'))
+    return;
+
 class FrmForm{
 
   function create( $values ){
-    global $wpdb, $frmdb, $frm_settings;
+    global $wpdb, $frm_settings;
     
     $new_values = array();
-    $new_values['form_key'] = FrmAppHelper::get_unique_key($values['form_key'], $frmdb->forms, 'form_key');
+    $new_values['form_key'] = FrmAppHelper::get_unique_key($values['form_key'], $wpdb->prefix .'frm_forms', 'form_key');
     $new_values['name'] = $values['name'];
     $new_values['description'] = $values['description'];
     $new_values['status'] = isset($values['status']) ? $values['status'] : 'draft';
@@ -33,21 +38,22 @@ class FrmForm{
     //if(isset($values['id']) and is_numeric($values['id']))
     //    $new_values['id'] = $values['id'];
 
-    $query_results = $wpdb->insert( $frmdb->forms, $new_values );
+    $query_results = $wpdb->insert( $wpdb->prefix .'frm_forms', $new_values );
     
     return $wpdb->insert_id;
   }
   
   function duplicate( $id, $template=false, $copy_keys=false, $blog_id=false ){
-    global $wpdb, $frmdb, $frm_form, $frm_field;
+    global $wpdb, $frm_field;
     
+    $frm_form = new FrmForm();
     $values = $frm_form->getOne( $id, $blog_id );
     if(!$values)
         return false;
         
     $new_values = array();
     $new_key = ($copy_keys) ? $values->form_key : '';
-    $new_values['form_key'] = FrmAppHelper::get_unique_key($new_key, $frmdb->forms, 'form_key');
+    $new_values['form_key'] = FrmAppHelper::get_unique_key($new_key, $wpdb->prefix .'frm_forms', 'form_key');
     $new_values['name'] = $values->name;
     $new_values['description'] = $values->description;
     $new_values['status'] = (!$template) ? 'draft' : '';
@@ -69,25 +75,26 @@ class FrmForm{
     $new_values['created_at'] = current_time('mysql', 1);
     $new_values['is_template'] = ($template) ? 1 : 0;
 
-    $query_results = $wpdb->insert( $frmdb->forms, $new_values );
+    $query_results = $wpdb->insert( $wpdb->prefix .'frm_forms', $new_values );
     
     if($query_results){
        $form_id = $wpdb->insert_id;
        $frm_field->duplicate($id, $form_id, $copy_keys, $blog_id);
-           
-      return $form_id;
+       
+       do_action('frm_after_duplicate_form', $form_id, $new_values);
+       return $form_id;
    }else
       return false;
   }
 
   function update( $id, $values, $create_link = false ){
-    global $wpdb, $frmdb, $frm_field, $frm_settings;
+    global $wpdb, $frm_field, $frm_settings;
 
     if ($create_link or isset($values['options']) or isset($values['item_meta']) or isset($values['field_options']))
         $values['status'] = 'published';
         
     if (isset($values['form_key']))
-        $values['form_key'] = FrmAppHelper::get_unique_key($values['form_key'], $frmdb->forms, 'form_key', $id);
+        $values['form_key'] = FrmAppHelper::get_unique_key($values['form_key'], $wpdb->prefix .'frm_forms', 'form_key', $id);
     
     $form_fields = array('form_key', 'name', 'description', 'status', 'prli_link_id');
     
@@ -119,7 +126,7 @@ class FrmForm{
     }
 
     if(!empty($new_values)){
-        $query_results = $wpdb->update( $frmdb->forms, $new_values, array( 'id' => $id ) );
+        $query_results = $wpdb->update( $wpdb->prefix .'frm_forms', $new_values, array( 'id' => $id ) );
         if($query_results)
             wp_cache_delete( $id, 'frm_form');
     }else{
@@ -166,11 +173,12 @@ class FrmForm{
                     
                 $field_options = apply_filters('frm_update_field_options', $field_options, $field, $values);
                 $default_value = maybe_serialize($values['item_meta'][$field_id]);
-                $field_key = (isset($values['field_options']['field_key_'.$field_id]))? $values['field_options']['field_key_'.$field_id] : $field->field_key;
-                $field_type = (isset($values['field_options']['type_'.$field_id]))? $values['field_options']['type_'.$field_id] : $field->type;
-                $field_description = (isset($values['field_options']['description_'.$field_id]))? $values['field_options']['description_'.$field_id] : $field->description;
+                $field_key = (isset($values['field_options']['field_key_'.$field_id])) ? $values['field_options']['field_key_'.$field_id] : $field->field_key;
+                $required = (isset($values['field_options']['required_'.$field_id])) ? $values['field_options']['required_'.$field_id] : false;
+                $field_type = (isset($values['field_options']['type_'.$field_id])) ? $values['field_options']['type_'.$field_id] : $field->type;
+                $field_description = (isset($values['field_options']['description_'.$field_id])) ? $values['field_options']['description_'.$field_id] : $field->description;
 
-                $frm_field->update($field_id, array('field_key' => $field_key, 'type' => $field_type, 'default_value' => $default_value, 'field_options' => $field_options, 'description' => $field_description));
+                $frm_field->update($field_id, array('field_key' => $field_key, 'type' => $field_type, 'default_value' => $default_value, 'field_options' => $field_options, 'description' => $field_description, 'required' => $required));
             }
         }
     }    
@@ -194,7 +202,7 @@ class FrmForm{
             $prli_link->update($form->prli_link_id, $prli); //update target url
         }else if($create_link && $form->is_template != 1){
             $link_id = prli_create_pretty_link(FrmFormsHelper::get_direct_link($values['form_key']), $values['form_key'], $form->name, $form->description, $group_id = '' );
-            $wpdb->update( $frmdb->forms, array('prli_link_id' => $link_id), array( 'id' => $id ) );
+            $wpdb->update( $wpdb->prefix .'frm_forms', array('prli_link_id' => $link_id), array( 'id' => $id ) );
         }
     }    
     do_action('frm_update_form', $id, $values);
@@ -204,7 +212,7 @@ class FrmForm{
   }
 
   function destroy( $id ){
-    global $wpdb, $frmdb, $frm_entry;
+    global $wpdb, $frm_entry;
 
     $form = $this->getOne($id);
     if (!$form or $form->default_template)
@@ -216,9 +224,9 @@ class FrmForm{
         $frm_entry->destroy($item->id);
 
     // Disconnect the fields from this form
-    $query_results = $wpdb->query("DELETE FROM `$frmdb->fields` WHERE `form_id` = '$id'");
+    $query_results = $wpdb->query($wpdb->prepare("DELETE FROM {$wpdb->prefix}frm_fields WHERE form_id=%d", $id));
 
-    $query_results = $wpdb->query("DELETE FROM `$frmdb->forms` WHERE `id` = '$id'");
+    $query_results = $wpdb->query($wpdb->prepare("DELETE FROM {$wpdb->prefix}frm_forms WHERE id=%d", $id));
     if ($query_results){
         do_action('frm_destroy_form', $id);
         do_action('frm_destroy_form_'. $id);
@@ -227,24 +235,29 @@ class FrmForm{
   }
   
   function getName( $id ){
-      global $wpdb, $frmdb;
-      $query = "SELECT name FROM $frmdb->forms WHERE ";
-      $query .= (is_numeric($id)) ? "id" : "form_key";
-      $query .= "='{$id}'";
+      global $wpdb;
+      $cache = wp_cache_get($id, 'frm_form');
+      if($cache)
+        return stripslashes($cache->name);
+        
+      $query = "SELECT name FROM {$wpdb->prefix}frm_forms WHERE ";
+      $query .= (is_numeric($id)) ? "id=%d" : "form_key=%s";
+      $query = $wpdb->prepare($query, $id);
+      
       $r = $wpdb->get_var($query);
       return stripslashes($r);
   }
   
   function getIdByKey( $key ){
-      global $wpdb, $frmdb;
-      $query = "SELECT id FROM $frmdb->forms WHERE form_key='$key' LIMIT 1";
+      global $wpdb;
+      $query = $wpdb->prepare("SELECT id FROM {$wpdb->prefix}frm_forms WHERE form_key=%s LIMIT 1", $key);
       return $wpdb->get_var($query);
   }
 
   function getOne( $id, $blog_id=false ){
       global $wpdb, $frmdb;
       
-      if ($blog_id and IS_WPMU){
+      if ($blog_id and is_multisite()){
           global $wpmuBaseTablePrefix;
           if($wpmuBaseTablePrefix)
               $prefix = "{$wpmuBaseTablePrefix}{$blog_id}_";
@@ -253,7 +266,7 @@ class FrmForm{
               
           $table_name = "{$prefix}frm_forms";
       }else{
-          $table_name = $frmdb->forms;
+          $table_name = $wpdb->prefix .'frm_forms';
           $cache = wp_cache_get($id, 'frm_form');
           if($cache){
               if(isset($cache->options))
@@ -283,11 +296,11 @@ class FrmForm{
         if(is_numeric($limit))
             $limit = " LIMIT {$limit}";
             
-        $query = 'SELECT * FROM ' . $frmdb->forms . FrmAppHelper::prepend_and_or_where(' WHERE ', $where) . $order_by . $limit;
+        $query = 'SELECT * FROM ' . $wpdb->prefix .'frm_forms' . FrmAppHelper::prepend_and_or_where(' WHERE ', $where) . $order_by . $limit;
             
         if ($limit == ' LIMIT 1' or $limit == 1){
             if(is_array($where))
-                $results = $frmdb->get_one_record($frmdb->forms, $where, '*', $order_by);
+                $results = $frmdb->get_one_record($wpdb->prefix .'frm_forms', $where, '*', $order_by);
             else
                 $results = $wpdb->get_row($query);
                 
@@ -297,7 +310,7 @@ class FrmForm{
             }
         }else{
             if(is_array($where))
-                $results = $frmdb->get_records($frmdb->forms, $where, $order_by, $limit);
+                $results = $frmdb->get_records($wpdb->prefix .'frm_forms', $where, $order_by, $limit);
             else
                 $results = $wpdb->get_results($query);
             

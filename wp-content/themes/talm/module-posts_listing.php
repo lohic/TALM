@@ -112,9 +112,9 @@
 					<a href="<?php the_permalink();?>">
 						<?php
 						if ( has_post_thumbnail() ) {
-							$id = get_post_thumbnail_id();
-							echo wp_get_attachment_image  ( $id, 'talm-thumb');
-							//the_post_thumbnail();
+							//$id = get_post_thumbnail_id();
+							//echo wp_get_attachment_image  ( $id, 'talm-thumb');
+							the_post_thumbnail();
 						?>
 							<footer id="footer_<?php the_ID();?>" class="<?php echo $tagTheme;?>">
 								<h3 class="titre"><?php echo $le_tag_name;?></h3>

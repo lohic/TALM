@@ -2,71 +2,45 @@
 /*
 Plugin Name: Advanced Custom Fields: Flexible Content Field
 Plugin URI: http://www.advancedcustomfields.com/
-Description: Adds the flexible content field
-Version: 1.0.2
+Description: This premium Add-on adds a flexible content field type for the Advanced Custom Fields plugin
+Version: 1.1.1
 Author: Elliot Condon
 Author URI: http://www.elliotcondon.com/
 License: GPL
 Copyright: Elliot Condon
 */
 
+// only include add-on once
+if( !function_exists('acf_register_flexible_content_field') ):
 
-class acf_flexible_content_plugin
+
+// add action to include field
+add_action('acf/register_fields', 'acf_register_flexible_content_field');
+
+function acf_register_flexible_content_field()
 {
-	var $settings;
-	
-	
-	/*
-	*  Constructor
-	*
-	*  @description: 
-	*  @since 1.0.0
-	*  @created: 23/06/12
-	*/
-	
-	function __construct()
-	{
-		// vars
-		$settings = array(
-			'version' => '1.0.2',
-			'remote' => 'http://download.advancedcustomfields.com/FC9O-H6VN-E4CL-LT33/info/',
-			'basename' => plugin_basename(__FILE__),
-		);
-		
-		
-		// create remote update
-		if( is_admin() )
-		{
-			if( !class_exists('acf_remote_update') )
-			{
-				include_once('acf-remote-update.php');
-			}
-			
-			new acf_remote_update( $settings );
-		}
-		
-		
-		// actions
-		add_action('acf/register_fields', array($this, 'register_fields'));
-
-	}
-	
-	
-	/*
-	*  register_fields
-	*
-	*  @description: 
-	*  @since: 3.6
-	*  @created: 31/01/13
-	*/
-	
-	function register_fields()
-	{
-		include_once('flexible-content.php');
-	}
-	
+	include_once('flexible-content.php');
 }
 
-new acf_flexible_content_plugin();
+
+/*
+*  Update
+*
+*  if update file exists, allow this add-on to connect and recieve updates.
+*  all ACF premium Add-ons which are distributed within a plugin or theme, must have the update file removed.
+*
+*  @type	file
+*  @date	13/07/13
+*
+*  @param	N/A
+*  @return	N/A
+*/
+
+if( is_admin() && file_exists(  dirname( __FILE__ ) . '/acf-flexible-content-update.php' ) )
+{
+	include_once( dirname( __FILE__ ) . '/acf-flexible-content-update.php' );
+}
+
+endif; // class_exists check
 
 ?>

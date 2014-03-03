@@ -1,4 +1,4 @@
-=== WP-Optimize ===
+﻿=== WP-Optimize ===
 
 Contributors: ruhanirabin
 
@@ -6,11 +6,11 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 
 Tags: comments, spam, optimize, database, revisions, users, posts, trash, schedule, automatic, clean, phpmyadmin
 
-Requires at least: 3.5
+Requires at least: 3.7
 
-Tested up to: 4
+Tested up to: 3.8.1-alpha
 
-Stable tag: 1.0.1
+Stable tag: 1.6.1
 
 
 
@@ -26,14 +26,15 @@ WP-Optimize is a WordPress 3.xx database cleanup and optimization tool. It doesn
 
 It allows you to remove post revisions, comments in the spam queue, un-approved comments, items in trash within few clicks. 
 
-** Weekly scheduler introduced (EXPERIMENTAL) **
+**Simple scheduler introduced (Still in very EXPERIMENTAL stage)**
 
-Now Multi-Lingual. 
+**All the potentially dangerous clean up options are MARKED RED.**
 
+**When you use this plugin for the first time or just updated to major version, make a backup of your database. This is a must for everyone**
 
 **Are you interested to be a contributed developer of this plugin, use the contact form link below to contact me.**
 
-You will be credited inside the plugin screen.
+You will be credited inside the plugin screen and the plugin listing at WordPress.
 
 
 **Requirements:**
@@ -52,7 +53,43 @@ You will be credited inside the plugin screen.
 
 **Translators are welcome to send their Translated Files to be included.**
 
-See options inside plugin or contact me via http://www.ruhanirabin.com/contact/
+See options inside plugin or contact me via http://www.ruhanirabin.com/contact/ 
+
+Or you can **Email translations to plugins(at)ruhanirabin.com**
+
+
+**WP-Optimize Translators:**
+
+
+
+*   Language ru_RU: Русский язык - Виталий МакЛауд (Эликсир жизни) - http://www.visbiz.org/
+
+*   Language zh_TW: 正體中文語系檔案由香腸炒魷魚(香腸)翻譯。 -  http://sofree.cc
+
+*   Language zh_CN: 简体中文语言包 由 SoumaHoshino 提供 - http://moesora.com/
+
+*   Language fr_FR: Stéphane Benoit. - http://www.gnosticisme.com
+
+*   Language de_DE: Rewolve44 - http://www.myfotohome.at/
+
+*   Language lv: Tulkotāji - http://trendfor.lv
+
+*   Language pt_BR: Leonardo Kfoury - http://www.kfoury.com.br/site/
+
+*   Language fa_IR: Morteza Amiri - http://www.GameSiders.com/
+
+*   Language es_ES: Navone Juan - http://navonejuan.com.ar/
+
+*   Language tr_TR: Hakan Er tarafından Türkçe Dili - http://hakanertr.wordpress.com/
+
+*   Language id_ID: Nasrulhaq Muiz - http://al-badar.net/
+
+*   Language sl_SI: Tomi Sambrailo - http://www.refuzed.it/
+
+*   Language nb_NO: Simen Eggen - http://www.simeneggen.com
+
+*   Language nl_NL: Mischa ter Smitten - http://blog.tersmitten.nl/
+
 
 
 
@@ -60,23 +97,37 @@ See options inside plugin or contact me via http://www.ruhanirabin.com/contact/
 
 
 
-*   Remove all trackbacks and pingbacks (can significantly reduce db size)  [NEW]
+*   [NEW] Option to add or remove link on wp admin bar.
 
-*   Clear Trash Comments and Posts [NEW]
+*   [NEW] New admin interface.
 
-*   Enable/Disable weekly schedules of optimization  [NEW] Note: This is an EXPERIMENTAL feature. It may or may not work on all servers.
+*   [NEW] Removal of WordPress transient options.
 
-*   Remove the WordPress post revisions
+*   [NEW] Removal of orphaned post meta data.
 
-*   Remove the WordPress auto draft posts
+*   [REMOVED] Removal of unused tags.
 
-*   Remove all the comments in the spam queue
+*   [NEW] 3 different schedule times added (weekly, bi-weekly and monthly).
 
-*   Remove all the un-approved comments
+*   [NEW] Retain/Keep last X number of weeks data - this option keeps the last selected number of weeks data when cleaning up.
 
-*   Apply mysql optimize commands on your database tables without phpMyAdmin.
+*   [NEW] Remove all trackbacks and pingbacks (can significantly reduce db size)
 
-*   Display Database table statistics. Shows how much space can be optimzied and how much space has been cleared.
+*   [NEW] Clear Trash Comments and Posts (This will also follow the "Keep X number of weeks data" option if it was selected)
+
+*   [NEW] Enable/Disable weekly schedules of optimization  (This will also follow the "Keep X number of weeks data" option if it was selected) Note: This is an EXPERIMENTAL feature. It may or may not work on all servers.
+
+*   [NEW] Remove the WordPress post revisions (This will also follow the "Keep X number of weeks data" option if it was selected)
+
+*   [NEW] Remove the WordPress auto draft posts (This will also follow the "Keep X number of weeks data" option if it was selected)
+
+*   [NEW] Remove all the comments in the spam queue (This will also follow the "Keep X number of weeks data" option if it was selected)
+
+*   [NEW] Remove all the un-approved comments (This will also follow the "Keep X number of weeks data" option if it was selected)
+
+*   Apply MySql optimize commands on your database tables without phpMyAdmin.
+
+*   Display Database table statistics. Shows how much space can be optimized and how much space has been cleared.
 
 *   Visible only to the administrators.
 
@@ -87,11 +138,13 @@ See options inside plugin or contact me via http://www.ruhanirabin.com/contact/
 
 
 
-*   Everytime you save a new post or pages, WordPress creates a revision of that post or page. If you edit a post 6 times you might have 5 copy of that post as revisions. Imagine if your post or pages are long and big. It is a huge number of bytes thats on your MySQL overhead. Now WP-Optimize allows you to optimize and shrink your posts table by removing not necessary post revisions from the database. As example, if you have a post which is approximately 100KB data and you have 5 revisions of that post, the total space wasted is about 500KB. And if you have 100 posts similar to it, you have 50MB database space wasted.
+*   Every-time you save a new post or pages, WordPress creates a revision of that post or page. If you edit a post 6 times you might have 5 copy of that post as revisions. Imagine if your post or pages are long and big. It is a huge number of bytes that's on your MySQL overhead. Now WP-Optimize allows you to optimize and shrink your posts table by removing not necessary post revisions from the database. As example, if you have a post which is approximately 100KB data and you have 5 revisions of that post, the total space wasted is about 500KB. And if you have 100 posts similar to it, you have 50MB database space wasted.
 
-*   Similar to the scenario described above, there might be thousands of spams and un-approved comments in your comments table, WP-Optimize can clean and remove those in a single click
+*   Similar to the scenario described above, there might be thousands of spam and un-approved comments in your comments table, WP-Optimize can clean and remove those in a single click
 
 *   WP-Optimize reports which database tables have overhead and wasted spaces also it allows you to shrink and get rid of those wasted spaces
+
+*   Automatically cleans database every week and respects the "Keep X number of weeks data" option. 
 
 
 
@@ -111,6 +164,30 @@ See options inside plugin or contact me via http://www.ruhanirabin.com/contact/
 
 
 == Frequently Asked Questions ==
+
+
+
+= Can you help me restore my database? =
+
+
+
+No I can't. Please make a backup of your entire database before using this Plugin for the first time. Also backup your database when you upgrade to a MAJOR NEW version (for example - v0.9.8 to 1.5.5 ).
+
+
+
+= Everytime I clear transient options, it comes back automatically =
+
+
+
+WordPress automatically creates transient options. It is pretty difficult to completley get rid of it. This is why everytime you clean transient options, you will notice new transient options has been created. My best advice would be clear the transient options on a schedule. So, for example it may create 50 transient option in a week and you clear it weekly so the next 50 transient option comes in. Rather than having 100 transient option, you will have 50 per week.
+
+
+
+= Optimization does not have any effect on database / it is not optimizing the database =
+
+
+
+Some of the shared web hosting company does not allow scripts to run OPTIMIZE command via SQL statements. If you are hosted with these web hosts, the optimize action will not be able to optimize your database. Please consult your web hosting company regarding this matter.
 
 
 
@@ -134,7 +211,7 @@ See options inside plugin or contact me via http://www.ruhanirabin.com/contact/
 
 
 
-This is a very primary version of the plugin. So I would recommend you to test it out on your local system.
+This is a very primary version of the plugin. So I would recommend you to test it out on your local system or make a backup of your database (just to be extra careful).
 
 
 
@@ -143,15 +220,117 @@ This is a very primary version of the plugin. So I would recommend you to test i
 
 
 
-1. Main screen
+1. Optimizer
 
-2. Database tables report
+2. Settings Screen
 
-3. Menu Item
+3. Table Report
 
 
 
 == Changelog ==
+
+= 1.6.1 =
+
+* Fixed - trashed Comments was not clearing out.
+
+* 1 Translation update.
+
+
+
+= 1.5.7 =
+
+* 2 new Translations updates and 2 new languages added.
+
+
+
+= 1.5.6 =
+
+* "Unused Tags cleanup" option made a problem on some WordPress sites that it deletes empty categories. Since I am unable to replicate this problem. I am making this option disabled.
+
+* Translations updates and 3 new languages added.
+
+* Minor maintenance and fixes.
+
+
+
+= 1.5.5 =
+
+* Safe clean up options are selected by default, defaults are not by user preference for now (Optimizer Page).
+
+* All the potentially dangerous clean up options are MARKED RED.
+
+* Translations update for language - lv, de_DE, zh_TW, pt_BR, fa_IR, es_ES.
+
+* New features explained - http://j.mp/HBIoVT (read the blog post).
+
+
+
+= 1.5.4 =
+
+* More path related fixes for various warnings. Maintenance
+
+
+
+= 1.5.2 =
+
+* Fatar error fix, if it disabled your wp admin, please remove the wp-optimize directory and reinstall again.
+
+
+
+= 1.5.1 =
+
+* Option to add or remove link on wp admin bar (even enabled - it is visible to admin only).
+
+* New admin interface.
+
+* Settings to select items for automatic optimization.
+
+* Removal of WordPress transient options.
+
+* Removal of orphaned post meta tags.
+
+* Removal of unused tags.
+
+* 3 different schedule times added (weekly, bi-weekly and monthly).
+
+* 3 language added - ru_RU, zh_CN, fr_FR (zh_TW and nl_NL coming soon).
+
+* Code optimization and translation strings updated.
+
+* Updated .PO file for translators.
+
+* Integrated development log from TRAC
+
+
+
+= 1.1.2 =
+
+* removed persistent admin bar menu item
+
+* Language ru_RU and zh_TW updated.
+
+
+
+= 1.1.1 =
+
+* Fix Fatal Error.
+
+
+= 1.1.0 =
+
+* Added WP-Optimize to admin menu bar on top. Always accessible.
+
+* Added wp-optimize.pot file for translators (inside ./languages/ folder).
+
+* Last auto optimization timestamp / display
+
+* Fix possible scheduler bug as requested at support forum
+
+* Fix some other codes regarding SQL query parameters
+
+* Ability to keep last X weeks of data, any junk data before that period will be deleted - this option affects both Auto and Manual process. Appreciate time and help from Mikel King (http://mikelking.com/) about this matter.
+
 
 = 1.0.1 =
 

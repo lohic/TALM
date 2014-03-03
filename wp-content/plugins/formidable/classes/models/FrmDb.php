@@ -1,4 +1,9 @@
 <?php
+if(!defined('ABSPATH')) die(__('You are not allowed to call this page directly.', 'formidable'));
+
+if(class_exists('FrmDb'))
+    return;
+
 class FrmDb{
     var $fields;
     var $forms;
@@ -14,8 +19,9 @@ class FrmDb{
     }
     
     function upgrade($old_db_version=false){
-        global $wpdb, $frm_db_version;
+        global $wpdb;
         //$frm_db_version is the version of the database we're moving to
+        $frm_db_version = FrmAppHelper::$db_version;
         $old_db_version = (float)$old_db_version;
         if(!$old_db_version)
             $old_db_version = get_option('frm_db_version');
@@ -83,6 +89,7 @@ class FrmDb{
                 post_id int(11) default NULL,
                 user_id int(11) default NULL,
                 parent_item_id int(11) default NULL,
+                is_draft boolean default 0,
                 updated_by int(11) default NULL,
                 created_at datetime NOT NULL,
                 updated_at datetime NOT NULL,
@@ -116,7 +123,7 @@ class FrmDb{
             $all_entries = $frm_entry->getAll();
             foreach($all_entries as $ent){
                 $opts = maybe_unserialize($ent->description);
-                if(is_array($opts))
+                if(is_array($opts) and in_array($opts['ip']))
                     $wpdb->update( $this->entries, array('ip' => $opts['ip']), array( 'id' => $ent->id ) );
             }
         }
@@ -158,10 +165,47 @@ DEFAULT_HTML;
                 unset($field);
             }
             unset($default_html);
+            unset($old_default_html);
+            unset($fields);
         }
+        
+        if($frm_db_version >= 11 and $old_db_version < 11){
+            $forms = $wpdb->get_results("SELECT id, options FROM $this->forms");
+            $sending = __('Sending', 'formidable');
+            $img = FrmAppHelper::plugin_url() .'/images/ajax_loader.gif';
+            $old_default_html = <<<DEFAULT_HTML
+<div class="frm_submit">
+[if back_button]<input type="submit" value="[back_label]" name="frm_prev_page" formnovalidate="formnovalidate" [back_hook] />[/if back_button]
+<input type="submit" value="[button_label]" [button_action] />
+<img class="frm_ajax_loading" src="$img" alt="$sending" style="visibility:hidden;" />
+</div>
+DEFAULT_HTML;
+            unset($sending);
+            unset($img);
+            
+            $new_default_html = FrmFormsHelper::get_default_html('submit');
+            $draft_link = FrmFormsHelper::get_draft_link();
+            foreach($forms as $form){
+                $form->options = maybe_unserialize($form->options);
+                if(!isset($form->options['submit_html']) or empty($form->options['submit_html']))
+                    continue;
+                
+                if((stripslashes($form->options['submit_html']) != $new_default_html) and (stripslashes($form->options['submit_html']) == $old_default_html)){
+                    $form->options['submit_html'] = $new_default_html;
+                    $wpdb->update($this->forms, array('options' => serialize($form->options)), array( 'id' => $form->id ));
+                }else if(!strpos($form->options['submit_html'], 'save_draft')){
+                    $form->options['submit_html'] = preg_replace('~\<\/div\>(?!.*\<\/div\>)~', $draft_link ."\r\n</div>", $form->options['submit_html']);
+                    $wpdb->update($this->forms, array('options' => serialize($form->options)), array( 'id' => $form->id ));
+                }
+                unset($form);
+            }
+            unset($forms);
+        }
+        
+        
 
         /**** ADD/UPDATE DEFAULT TEMPLATES ****/
-        FrmFormsController::add_default_templates(FRM_TEMPLATES_PATH);
+        FrmFormsController::add_default_templates(FrmAppHelper::plugin_path().'/classes/templates');
 
       
         /***** SAVE DB VERSION *****/
@@ -253,7 +297,7 @@ DEFAULT_HTML;
             wp_die($frm_settings->admin_permission);
         }
         
-        global $wpdb;
+        global $wpdb, $wp_roles;
         
         $wpdb->query('DROP TABLE IF EXISTS '. $this->fields);
         $wpdb->query('DROP TABLE IF EXISTS '. $this->forms);
@@ -261,13 +305,7 @@ DEFAULT_HTML;
         $wpdb->query('DROP TABLE IF EXISTS '. $this->entry_metas);
         
         delete_option('frm_options');
-        delete_option('frm_db_version');
-        
-        $frm_update = new FrmUpdatesController();
-        delete_option($frm_update->pro_last_checked_store);
-        delete_option($frm_update->pro_auth_store);
-        delete_option($frm_update->pro_cred_store);
-        
+        delete_option('frm_db_version');        
         
         //delete roles
         $frm_roles = FrmAppHelper::frm_capabilities();
@@ -278,8 +316,6 @@ DEFAULT_HTML;
                 unset($role);
                 unset($details);
     		}
-    		unset($role);
-    		unset($details);
     		unset($frm_role);
     		unset($frm_role_description);
 		}
