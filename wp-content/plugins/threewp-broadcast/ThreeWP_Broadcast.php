@@ -6,7 +6,7 @@ Author URI:		http://www.plainview.se
 Description:	Broadcast / multipost a post, with attachments, custom fields, tags and other taxonomies to other blogs in the network.
 Plugin Name:	ThreeWP Broadcast
 Plugin URI:		http://plainview.se/wordpress/threewp-broadcast/
-Version:		2.17
+Version:		2.20
 */
 
 namespace threewp_broadcast;
@@ -84,7 +84,7 @@ class ThreeWP_Broadcast
 	**/
 	public $permalink_cache;
 
-	public $plugin_version = 2.17;
+	public $plugin_version = 2.20;
 
 	protected $sdk_version_required = 20130505;		// add_action / add_filter
 
@@ -92,10 +92,12 @@ class ThreeWP_Broadcast
 		'blogs_to_hide' => 5,								// How many blogs to auto-hide
 		'broadcast_internal_custom_fields' => false,		// Broadcast internal custom fields?
 		'canonical_url' => true,							// Override the canonical URLs with the parent post's.
+		'clear_post' => true,								// Clear the post before broadcasting.
 		'custom_field_whitelist' => '_wp_page_template _wplp_ _aioseop_',				// Internal custom fields that should be broadcasted.
 		'custom_field_blacklist' => '',						// Internal custom fields that should not be broadcasted.
 		'database_version' => 0,							// Version of database and settings
 		'debug' => false,									// Display debug information
+		'debug_ips' => '',									// List of IP addresses that can see debug information, when enabled.
 		'save_post_priority' => 640,						// Priority of save_post action. Higher = lets other plugins do their stuff first
 		'override_child_permalinks' => false,				// Make the child's permalinks link back to the parent item?
 		'post_types' => 'post page',						// Custom post types which use broadcasting
@@ -131,11 +133,14 @@ class ThreeWP_Broadcast
 		$this->add_filter( 'threewp_broadcast_get_user_writable_blogs', 11 );		// Allow other plugins to do this first.
 		$this->add_filter( 'threewp_broadcast_get_post_types', 9 );					// Add our custom post types to the array of broadcastable post types.
 		$this->add_action( 'threewp_broadcast_manage_posts_custom_column', 9 );		// Just before the standard 10.
+		$this->add_action( 'threewp_broadcast_maybe_clear_post', 11 );
 		$this->add_action( 'threewp_broadcast_menu', 9 );
 		$this->add_action( 'threewp_broadcast_menu', 'threewp_broadcast_menu_final', 100 );
 		$this->add_action( 'threewp_broadcast_prepare_broadcasting_data' );
 		$this->add_filter( 'threewp_broadcast_prepare_meta_box', 9 );
 		$this->add_filter( 'threewp_broadcast_prepare_meta_box', 'threewp_broadcast_prepared_meta_box', 100 );
+		$this->add_action( 'threewp_broadcast_wp_insert_term', 9 );
+		$this->add_action( 'threewp_broadcast_wp_update_term', 9 );
 
 		if ( $this->get_site_option( 'canonical_url' ) )
 			$this->add_action( 'wp_head', 1 );
@@ -432,6 +437,11 @@ class ThreeWP_Broadcast
 		$fs = $form->fieldset( 'misc' )
 			->label_( 'Miscellaneous' );
 
+		$clear_post = $fs->checkbox( 'clear_post' )
+			->description_( 'The POST PHP variable is data sent when updating posts. Most plugins are fine if the POST is cleared before broadcasting, while others require that the data remains intact. Uncheck this setting if you notice that child posts are not being treated the same on the child blogs as they are on the parent blog.' )
+			->label_( 'Clear POST' )
+			->checked( $this->get_site_option( 'debug', false ) );
+
 		$save_post_priority = $fs->number( 'save_post_priority' )
 			->description_( 'The priority for the save_post hook. Should be after all other plugins have finished modifying the post. Default is 640.' )
 			->label_( 'save_post priority' )
@@ -457,10 +467,23 @@ class ThreeWP_Broadcast
 			->required()
 			->value( $this->get_site_option( 'existing_attachments', 'use' ) );
 
+		$fs = $form->fieldset( 'debug' )
+			->label_( 'Debugging' );
+
+		$fs->markup( 'debug_info' )
+			->p_( "According to the settings below, you are currently%s in debug mode. Don't forget to reload this page after saving the settings.", $this->debugging() ? '' : ' <strong>not</strong>' );
+
 		$debug = $fs->checkbox( 'debug' )
 			->description_( 'Show debugging information in various places.' )
 			->label_( 'Enable debugging' )
 			->checked( $this->get_site_option( 'debug', false ) );
+
+		$debug_ips = $fs->textarea( 'debug_ips' )
+			->description_( 'Only show debugging info to specific IP addresses. Use spaces between IPs. You can also specify part of an IP address. Your address is %s', $_SERVER[ 'REMOTE_ADDR' ] )
+			->label_( 'Debug IPs' )
+			->rows( 5, 16 )
+			->trim()
+			->value( $this->get_site_option( 'debug_ips', '' ) );
 
 		$save = $form->primary_button( 'save' )
 			->value_( 'Save settings' );
@@ -490,11 +513,13 @@ class ThreeWP_Broadcast
 			$whitelist = $this->lines_to_string( $whitelist );
 			$this->update_site_option( 'custom_field_whitelist', $whitelist );
 
+			$this->update_site_option( 'clear_post', $clear_post->is_checked() );
 			$this->update_site_option( 'save_post_priority', $save_post_priority->get_post_value() );
 			$this->update_site_option( 'blogs_to_hide', $blogs_to_hide->get_post_value() );
 			$this->update_site_option( 'existing_attachments', $existing_attachments->get_post_value() );
 
 			$this->update_site_option( 'debug', $debug->is_checked() );
+			$this->update_site_option( 'debug_ips', $debug_ips->get_filtered_post_value() );
 
 			$this->message( 'Options saved!' );
 		}
@@ -1413,8 +1438,11 @@ This can be increased by adding the following to your wp-config.php:
 		$post_type = $meta_box_data->post->post_type;
 		$post_type_object = get_post_type_object( $post_type );
 		$post_type_supports_thumbnails = post_type_supports( $post_type, 'thumbnail' );
-		$post_type_supports_custom_fields = post_type_supports( $post_type, 'custom-fields' );
 		$post_type_is_hierarchical = $post_type_object->hierarchical;
+
+		// 20140327 Because so many plugins create broken post types, assume that all post types support custom fields.
+		// $post_type_supports_custom_fields = post_type_supports( $post_type, 'custom-fields' );
+		$post_type_supports_custom_fields = true;
 
 		if ( is_super_admin() || $this->role_at_least( $this->get_site_option( 'role_link' ) ) )
 		{
@@ -1641,10 +1669,9 @@ This can be increased by adding the following to your wp-config.php:
 			$parent = $filter->broadcast_data->get_linked_parent();
 			$parent_blog_id = $parent[ 'blog_id' ];
 			switch_to_blog( $parent_blog_id );
-			$filter->html->put(
-				'linked_from',
-				$this->_(sprintf( 'Linked from %s', '<a href="' . get_bloginfo( 'url' ) . '/wp-admin/post.php?post=' .$parent[ 'post_id' ] . '&action=edit">' . get_bloginfo( 'name' ) . '</a>' ) )
-			);
+
+			$html = $this->_(sprintf( 'Linked from %s', '<a href="' . get_bloginfo( 'url' ) . '/wp-admin/post.php?post=' .$parent[ 'post_id' ] . '&action=edit">' . get_bloginfo( 'name' ) . '</a>' ) );
+			$filter->html->put( 'linked_from', $html );
 			restore_current_blog();
 		}
 		elseif ( $filter->broadcast_data->has_linked_children() )
@@ -1764,6 +1791,29 @@ This can be increased by adding the following to your wp-config.php:
 	}
 
 	/**
+		@brief		Decide what to do with the POST.
+		@since		2014-03-23 23:08:31
+	**/
+	public function threewp_broadcast_maybe_clear_post( $action )
+	{
+		if ( $action->is_applied() )
+		{
+			$this->debug( 'Not maybe clearing the POST.' );
+			return;
+		}
+
+		$clear_post = $this->get_site_option( 'clear_post', true );
+		if ( $clear_post )
+		{
+
+			$this->debug( 'Clearing the POST.' );
+			$action->post = [];
+		}
+		else
+			$this->debug( 'Not clearing the POST.' );
+	}
+
+	/**
 		@brief		Fill the broadcasting_data object with information.
 
 		@details
@@ -1810,7 +1860,8 @@ This can be increased by adding the following to your wp-config.php:
 
 		$bcd->post_type_object = get_post_type_object( $bcd->post->post_type );
 		$bcd->post_type_supports_thumbnails = post_type_supports( $bcd->post->post_type, 'thumbnail' );
-		$bcd->post_type_supports_custom_fields = post_type_supports( $bcd->post->post_type, 'custom-fields' );
+		//$bcd->post_type_supports_custom_fields = post_type_supports( $bcd->post->post_type, 'custom-fields' );
+		$bcd->post_type_supports_custom_fields = true;
 		$bcd->post_type_is_hierarchical = $bcd->post_type_object->hierarchical;
 
 		$bcd->custom_fields = $form->checkbox( 'custom_fields' )->get_post_value()
@@ -1936,6 +1987,73 @@ This can be increased by adding the following to your wp-config.php:
 		return $this->broadcast_post( $broadcasting_data );
 	}
 
+	/**
+		@brief		Allows Broadcast plugins to update the term with their own info.
+		@since		2014-04-08 15:12:05
+	**/
+	public function threewp_broadcast_wp_insert_term( $action )
+	{
+		if ( ! isset( $action->term->parent ) )
+			$action->term->parent = 0;
+
+		$term = wp_insert_term(
+			$action->term->name,
+			$action->taxonomy,
+			[
+				'description' => $action->term->description,
+				'parent' => $action->term->parent,
+				'slug' => $action->term->slug,
+			]
+		);
+
+		// Sometimes the search didn't find the term because it's SIMILAR and not exact.
+		// WP will complain and give us the term tax id.
+		if ( is_wp_error( $action->new_term ) )
+		{
+			$wp_error = $action->new_term;
+			if ( isset( $wp_error->error_data[ 'term_exists' ] ) )
+				$term_taxonomy_id = $wp_error->error_data[ 'term_exists' ];
+		}
+		else
+			$term_taxonomy_id = $term[ 'term_taxonomy_id' ];
+
+		$this->debug( 'Created the new term %s with the term taxonomy ID of %s.', $action->term->name, $term_taxonomy_id );
+
+		$action->new_term = get_term_by( 'term_taxonomy_id', $term_taxonomy_id, $action->taxonomy, ARRAY_A );
+	}
+
+	/**
+		@brief		[Maybe] update a term.
+		@since		2014-04-10 14:26:23
+	**/
+	public function threewp_broadcast_wp_update_term( $action )
+	{
+		$update = true;
+
+		// If we are given an old term, then we have a chance of checking to see if there should be an update called at all.
+		if ( $action->has_old_term() )
+		{
+			// Assume they match.
+			$update = false;
+			foreach( [ 'name', 'description', 'parent' ] as $key )
+				if ( $action->old_term->$key != $action->new_term->$key )
+					$update = true;
+		}
+
+		if ( $update )
+		{
+			$this->debug( 'Updating the term %s.', $action->new_term->name );
+			wp_update_term( $action->new_term->term_id, $action->taxonomy, array(
+				'description' => $action->new_term->description,
+				'name' => $action->new_term->name,
+				'parent' => $action->new_term->parent,
+			) );
+			$action->updated = true;
+		}
+		else
+			$this->debug( 'Will not update the term %s.', $action->new_term->name );
+	}
+
 	public function untrash_post( $post_id)
 	{
 		$this->trash_untrash_delete_post( 'wp_untrash_post', $post_id );
@@ -2021,9 +2139,9 @@ This can be increased by adding the following to your wp-config.php:
 	{
 		$bcd = $broadcasting_data;
 
-		$this->debug( 'Broadcasting the post %s <pre>%s</pre>', $bcd->post->ID, var_export( $bcd->post, true ) );
+		$this->debug( 'Broadcasting the post %s <pre>%s</pre>', $bcd->post->ID, $this->code_export( $bcd->post ) );
 
-		$this->debug( 'The POST was <pre>%s</pre>', var_export( $bcd->_POST, true ) );
+		$this->debug( 'The POST was <pre>%s</pre>', $this->code_export( $bcd->_POST ) );
 
 		// For nested broadcasts. Just in case.
 		switch_to_blog( $bcd->parent_blog_id );
@@ -2047,17 +2165,7 @@ This can be increased by adding the following to your wp-config.php:
 		if ( $bcd->taxonomies )
 		{
 			$this->debug( 'Will broadcast taxonomies.' );
-			$bcd->parent_blog_taxonomies = get_object_taxonomies( [ 'object_type' => $bcd->post->post_type ], 'array' );
-			$bcd->parent_post_taxonomies = [];
-			foreach( $bcd->parent_blog_taxonomies as $parent_blog_taxonomy => $taxonomy )
-			{
-				// Parent blog taxonomy terms are used for creating missing target term ancestors
-				$bcd->parent_blog_taxonomies[ $parent_blog_taxonomy ] = [
-					'taxonomy' => $taxonomy,
-					'terms'    => $this->get_current_blog_taxonomy_terms( $parent_blog_taxonomy ),
-				];
-				$bcd->parent_post_taxonomies[ $parent_blog_taxonomy ] = get_the_terms( $bcd->post->ID, $parent_blog_taxonomy );
-			}
+			$this->collect_post_type_taxonomies( $bcd );
 		}
 		else
 			$this->debug( 'Will not broadcast taxonomies.' );
@@ -2106,18 +2214,12 @@ This can be increased by adding the following to your wp-config.php:
 
 		// Handle any galleries.
 		$bcd->galleries = new collection;
-		$rx = get_shortcode_regex();
-		$matches = '';
-		preg_match_all( '/' . $rx . '/', $bcd->post->post_content, $matches );
+		$matches = $this->find_shortcodes( $bcd->post->post_content, 'gallery' );
+		$this->debug( 'Found %s gallery shortcodes. ', count( $matches[ 2 ] ) );
 
 		// [2] contains only the shortcode command / key. No options.
 		foreach( $matches[ 2 ] as $index => $key )
 		{
-			// Look for only the gallery shortcode.
-			if ( $key !== 'gallery' )
-				continue;
-
-			$this->debug( 'Found a gallery: ', $matches[ 0 ][ $index ] );
 			// We've found a gallery!
 			$bcd->has_galleries = true;
 			$gallery = new \stdClass;
@@ -2128,6 +2230,7 @@ This can be increased by adding the following to your wp-config.php:
 
 			// Extract the IDs
 			$gallery->ids_string = preg_replace( '/.*ids=\"([0-9,]*)".*/', '\1', $gallery->old_shortcode );
+			$this->debug( 'Gallery %s has IDs: %s', $gallery->old_shortcode, $gallery->ids_string );
 			$gallery->ids_array = explode( ',', $gallery->ids_string );
 			foreach( $gallery->ids_array as $id )
 			{
@@ -2144,7 +2247,10 @@ This can be increased by adding the following to your wp-config.php:
 		array_push( $this->broadcasting, $bcd );
 
 		// POST is no longer needed. Empty it so that other plugins don't use it.
-		$_POST = [];
+		$action = new actions\maybe_clear_post;
+		$action->post = $_POST;
+		$action->apply();
+		$_POST = $action->post;
 
 		$action = new actions\broadcasting_started;
 		$action->broadcasting_data = $bcd;
@@ -2272,28 +2378,14 @@ This can be increased by adding the following to your wp-config.php:
 								);
 							}
 
-							$new_taxonomy = wp_insert_term(
-								$parent_post_term->name,
-								$parent_post_taxonomy,
-								array(
-									'slug' => $parent_post_term->slug,
-									'description' => $parent_post_term->description,
-									'parent' => $target_parent_id,
-								)
-							);
-
-							// Sometimes the search didn't find the term because it's SIMILAR and not exact.
-							// WP will complain and give us the term tax id.
-							if ( is_wp_error( $new_taxonomy ) )
-							{
-								$wp_error = $new_taxonomy;
-								if ( isset( $wp_error->error_data[ 'term_exists' ] ) )
-									$term_taxonomy_id = $wp_error->error_data[ 'term_exists' ];
-							}
-							else
-							{
-								$term_taxonomy_id = $new_taxonomy[ 'term_taxonomy_id' ];
-							}
+							$new_term = clone( $parent_post_term );
+							$new_term->parent = $target_parent_id;
+							$action = new actions\wp_insert_term;
+							$action->taxonomy = $parent_post_taxonomy;
+							$action->term = $new_term;
+							$action->apply();
+							$new_taxonomy = $action->new_term;
+							$term_taxonomy_id = $new_taxonomy[ 'term_taxonomy_id' ];
 							$this->debug( 'Taxonomies: Created taxonomy %s (%s).', $parent_post_term->name, $term_taxonomy_id );
 
 							$taxonomies_to_add_to []= intval( $term_taxonomy_id );
@@ -2303,7 +2395,7 @@ This can be increased by adding the following to your wp-config.php:
 					$this->debug( 'Taxonomies: Syncing terms.' );
 					$this->sync_terms( $bcd, $parent_post_taxonomy );
 
-					if ( count( $taxonomies_to_add_to) > 0 )
+					if ( count( $taxonomies_to_add_to ) > 0 )
 					{
 						// This relates to the bug mentioned in the method $this->set_term_parent()
 						delete_option( $parent_post_taxonomy . '_children' );
@@ -2336,6 +2428,7 @@ This can be increased by adding the following to your wp-config.php:
 					$a = new \stdClass();
 					$a->old = $attachment;
 					$a->new = get_post( $o->attachment_id );
+					$a->new->id = $a->new->ID;		// Lowercase is expected.
 					$bcd->copied_attachments[] = $a;
 					$this->debug( 'Copied attachment %s to %s', $a->old->id, $a->new->id );
 				}
@@ -2355,7 +2448,7 @@ This can be increased by adding the following to your wp-config.php:
 					// Replace the GUID with the new one.
 					$modified_post->post_content = str_replace( $a->old->guid, $a->new->guid, $modified_post->post_content );
 					// And replace the IDs present in any image captions.
-					$modified_post->post_content = str_replace( 'id="attachment_' . $a->old->id . '"', 'id="attachment_' . $a->new->ID . '"', $modified_post->post_content );
+					$modified_post->post_content = str_replace( 'id="attachment_' . $a->old->id . '"', 'id="attachment_' . $a->new->id . '"', $modified_post->post_content );
 					$this->debug( 'Modifying attachment link from %s to %s', $a->old->id, $a->new->id );
 				}
 			}
@@ -2375,7 +2468,7 @@ This can be increased by adding the following to your wp-config.php:
 					{
 						if ( $ca->old->id != $id )
 							continue;
-						$new_ids[] = $ca->new->ID;
+						$new_ids[] = $ca->new->id;
 					}
 				}
 				$new_ids_string = implode( ',', $new_ids );
@@ -2391,7 +2484,10 @@ This can be increased by adding the following to your wp-config.php:
 
 			// Maybe updating the post is not necessary.
 			if ( $unmodified_post->post_content != $modified_post->post_content )
+			{
+				$this->debug( 'Modifying with new post: %s', $this->code_export( $modified_post->post_content ) );
 				wp_update_post( $modified_post );	// Or maybe it is.
+			}
 
 			if ( $bcd->custom_fields )
 			{
@@ -2488,12 +2584,21 @@ This can be increased by adding the following to your wp-config.php:
 		$action->broadcasting_data = $bcd;
 		$action->apply();
 
-		$this->debug( 'Finished broadcasting. Now stopping Wordpress.' );
-		if ( $this->debugging() )
-			exit;
-
 		// Finished broadcasting.
 		array_pop( $this->broadcasting );
+
+		if ( $this->debugging() )
+		{
+			if ( ! $this->is_broadcasting() )
+			{
+				$this->debug( 'Finished broadcasting. Now stopping Wordpress.' );
+				exit;
+			}
+			else
+			{
+				$this->debug( 'Still broadcasting.' );
+			}
+		}
 
 		$this->load_language();
 
@@ -2507,6 +2612,38 @@ This can be increased by adding the following to your wp-config.php:
 		] );
 
 		return $bcd;
+	}
+
+	/**
+		@brief		Dump a variable with code tags.
+		@since		2014-04-06 21:49:24
+	**/
+	public function code_export( $variable )
+	{
+		return sprintf( '<pre><code>%s</code></pre>', var_export( $variable, true ) );
+	}
+
+	/**
+		@brief		Collects the post type's taxonomies into the broadcasting data object.
+		@details	Requires only that $bcd->post->post_type be filled in.
+		@since		2014-04-08 13:40:44
+	**/
+	public function collect_post_type_taxonomies( $bcd )
+	{
+		$bcd->parent_blog_taxonomies = get_object_taxonomies( [ 'object_type' => $bcd->post->post_type ], 'array' );
+		$bcd->parent_post_taxonomies = [];
+		foreach( $bcd->parent_blog_taxonomies as $parent_blog_taxonomy => $taxonomy )
+		{
+			// Parent blog taxonomy terms are used for creating missing target term ancestors
+			$bcd->parent_blog_taxonomies[ $parent_blog_taxonomy ] = [
+				'taxonomy' => $taxonomy,
+				'terms'    => $this->get_current_blog_taxonomy_terms( $parent_blog_taxonomy ),
+			];
+			if ( isset( $bcd->post->ID ) )
+				$bcd->parent_post_taxonomies[ $parent_blog_taxonomy ] = get_the_terms( $bcd->post->ID, $parent_blog_taxonomy );
+			else
+				$bcd->parent_post_taxonomies[ $parent_blog_taxonomy ] = get_terms( [ $parent_blog_taxonomy ] );
+		}
 	}
 
 	/**
@@ -2610,7 +2747,23 @@ This can be increased by adding the following to your wp-config.php:
 	*/
 	public function debugging()
 	{
-		return $this->get_site_option( 'debug', false );
+		$debugging = $this->get_site_option( 'debug', false );
+		if ( ! $debugging )
+			return false;
+
+		// Debugging is enabled. Now check if we should show it to this user.
+		$ips = $this->get_site_option( 'debug_ips', '' );
+		// Empty = no limits.
+		if ( $ips == '' )
+			return true;
+
+		$lines = explode( "\n", $ips );
+		foreach( $lines as $line )
+			if ( strpos( $_SERVER[ 'REMOTE_ADDR' ], $line ) !== false )
+				return true;
+
+		// No match = not debugging for this user.
+		return false;
 	}
 
 	/**
@@ -2760,17 +2913,13 @@ This can be increased by adding the following to your wp-config.php:
 		if ( is_null( $term_id ) || 0 == $term_id )
 		{
 			// The target parent does not exist, we need to create it
-			$new_term = wp_insert_term(
-				$source_parent[ 'name' ],
-				$source_post_taxonomy,
-				array(
-					'slug'        => $source_parent[ 'slug' ],
-					'description' => $source_parent[ 'description' ],
-					'parent'      => $target_grandparent_id,
-				)
-			);
-
-			$term_id = $new_term[ 'term_id' ];
+			$new_term = (object)$source_parent;
+			$new_term->parent = $target_grandparent_id;
+			$action = new actions\wp_insert_term;
+			$action->taxonomy = $source_post_taxonomy;
+			$action->term = $new_term;
+			$action->apply();
+			$term_id = $action->new_term[ 'term_id' ];
 		}
 		elseif ( is_array( $term_id ) )
 		{
@@ -2894,8 +3043,8 @@ This can be increased by adding the following to your wp-config.php:
 		{
 			$attachment_posts = get_posts( [
 				'cache_results' => false,
+				'name' => $attachment_data->post->post_name,
 				'numberposts' => PHP_INT_MAX,
-				'post_name' => $attachment_data->post->post_name,			// Isn't used, though it should be. Maybe a patch is in order...
 				'post_type' => 'attachment',
 
 			] );
@@ -2964,24 +3113,29 @@ This can be increased by adding the following to your wp-config.php:
 
 	/**
 		@brief		Syncs the terms of a taxonomy from the parent blog in the BCD to the current blog.
-		@details
-
-		Checks the parentage of the terms.
-
+		@details	If $bcd->add_new_taxonomies is set, new taxonomies will be created, else they are ignored.
 		@param		broadcasting_data		$bcd			The broadcasting data.
 		@param		string					$taxonomy		The taxonomy to sync.
 		@since		20131004
 	**/
-	private function sync_terms( $bcd, $taxonomy )
+	public function sync_terms( $bcd, $taxonomy )
 	{
 		$source_terms = $bcd->parent_blog_taxonomies[ $taxonomy ][ 'terms' ];
 		$target_terms = $this->get_current_blog_taxonomy_terms( $taxonomy );
+		$this->debug( 'Source terms for taxonomy %s: %s', $taxonomy, $this->code_export( $source_terms ) );
+		$this->debug( 'Target terms for taxonomy %s: %s', $taxonomy, $this->code_export( $target_terms ) );
+
+		$refresh_cache = false;
 
 		// Keep track of which terms we've found.
 		$found_targets = [];
 		$found_sources = [];
 
+		// Also keep track of which sources we haven't found on the target blog.
+		$unfound_sources = $source_terms;
+
 		// First step: find out which of the target terms exist on the source blog
+		$this->debug( 'Find out which of the source terms exist on the target blog.' );
 		foreach( $target_terms as $target_term_id => $target_term )
 			foreach( $source_terms as $source_term_id => $source_term )
 			{
@@ -2989,45 +3143,81 @@ This can be increased by adding the following to your wp-config.php:
 					continue;
 				if ( $source_term[ 'slug' ] == $target_term[ 'slug' ] )
 				{
+					$this->debug( 'Find source term %s. Source ID: %s. Target ID: %s.', $source_term[ 'slug' ], $source_term_id, $target_term_id );
 					$found_targets[ $target_term_id ] = $source_term_id;
 					$found_sources[ $source_term_id ] = $target_term_id;
+					unset( $unfound_sources[ $source_term_id ] );
 				}
 			}
+
+		// These sources were not found. Add them.
+		if ( isset( $bcd->add_new_taxonomies ) && $bcd->add_new_taxonomies )
+		{
+			$this->debug( '%s taxonomies are missing on this blog.', count( $unfound_sources ) );
+			foreach( $unfound_sources as $unfound_source_id => $unfound_source )
+			{
+				$unfound_source = (object)$unfound_source;
+				unset( $unfound_source->parent );
+				$action = new actions\wp_insert_term;
+				$action->taxonomy = $taxonomy;
+				$action->term = $unfound_source;
+				$action->apply();
+
+				$new_taxonomy = $action->new_term;
+				$new_taxonomy_id = $new_taxonomy[ 'term_id' ];
+				$target_terms[ $new_taxonomy_id ] = (array)$new_taxonomy;
+				$found_sources[ $unfound_source_id ] = $new_taxonomy_id;
+				$found_targets[ $new_taxonomy_id ] = $unfound_source_id;
+
+				$refresh_cache = true;
+			}
+		}
 
 		// Now we know which of the terms on our target blog exist on the source blog.
 		// Next step: see if the parents are the same on the target as they are on the source.
 		// "Same" meaning pointing to the same slug.
+		$this->debug( 'About to update taxonomy terms.' );
 		foreach( $found_targets as $target_term_id => $source_term_id)
 		{
-			$parent_of_target_term = $target_terms[ $target_term_id ][ 'parent' ];
-			$parent_of_equivalent_source_term = $source_terms[ $source_term_id ][ 'parent' ];
+			$source_term = (object)$source_terms[ $source_term_id ];
+			$target_term = (object)$target_terms[ $target_term_id ];
 
-			// Do the parents "match".
-			$needs_updating = ( $parent_of_target_term != $parent_of_equivalent_source_term &&
-				( isset( $found_sources[ $parent_of_equivalent_source_term ] ) || $parent_of_equivalent_source_term == 0 )
-			);
+			$action = new actions\wp_update_term;
+			$action->taxonomy = $taxonomy;
 
-			// Same name?
-			$needs_updating |= ( $source_terms[ $source_term_id ][ 'name' ] != $target_terms[ $target_term_id ][ 'name' ] );
+			// The old term is the target term, since it contains the old values.
+			$action->old_term = (object)$target_terms[ $target_term_id ];
+			// The new term is the source term, since it has the newer data.
+			$action->new_term = (object)$source_terms[ $source_term_id ];
 
-			if ( $needs_updating )
+			// ... but the IDs have to be switched around, since the target term has the new ID.
+			$action->switch_data();
+
+			// Update the parent.
+			$parent_of_equivalent_source_term = $source_term->parent;
+			$parent_of_target_term = $target_term->parent;
+
+			$new_parent = 0;
+			// Does the source term even have a parent?
+			if ( $parent_of_equivalent_source_term > 0 )
 			{
-				if ( $parent_of_equivalent_source_term != 0 )
-					$new_term_parent = $found_sources[ $parent_of_equivalent_source_term ];
-				else
-					$new_term_parent = 0;
-
-				// Update the name and the parent.
-				wp_update_term( $target_term_id, $taxonomy, array(
-					'name' => $source_terms[ $source_term_id ][ 'name' ],
-					'parent' => $new_term_parent,
-				) );
-
-				// wp_update_category alone won't work. The "cache" needs to be cleared.
-				// see: http://wordpress.org/support/topic/category_children-how-to-recalculate?replies=4
-				delete_option( 'category_children' );
+				// Did we find the parent term?
+				if ( isset( $found_sources[ $parent_of_equivalent_source_term ] ) )
+					$new_parent = $found_sources[ $parent_of_equivalent_source_term ];
 			}
+			else
+				$new_parent = 0;
+
+			$action->new_term->parent = $new_parent;
+
+			$action->apply();
+			$refresh_cache |= $action->updated;
 		}
+
+		// wp_update_category alone won't work. The "cache" needs to be cleared.
+		// see: http://wordpress.org/support/topic/category_children-how-to-recalculate?replies=4
+		if ( $refresh_cache )
+			delete_option( 'category_children' );
 	}
 
 	/**
@@ -3153,7 +3343,6 @@ This can be increased by adding the following to your wp-config.php:
 			);
 		$this->query( $query );
 	}
-
 }
 
 $threewp_broadcast = new ThreeWP_Broadcast();

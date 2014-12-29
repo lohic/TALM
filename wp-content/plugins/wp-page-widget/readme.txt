@@ -3,7 +3,7 @@ Contributors: CodeAndMore
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=X2CJ88BHMLAT6
 Tags: widget, page, post, single, wordpress, custom post type
 Requires at least: 2.5
-Tested up to: 3.8
+Tested up to: 3.9
 Stable tag: trunk
 
 Select widgets for each page / post / custom post type. For every single page / post / custom post type
@@ -56,6 +56,10 @@ The interface is integrated to category/taxonomy editing screen just like you ed
 
 
 == Changelog ==
+= 2.3 (2014-04-17) =
+* Compatibility with WP 3.9
+= 2.3 (2014-03-27) =
+* Compatibility with WP 3.8.1, compatible with NextGen, fix width when customizing
 = 2.2 (2013-12-26) =
 * Compatibility with WP 3.8
 = 2.1 (2013-09-23) =

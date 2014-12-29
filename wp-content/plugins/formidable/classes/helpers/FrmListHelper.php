@@ -1,16 +1,13 @@
 <?php
 
-if(!defined('ABSPATH')) die(__('You are not allowed to call this page directly.', 'formidable'));
+if ( !defined('ABSPATH') ) die('You are not allowed to call this page directly.');
 
 if(class_exists('FrmListHelper'))
     return;
 
 class FrmListHelper extends WP_List_Table {
-    var $table_name;
-    var $page_name;
-    var $params;
     
-	function FrmListHelper($args) {
+	function __construct($args) {
 	    global $frm_settings;
 	    
 	    $args = wp_parse_args( $args, array(
@@ -46,10 +43,9 @@ class FrmListHelper extends WP_List_Table {
 		$per_page = $this->get_items_per_page( 'formidable_page_formidable'. str_replace('-', '_', $this->page_name) .'_per_page', $default_count);
 
 		$start = ( isset( $_REQUEST['start'] ) ) ? $_REQUEST['start'] : (( $page - 1 ) * $per_page);
-		$s = isset( $_REQUEST['s'] ) ? $_REQUEST['s'] : '';
+		$s = isset( $_REQUEST['s'] ) ? stripslashes($_REQUEST['s']) : '';
 		$fid = isset( $_REQUEST['fid'] ) ? $_REQUEST['fid'] : '';
 		if($s != ''){
-		    $s = stripslashes($s);
 		    preg_match_all('/".*?("|$)|((?<=[\\s",+])|^)[^\\s",+]+/', $s, $matches);
 		    $search_terms = array_map('trim', $matches[0]);
 		}
@@ -88,16 +84,12 @@ class FrmListHelper extends WP_List_Table {
             </ol>
 <?php   }else{ 
             _e('No Forms Found', 'formidable') ?>. 
-            <a href="?page=formidable&amp;frm_action=new-selection"><?php _e('Add New'); ?></a>
+            <a href="?page=formidable&amp;frm_action=new-selection"><?php _e('Add New', 'formidable'); ?></a>
 <?php   }
 	}
 	
 	function get_bulk_actions(){
-	    global $frm_vars;
-	    
-	    $actions = array();
-	    if($frm_vars['pro_is_installed'])
-            $actions['bulk_delete'] = __('Delete');
+	    $actions = array('bulk_delete' => __('Delete'));
             
         return $actions;
     }
@@ -128,11 +120,6 @@ class FrmListHelper extends WP_List_Table {
 		
 		if ($this->params['template']){
 		    $actions['frm_duplicate'] = "<a href='" . wp_nonce_url( $duplicate_link ) . "'>". __('Create Form from Template', 'formidable') ."</a>";
-		    
-		    if(current_user_can('frm_edit_forms') and $frm_vars['pro_is_installed']){
-        	    $actions['export_template'] = "<a href='" . wp_nonce_url( admin_url( 'admin-ajax.php' ) ."?action=frm_forms_export&id={$item->id}" ) . "' title='$title ". __('Export Template', 'formidable') ."'>". __('Export Template', 'formidable') ."</a>";
-
-        	}
         }else{
             if(current_user_can('frm_edit_forms')){
     		    $actions['frm_settings'] = "<a href='" . wp_nonce_url( "?page=formidable&frm_action=settings&id={$item->id}" ) . "'>". __('Settings', 'formidable') ."</a>";
@@ -146,7 +133,7 @@ class FrmListHelper extends WP_List_Table {
         if(current_user_can('frm_delete_forms'))
 		    $actions['trash'] = '<a class="submitdelete" href="' . wp_nonce_url( $delete_link ) .'" onclick="return confirm(\''. __('Are you sure you want to delete that?', 'formidable') .'\')">' . __( 'Delete' ) . '</a>';
 		
-		$actions['view'] = '<a href="'. FrmFormsHelper::get_direct_link($item->form_key, $item->prli_link_id) .'" target="_blank">'. __('Preview') .'</a>';  
+		$actions['view'] = '<a href="'. FrmFormsHelper::get_direct_link($item->form_key, $item) .'" target="_blank">'. __('Preview') .'</a>';  
         
         $action_links = $this->row_actions( $actions );
         
@@ -207,9 +194,6 @@ class FrmListHelper extends WP_List_Table {
                 		$links[] = '<a href="'. wp_nonce_url( "?page=formidable-entries&frm_action=new&form={$item->id}" ) .'" class="frm_add_entry_icon frm_icon_font frm_bstooltip" title="'. __('Add Entry', 'formidable'). '" data-toggle="tooltip"> </a>';
                 	
                 	$links[] = '<a href="' . wp_nonce_url( "?page=formidable&frm_action=duplicate&id={$item->id}&template=1" ) .'" class="frm_icon_font frm_new_template_icon frm_bstooltip" title="'. __('Create template from form', 'formidable') .'" data-toggle="tooltip"> </a>';
-                	
-                	if($frm_vars['pro_is_installed'] and current_user_can('frm_edit_forms'))
-                	    $links[] = '<a href="'. wp_nonce_url( admin_url( 'admin-ajax.php' ) ."?action=frm_forms_export&id={$item->id}" ) . '" title="'. esc_attr(__('Export form template', 'formidable')) .'" class="frm_download_template frm_icon_font frm_bstooltip" data-toggle="tooltip"> </a>';
                 	
                     $val = implode(' ', $links);
                     break;

@@ -1,11 +1,12 @@
 <?php
-if(!defined('ABSPATH')) die(__('You are not allowed to call this page directly.', 'formidable'));
+if(!defined('ABSPATH')) die('You are not allowed to call this page directly.');
 
 if(class_exists('FrmAppHelper'))
     return;
 
 class FrmAppHelper{
-    public static $db_version = 11; //version of the database we are moving to
+    public static $db_version = 11; //version of the database we are moving to (skip 12)
+    public static $pro_db_version = 24;
     
     public static function plugin_version(){
         $plugin_data = get_file_data( WP_PLUGIN_DIR .'/formidable/formidable.php', array('Version' => 'Version'), 'plugin' );
@@ -63,24 +64,14 @@ class FrmAppHelper{
     }
     
     public static function load_scripts($scripts){
-        global $wp_version;
-        if(version_compare( $wp_version, '3.3', '<')){
-            global $wp_scripts;
-            $wp_scripts->do_items( (array)$scripts );
-        }else{
-            foreach((array)$scripts as $s)
-                wp_enqueue_script($s);
+        foreach ( (array) $scripts as $s ) {
+            wp_enqueue_script($s);
         }
     }
     
     public static function load_styles($styles){
-        global $wp_version;
-        if(version_compare( $wp_version, '3.3', '<')){
-            global $wp_styles;
-            $wp_styles->do_items( (array)$styles );
-        }else{
-            foreach((array)$styles as $s)
-                wp_enqueue_style($s);
+        foreach ( (array) $styles as $s ) {
+            wp_enqueue_style($s);
         }
     }
     
@@ -119,13 +110,13 @@ class FrmAppHelper{
     <?php
     }
     
-    static public function frm_capabilities(){
+    public static function frm_capabilities(){
         global $frm_vars;
         $cap = array(
-            'frm_view_forms' => __('View Forms and Templates', 'formidable'),
-            'frm_edit_forms' => __('Add/Edit Forms and Templates', 'formidable'),
-            'frm_delete_forms' => __('Delete Forms and Templates', 'formidable'),
-            'frm_change_settings' => __('Access this Settings Page', 'formidable')
+            'frm_view_forms'        => __('View Forms and Templates', 'formidable'),
+            'frm_edit_forms'        => __('Add/Edit Forms and Templates', 'formidable'),
+            'frm_delete_forms'      => __('Delete Forms and Templates', 'formidable'),
+            'frm_change_settings'   => __('Access this Settings Page', 'formidable')
         );
         if($frm_vars['pro_is_installed']){
             $cap['frm_view_entries'] = __('View Entries from Admin Area', 'formidable');
@@ -242,10 +233,7 @@ class FrmAppHelper{
         $key = '';
         
         if (!empty($name)){
-            if(function_exists('sanitize_key'))
-                $key = sanitize_key($name);
-            else
-                $key = sanitize_title_with_dashes($name);
+            $key = sanitize_key($name);
         }
         
         if(empty($key)){
@@ -278,7 +266,7 @@ class FrmAppHelper{
         global $frm_entry_meta, $frm_settings, $frm_vars;
         
         if(empty($post_values))
-            $post_values = $_POST;
+            $post_values = stripslashes_deep($_POST);
         
         $values = array('id' => $record->id, 'fields' => array());
 
@@ -305,7 +293,7 @@ class FrmAppHelper{
                 }
                 
                 $field_type = isset($post_values['field_options']['type_'.$field->id]) ? $post_values['field_options']['type_'.$field->id] : $field->type;
-                $new_value = (isset($post_values['item_meta'][$field->id])) ? stripslashes_deep(maybe_unserialize($post_values['item_meta'][$field->id])) : $meta_value;
+                $new_value = isset($post_values['item_meta'][$field->id]) ? maybe_unserialize($post_values['item_meta'][$field->id]) : $meta_value;
 
                 $field_array = array(
                     'id' => $field->id,
@@ -333,7 +321,7 @@ class FrmAppHelper{
                 $opt_defaults = FrmFieldsHelper::get_default_field_opts($field_array['type'], $field, true);
                 
                 foreach ($opt_defaults as $opt => $default_opt){
-                    $field_array[$opt] = ($post_values and isset($post_values['field_options'][$opt.'_'.$field->id]) ) ? stripslashes_deep(maybe_unserialize($post_values['field_options'][$opt.'_'.$field->id])) : (isset($field->field_options[$opt]) ? $field->field_options[$opt] : $default_opt);
+                    $field_array[$opt] = ($post_values && isset($post_values['field_options'][$opt.'_'.$field->id]) ) ? maybe_unserialize($post_values['field_options'][$opt.'_'.$field->id]) : (isset($field->field_options[$opt]) ? $field->field_options[$opt] : $default_opt);
                     if($opt == 'blank' and $field_array[$opt] == ''){
                         $field_array[$opt] = $frm_settings->blank_msg;
                     }else if($opt == 'invalid' and $field_array[$opt] == ''){
@@ -370,10 +358,7 @@ class FrmAppHelper{
             }
       
         $frm_form = new FrmForm();
-        if ($table == 'entries')
-            $form = $frm_form->getOne( $record->form_id );
-        else if ($table == 'forms')
-            $form = $frm_form->getOne( $record->id );
+        $form = $frm_form->getOne( $table == 'entries' ? $record->form_id : $record->id );
         unset($frm_form);
 
         if ($form){
@@ -382,9 +367,9 @@ class FrmAppHelper{
             if (is_array($form->options)){
                 foreach ($form->options as $opt => $value){
                     if(in_array($opt, array('email_to', 'reply_to', 'reply_to_name')))
-                        $values['notification'][0][$opt] = isset($post_values["notification[0][$opt]"]) ? stripslashes_deep(maybe_unserialize($post_values["notification[0][$opt]"])) : $value;
+                        $values['notification'][0][$opt] = isset($post_values["notification[0][$opt]"]) ? maybe_unserialize($post_values["notification[0][$opt]"]) : $value;
                     
-                    $values[$opt] = isset($post_values[$opt]) ? stripslashes_deep(maybe_unserialize($post_values[$opt])) : $value;
+                    $values[$opt] = isset($post_values[$opt]) ? maybe_unserialize($post_values[$opt]) : $value;
                 }
             }
         }
@@ -432,7 +417,7 @@ class FrmAppHelper{
                 $values[$h .'_html'] = (isset($post_values['options'][$h .'_html']) ? $post_values['options'][$h .'_html'] : FrmFormsHelper::get_default_html($h));
             unset($h);
         }
-
+        
         if ($table == 'entries')
             $values = FrmEntriesHelper::setup_edit_vars( $values, $record );
         else if ($table == 'forms')
@@ -460,7 +445,8 @@ class FrmAppHelper{
     public static function get_us_states(){
         return apply_filters('frm_us_states', array(
             'AL' => 'Alabama', 'AK' => 'Alaska', 'AR' => 'Arkansas', 'AZ' => 'Arizona', 
-            'CA' => 'California', 'CO' => 'Colorado', 'CT' => 'Connecticut', 'DE' => 'Delaware', 
+            'CA' => 'California', 'CO' => 'Colorado', 'CT' => 'Connecticut', 'DE' => 'Delaware',
+            'DC' => 'District of Columbia', 
             'FL' => 'Florida', 'GA' => 'Georgia', 'HI' => 'Hawaii', 'ID' => 'Idaho', 
             'IL' => 'Illinois', 'IN' => 'Indiana', 'IA' => 'Iowa', 'KS' => 'Kansas', 
             'KY' => 'Kentucky', 'LA' => 'Louisiana', 'ME' => 'Maine','MD' => 'Maryland', 
@@ -588,12 +574,16 @@ class FrmAppHelper{
     }
     
     public static function prepend_and_or_where( $starts_with = ' WHERE ', $where = '' ){
+        if ( empty($where) ) {
+            return '';
+        }
+        
         if(is_array($where)){
             global $frmdb, $wpdb;
             extract($frmdb->get_where_clause_and_values( $where ));
             $where = $wpdb->prepare($where, $values);
         }else{
-            $where = (( $where == '' ) ? '' : $starts_with . $where);
+            $where = $starts_with . $where;
         }
         
         return $where;
@@ -720,8 +710,13 @@ class FrmAppHelper{
     
     public static function maybe_json_decode($string){
         $new_string = json_decode($string, true);
-        if(json_last_error() == JSON_ERROR_NONE)
+        if ( function_exists('json_last_error') ) { // php 5.3+
+            if ( json_last_error() == JSON_ERROR_NONE ) {
+                $string = $new_string;
+            }
+        } else if ( isset($new_string) ) { // php < 5.3 fallback
             $string = $new_string;
+        }
         return $string;
     }
     

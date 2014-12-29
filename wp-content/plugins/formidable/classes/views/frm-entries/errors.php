@@ -9,7 +9,10 @@ if (isset($message) && $message != ''){
 
 if( isset($errors) && is_array($errors) && !empty($errors) ){
     global $frm_settings;
-?>
+
+if ( isset($form) && is_object($form) ) { ?>
+<script type="text/javascript">jQuery(document).ready(function($){frmScrollMsg(<?php echo $form->id ?>);})</script>
+<?php } ?>
 <div class="frm_error_style"> 
 <?php
 $img = '';
@@ -29,7 +32,7 @@ if(empty($frm_settings->invalid_msg)){
         }else{
             $show_img = true;
         }
-        echo stripslashes($error) . '<br/>';
+        echo $error . '<br/>';
     }
 }else{
     echo $frm_settings->invalid_msg;
@@ -45,7 +48,7 @@ if(empty($frm_settings->invalid_msg)){
         }else{
             $show_img = true;
         }
-        echo stripslashes($error);
+        echo $error;
     }
 } ?>
 </div>

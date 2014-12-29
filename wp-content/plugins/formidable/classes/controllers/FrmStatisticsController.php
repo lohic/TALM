@@ -1,11 +1,11 @@
 <?php
-if(!defined('ABSPATH')) die(__('You are not allowed to call this page directly.', 'formidable'));
+if(!defined('ABSPATH')) die('You are not allowed to call this page directly.');
 
 if(class_exists('FrmStatisticsController'))
     return;
 
 class FrmStatisticsController{
-    function FrmStatisticsController(){
+    public static function load_hooks(){
         add_action('admin_menu', 'FrmStatisticsController::menu', 24);
     }
     

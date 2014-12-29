@@ -3,13 +3,13 @@
  * @package Formidable
  */
 
-if(!defined('ABSPATH')) die(__('You are not allowed to call this page directly.', 'formidable'));
+if(!defined('ABSPATH')) die('You are not allowed to call this page directly.');
 
 if(class_exists('FrmSettingsController'))
     return;
- 
+
 class FrmSettingsController{
-    function FrmSettingsController(){
+    public static function load_hooks(){
         add_action('admin_menu', 'FrmSettingsController::menu', 45);
         add_action('frm_before_settings', 'FrmSettingsController::license_box');
     }
@@ -48,7 +48,7 @@ class FrmSettingsController{
         
         if(!isset($frm_vars['settings_routed']) or !$frm_vars['settings_routed']){
             //$errors = $frm_settings->validate($_POST,array());
-            $frm_settings->update($_POST);
+            $frm_settings->update(stripslashes_deep($_POST));
 
             if( empty($errors) ){
                 $frm_settings->store();

@@ -81,3 +81,14 @@
 	padding: 7px 10px;
 	font-family: Georgia,"Times New Roman","Bitstream Charter",Times,serif;
 }
+
+.widget .widget-title .new-widget-action{
+	display: block;
+	height: 43px;
+	position: absolute;
+	right: 0;
+	width: 43px;
+}
+.widget .widget-title .new-widget-action:after{
+	content:"";
+}

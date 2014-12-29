@@ -7,9 +7,9 @@
     <td class="frm_email_reply_container">
         <div class="alignright frm_email_actions feature-filter">
             <?php echo $email_key; ?>
-            <?php if($email_key > 0){ ?>
+            <?php if ( $email_key !== 0 ) { ?>
             <span class="frm_email_icons">
-                <a href="javascript:frmRemoveEmailList(<?php echo $email_key ?>)" class="frm_icon_font frm_delete_icon"> </a>
+                <a data-removeid="frm_notification_<?php echo $email_key ?>" class="frm_icon_font frm_delete_icon frm_remove_email"> </a>
             </span>
             <?php } ?>
         </div>
@@ -22,7 +22,7 @@
         if(!empty($values['fields'])){ ?>
         <optgroup label="<?php _e('Fields', 'formidable') ?>">
         <?php
-        $field_select = array('text', 'email', 'user_id', 'hidden');
+        $field_select = array('text', 'email', 'user_id', 'hidden', 'select', 'radio');
         foreach($values['fields'] as $val_key => $fo){
             if(in_array($fo['type'], $field_select)){ ?>
                 <option value="<?php echo $fo['id'] ?>" <?php selected($notification['reply_to_name'], $fo['id']); ?>><?php echo FrmAppHelper::truncate($fo['name'], 40) ?></option>
@@ -71,11 +71,22 @@
 </tr>
 
  <tr>
-     <td colspan="2"><label><?php _e('Email Recipients', 'formidable') ?></label> <span class="frm_help frm_icon_font frm_tooltip_icon" title="<?php _e('To send to multiple addresses, separate each address with a comma. You can use [admin_email] to dynamically use the address on your WordPress General Settings page. &lt;br/&gt;PRO only: Leave blank if you do not want email notifications for this form.', 'formidable') ?>"></span>
+     <td colspan="2"><label><?php _e('Email Recipients', 'formidable') ?></label> <span class="frm_help frm_icon_font frm_tooltip_icon" title="<?php esc_attr_e('To send to multiple addresses, separate each address with a comma. You can use [admin_email] to dynamically use the address on your WordPress General Settings page. &lt;br/&gt;PRO only: Leave blank if you do not want email notifications for this form.', 'formidable') ?>"></span>
     <input type="text" name="notification[<?php echo $email_key ?>][email_to]" value="<?php echo esc_attr($notification['email_to']); ?>" class="frm_not_email_to frm_long_input" id="email_to_<?php echo $email_key ?>" />
+    
+    <p><label><?php _e('Subject', 'formidable') ?></label> <span class="frm_help frm_icon_font frm_tooltip_icon" title="<?php echo esc_attr(sprintf(__('If you leave the subject blank, the default will be used: %1$s Form submitted on %2$s', 'formidable'), $form->name, get_option('blogname'))); ?>"></span><br/>
+    <input type="text" name="notification[<?php echo $email_key ?>][email_subject]" class="frm_not_email_subject frm_long_input" id="email_subject_<?php echo $email_key ?>" size="55" value="<?php echo esc_attr($notification['email_subject']); ?>" /></p>
+
+    <p><label><?php _e('Message', 'formidable') ?> </label><br/>
+    <textarea name="notification[<?php echo $email_key ?>][email_message]" class="frm_not_email_message frm_long_input" id="email_message_<?php echo $email_key ?>" cols="50" rows="5"><?php echo FrmAppHelper::esc_textarea($notification['email_message']) ?></textarea></p>
+
+    <h4><?php _e('Options', 'formidable') ?> </h4>
+        <label for="inc_user_info_<?php echo $email_key ?>"><input type="checkbox" name="notification[<?php echo $email_key ?>][inc_user_info]" class="frm_not_inc_user_info" id="inc_user_info_<?php echo $email_key ?>" value="1" <?php checked($notification['inc_user_info'], 1); ?> /> <?php _e('Append IP Address, Browser, and Referring URL to message', 'formidable') ?></label>
+
+    <p><label for="plain_text_<?php echo $email_key ?>"><input type="checkbox" name="notification[<?php echo $email_key ?>][plain_text]" id="plain_text_<?php echo $email_key ?>" value="1" <?php checked($notification['plain_text'], 1); ?> /> <?php _e('Send Emails in Plain Text', 'formidable') ?></label></p>
 <?php 
 if(!$frm_vars['pro_is_installed'])
-    FrmAppController::update_message('customize your email notifications and send auto responders');
+    FrmAppController::update_message('send autoresponders or conditionally send email notifications');
     
 do_action('frm_additional_form_notification_options', $values, compact('notification', 'email_key')); ?>
 </td></tr>

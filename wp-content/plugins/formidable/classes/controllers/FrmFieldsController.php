@@ -3,13 +3,13 @@
  * @package Formidable
  */
 
-if(!defined('ABSPATH')) die(__('You are not allowed to call this page directly.', 'formidable'));
+if(!defined('ABSPATH')) die('You are not allowed to call this page directly.');
 
 if(class_exists('FrmFieldsController'))
     return;
  
 class FrmFieldsController{
-    function FrmFieldsController(){
+    public static function load_hooks(){
         add_action('wp_ajax_frm_load_field', 'FrmFieldsController::load_field');
         add_action('wp_ajax_frm_insert_field', 'FrmFieldsController::create');
         add_action('wp_ajax_frm_field_name_in_place_edit', 'FrmFieldsController::edit_name');
@@ -58,7 +58,7 @@ class FrmFieldsController{
         $form_id = $_POST['form_id'];
         $values = array();
         if(class_exists('FrmProForm'))
-            $values['post_type'] = FrmProForm::post_type($form_id);
+            $values['post_type'] = FrmProFormsHelper::post_type($form_id);
         
         $field_values = apply_filters('frm_before_field_created', FrmFieldsHelper::setup_new_vars($field_data, $form_id));
         
@@ -239,21 +239,23 @@ class FrmFieldsController{
         global $current_screen, $hook_suffix;
 
         // Catch plugins that include admin-header.php before admin.php completes.
-        if (empty( $current_screen ) and function_exists('set_current_screen')){
+        if ( empty( $current_screen ) && function_exists('set_current_screen') ) {
             $hook_suffix = '';
         	set_current_screen();
         }
         
-        if(function_exists('register_admin_color_schemes'))
+        if ( function_exists('register_admin_color_schemes') ) {
             register_admin_color_schemes();
+        }
         
         $hook_suffix = $admin_body_class = '';
         
         if ( get_user_setting('mfold') == 'f' )
         	$admin_body_class .= ' folded';
 
-        if ( function_exists('is_admin_bar_showing') and is_admin_bar_showing() )
+        if ( function_exists('is_admin_bar_showing') && is_admin_bar_showing() ) {
         	$admin_body_class .= ' admin-bar';
+        }
 
         if ( is_rtl() )
         	$admin_body_class .= ' rtl';
@@ -263,8 +265,14 @@ class FrmFieldsController{
         $prepop[__('Countries', 'formidable')] = FrmAppHelper::get_countries();
         
         $states = FrmAppHelper::get_us_states();
-        $prepop[__('U.S. States', 'formidable')] = array_values($states);
-        $prepop[__('U.S. State Abbreviations', 'formidable')] = array_keys($states);
+        $state_abv = array_keys($states);
+        sort($state_abv);
+        $prepop[__('U.S. State Abbreviations', 'formidable')] = $state_abv;
+        $states = array_values($states);
+        sort($states);
+        $prepop[__('U.S. States', 'formidable')] = $states;
+        unset($state_abv);
+        unset($states);
         
         $prepop[__('Age', 'formidable')] = array(
             __('Under 18', 'formidable'), __('18-24', 'formidable'), __('25-34', 'formidable'), 
@@ -298,7 +306,7 @@ class FrmFieldsController{
         if(!is_admin() or !current_user_can('frm_edit_forms'))
             return;
         
-        extract($_POST);
+        extract(stripslashes_deep($_POST));
         
         $frm_field = new FrmField();
         $field = $frm_field->getOne($field_id);
@@ -307,7 +315,6 @@ class FrmFieldsController{
             return;
         
         $field = FrmFieldsHelper::setup_edit_vars($field);
-        $opts = stripslashes($opts);    
         $opts = explode("\n", rtrim($opts, "\n"));
         if($field['separate_value']){
             foreach($opts as $opt_key => $opt){
@@ -324,7 +331,7 @@ class FrmFieldsController{
         
         $frm_field->update($field_id, array('options' => maybe_serialize($opts)));
         
-        $field['options'] = stripslashes_deep($opts);
+        $field['options'] = $opts;
         $field_name = $field['name'];
         
         if ($field['type'] == 'radio' or $field['type'] == 'checkbox'){
@@ -413,7 +420,7 @@ class FrmFieldsController{
             $add_html .= ' maxlength="'. $field['max'] .'"';
         
         if(!is_admin() or defined('DOING_AJAX') or !isset($_GET) or !isset($_GET['page']) or $_GET['page'] == 'formidable-entries'){
-            if(isset($field['required']) and $field['required']){
+            /*if(isset($field['required']) and $field['required']){
                 $action = isset($_REQUEST['frm_action']) ? 'frm_action' : 'action';
                 $action = FrmAppHelper::get_param($action);
                 
@@ -426,7 +433,7 @@ class FrmFieldsController{
                     $class .= " required";
                 }
                 unset($action);
-            }
+            }*/
             
             if(isset($field['clear_on_focus']) and $field['clear_on_focus'] and !empty($field['default_value'])){
                 

@@ -2,7 +2,7 @@
 
 class FrmShowForm extends WP_Widget {
 
-	function FrmShowForm() {
+	function __construct() {
 		$widget_ops = array( 'description' => __( "Display a Formidable Form", 'formidable') );
 		$this->WP_Widget('frm_show_form', __('Formidable Form', 'formidable'), $widget_ops);
 	}
@@ -26,7 +26,7 @@ class FrmShowForm extends WP_Widget {
             $frm_vars['sidebar_width'] = $instance['size'];
         }
         
-		echo FrmEntriesController::show_form($instance['form'], '', false, $instance['description']);
+		echo FrmFormsController::show_form($instance['form'], '', false, $instance['description']);
         $frm_vars['sidebar_width'] = '';
 		echo '</div>';
 		echo $after_widget;
@@ -60,5 +60,3 @@ class FrmShowForm extends WP_Widget {
 <?php 
 	}
 }
-
-?>

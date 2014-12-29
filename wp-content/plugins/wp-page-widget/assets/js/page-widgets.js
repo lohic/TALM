@@ -26,8 +26,12 @@ wpPWidgets = {
 			h = h + parseInt(H * 48, 10);
 			//$(this).css( 'minHeight', 50 + 'px' ); // Why h? CHO changed to 50
 		});
-
-		$('a.widget-action').live('click', function(){
+		$(".widget .widget-title").each(function(index, element) {
+            if(!$("a.widget-action", this).length){
+				$(this).prepend('<a href="#available-widgets" class="new-widget-action hide-if-no-js"></a>');	
+			}
+        });
+		$('a.widget-action, a.new-widget-action').live('click', function(){
 			var css = {}, widget = $(this).closest('div.widget'), inside = widget.children('.widget-inside'), w = parseInt( widget.find('input.widget-width').val(), 10 );
 
 			if ( inside.is(':hidden') ) {

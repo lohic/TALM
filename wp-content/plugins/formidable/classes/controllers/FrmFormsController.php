@@ -3,19 +3,21 @@
  * @package Formidable
  */ 
 
-if(!defined('ABSPATH')) die(__('You are not allowed to call this page directly.', 'formidable'));
+if(!defined('ABSPATH')) die('You are not allowed to call this page directly.');
 
 if(class_exists('FrmFormsController'))
     return;
  
 class FrmFormsController{
-    function FrmFormsController(){
+    public static function load_hooks(){
         add_action('admin_menu', 'FrmFormsController::menu', 10);
         add_action('admin_menu', 'FrmFormsController::mid_menu', 40);
         add_action('admin_head-toplevel_page_formidable', 'FrmFormsController::head');
+        add_action('widgets_init', 'FrmFormsController::register_widgets');
         add_action('wp_ajax_frm_form_key_in_place_edit', 'FrmFormsController::edit_key');
         add_action('wp_ajax_frm_form_desc_in_place_edit', 'FrmFormsController::edit_description');
         add_action('wp_ajax_frm_delete_form_wo_fields', 'FrmFormsController::destroy_wo_fields');
+        add_action('frm_after_duplicate_form', 'FrmFormsController::after_duplicate', 10, 2);
         add_action('wp_ajax_frm_save_form', 'FrmFormsController::route');
         add_filter('frm_submit_button', 'FrmFormsController::submit_button_label');
         add_filter('media_buttons_context', 'FrmFormsController::insert_form_button');
@@ -26,6 +28,15 @@ class FrmFormsController{
         
         add_action('wp_ajax_frm_forms_preview', 'FrmFormsController::preview');
         add_action('wp_ajax_nopriv_frm_forms_preview', 'FrmFormsController::preview');
+        
+        add_filter('frm_admin_list_form_action', 'FrmFormsController::process_bulk_form_actions');
+        
+        add_action( 'admin_bar_init', 'FrmFormsController::admin_bar_css' );
+        add_action( 'wp_before_admin_bar_render', 'FrmFormsController::admin_bar_configure' );
+        
+        //Shortcodes
+        add_shortcode('formidable', 'FrmFormsController::get_form_shortcode');
+        add_filter( 'widget_text', 'FrmFormsController::widget_text_filter', 9 );
     }
     
     public static function menu(){
@@ -52,6 +63,11 @@ class FrmFormsController{
 
         wp_enqueue_script('formidable-editinplace');
         wp_enqueue_script('jquery-frm-themepicker');
+    }
+    
+    public static function register_widgets(){
+        require_once(FrmAppHelper::plugin_path() . '/classes/widgets/FrmShowForm.php');
+        register_widget('FrmShowForm');
     }
     
     public static function list_form(){
@@ -183,6 +199,9 @@ class FrmFormsController{
         }else{
             $record = $frm_form->update( $id, $values );
             $message = __('Form was Successfully Updated', 'formidable');
+            if ( defined('DOING_AJAX') ) {
+                die($message);
+            }
             return self::get_edit_vars($id, '', $message);
         }
     }
@@ -199,6 +218,12 @@ class FrmFormsController{
             return self::display_forms_list($params, __('There was a problem creating new template.', 'formidable'));
     }
     
+    
+    public static function after_duplicate($form_id, $values) {
+        $frm_form = new FrmForm();
+        $frm_form->after_duplicate($form_id, $values);
+    }
+    
     public static function page_preview(){
         $params = self::get_params();
         if (!$params['form']) return;
@@ -206,7 +231,7 @@ class FrmFormsController{
         $frm_form = new FrmForm();
         $form = $frm_form->getOne($params['form']);
         if(!$form) return;
-        return FrmEntriesController::show_form($form->id, '', true, true);
+        return self::show_form($form->id, '', true, true);
     }
 
     public static function preview(){
@@ -233,7 +258,7 @@ class FrmFormsController{
         $controller = FrmAppHelper::get_param('controller');
         $key = (isset($_GET['form']) ? $_GET['form'] : (isset($_POST['form']) ? $_POST['form'] : ''));
         $form = $frm_form->getAll(array('form_key' => $key), '', 1);
-        if (!$form) $form = $frm_form->getAll(array(), '', 1);
+        if (!$form) $form = $frm_form->getAll('', '', 1);
         
         require(FrmAppHelper::plugin_path() .'/classes/views/frm-entries/direct.php');
         die(); 
@@ -393,6 +418,10 @@ class FrmFormsController{
         global $frm_entry, $frm_field, $frm_vars;
         $frm_form = new FrmForm();
         $record = $frm_form->getOne( $id );
+        if ( !$record ) {
+            wp_die( __('You are trying to edit a form that does not exist.', 'formidable') );
+        }
+        
         $frm_field_selection = FrmFieldsHelper::field_selection();
         $fields = $frm_field->getAll(array('fi.form_id' => $record->id), 'field_order');
         $values = FrmAppHelper::setup_edit_vars($record, 'forms', $fields, true);
@@ -433,7 +462,62 @@ class FrmFormsController{
         return $values;
     }
     
+    public static function process_bulk_form_actions($errors) {
+        if ( !isset($_POST) ) return;
+        
+        $bulkaction = FrmAppHelper::get_param('action');
+        if ( $bulkaction == -1 ) {
+            $bulkaction = FrmAppHelper::get_param('action2');
+        }
+
+        if ( !empty($bulkaction) && strpos($bulkaction, 'bulk_') === 0 ) {
+            if ( isset($_GET) && isset($_GET['action']) ) {
+                $_SERVER['REQUEST_URI'] = str_replace('&action=' .$_GET['action'], '', $_SERVER['REQUEST_URI']);
+            }
+            if ( isset($_GET) && isset($_GET['action2']) ) {
+                $_SERVER['REQUEST_URI'] = str_replace('&action=' .$_GET['action2'], '', $_SERVER['REQUEST_URI']);
+            }
+            
+            $bulkaction = str_replace('bulk_', '', $bulkaction);
+        } else {
+            $bulkaction = '-1';
+            if(isset($_POST['bulkaction']) && $_POST['bulkaction'] != '-1') {
+                $bulkaction = $_POST['bulkaction'];
+            } else if(isset($_POST['bulkaction2']) && $_POST['bulkaction2'] != '-1') {
+                $bulkaction = $_POST['bulkaction2'];
+            }
+        }
+
+        $ids = FrmAppHelper::get_param('item-action', '');
+        if ( empty($ids) ) {
+            $errors[] = __('No forms were specified', 'formidable');
+        } else {                
+            if ( $bulkaction == 'delete' ) {
+                if ( !current_user_can('frm_delete_forms') ) {
+                    global $frm_settings;
+                    $errors[] = $frm_settings->admin_permission;
+                } else {
+                    if ( !is_array($ids) ) {
+                        $ids = explode(',', $ids);
+                    }
+                        
+                    if ( is_array($ids) ) {
+                        if ( $bulkaction == 'delete' ) {
+                            $frm_form = new FrmForm();
+                            foreach ( $ids as $form_id ) {
+                                $frm_form->destroy($form_id);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return $errors;
+    }
+    
     public static function add_default_templates($path, $default=true, $template=true){
+        _deprecated_function( __FUNCTION__, '1.07.05', 'FrmXMLController::add_default_templates()' );
+        
         global $frm_field;
         $path = untrailingslashit(trim($path));
         $templates = glob($path."/*.php");
@@ -455,10 +539,11 @@ class FrmFormsController{
             include($templates[$i]);
             
             //get updated form
-            if($form)
+            if ( isset($form) && $form ) {
                 $form = $frm_form->getOne($form->id);
-            else
+            } else {
                 $form = $frm_form->getAll($template_query, '', 1);
+            }
             
             if($form)
                 do_action('frm_after_duplicate_form', $form->id, (array)$form);
@@ -519,6 +604,175 @@ class FrmFormsController{
                 return self::display_forms_list();
             }
         }
+    }
+    
+    
+    /* FRONT-END FORMS */
+    public static function admin_bar_css() {
+        FrmAppController::load_wp_admin_style();
+    }
+    
+    public static function admin_bar_configure() {
+        if ( is_admin() || !current_user_can('frm_edit_forms') ) {
+            return;
+        }
+        
+        global $frm_vars;
+        if ( empty($frm_vars['forms_loaded']) ) {
+            return;
+        }
+        
+        $actions = array();
+        foreach ($frm_vars['forms_loaded'] as $form ) {
+            if ( is_object($form) ) {
+                $actions[$form->id] = $form->name;
+            }
+            unset($form);
+        }
+        
+        if ( empty($actions) ) {
+            return;
+        }
+        
+        asort($actions);
+        
+        global $wp_admin_bar;
+        
+        if ( count($actions) == 1 ) {
+            $wp_admin_bar->add_menu( array(
+                'title' => 'Edit Form',
+                'href'  => admin_url('admin.php?page=formidable&frm_action=edit&id='. current( array_keys( $actions ) )),
+                'id'    => 'frm-forms'
+            ) );
+        } else {            
+            $wp_admin_bar->add_menu( array(
+        		'id'    => 'frm-forms',
+        		'title' => '<span class="ab-icon"></span><span class="ab-label">' . __( 'Edit Forms', 'formidable' ) . '</span>',
+        		'href'  => admin_url( 'admin.php?page=formidable&frm_action=edit&id='. current( array_keys( $actions ) ) ),
+        		'meta'  => array(
+        			'title' => __( 'Edit Forms', 'formidable' ),
+        		),
+        	) );
+        	
+        	foreach ( $actions as $form_id => $name ) {
+
+        		$wp_admin_bar->add_menu( array(
+        			'parent'    => 'frm-forms',
+        			'id'        => 'edit_form_'. $form_id,
+        			'title'     => empty($name) ? __('(no title)') : $name,
+        			'href'      => admin_url( 'admin.php?page=formidable&frm_action=edit&id='. $form_id )
+        		) );
+        	}
+        }  
+    }
+    
+    
+    
+    //formidable shortcode
+    public static function get_form_shortcode($atts) {
+        global $frm_vars;
+        if ( isset($frm_vars['skip_shortcode']) && $frm_vars['skip_shortcode'] ) {
+            $sc = '[formidable';
+            foreach ( $atts as $k => $v ) {
+                $sc .= ' '. $k .'="'. $v .'"';
+            }
+            return $sc .']';
+        }
+        
+        $shortcode_atts = shortcode_atts(array(
+            'id' => '', 'key' => '', 'title' => false, 'description' => false,
+            'readonly' => false, 'entry_id' => false, 'fields' => array(),
+            'exclude_fields' => array(), 'minimize' => false,
+        ), $atts);
+        do_action('formidable_shortcode_atts', $shortcode_atts, $atts);
+        extract($shortcode_atts);
+        return self::show_form($id, $key, $title, $description, $atts); 
+    }
+    
+    //filter form shortcode in text widgets
+    public static function widget_text_filter( $content ) {
+    	$regex = '/\[\s*formidable\s+.*\]/';
+    	return preg_replace_callback( $regex, 'FrmAppController::widget_text_filter_callback', $content );
+    }
+    
+    public static function show_form($id = '', $key = '', $title = false, $description = false, $atts = array()) {
+        global $frm_settings, $post;
+        
+        $frm_form = new FrmForm();
+        if ( empty($id) ) {
+            $id = $key;
+        }
+        
+        // no form id or key set
+        if ( empty($id) ) {
+            return __('Please select a valid form', 'formidable');
+        }
+        
+        $form = $frm_form->getOne($id);
+        if ( !$form ) {
+            return __('Please select a valid form', 'formidable');
+        }
+        $form = apply_filters('frm_pre_display_form', $form);
+        
+        // don't show a draft form on a page
+        if ( $form->status == 'draft' && (!$post || $post->ID != $frm_settings->preview_page_id) ) {
+            return __('Please select a valid form', 'formidable');
+        }
+        
+        // don't show the form if user should be logged in
+        if ( $form->logged_in && !is_user_logged_in() ) {
+            return do_shortcode($frm_settings->login_msg);
+        }
+        
+        // don't show the form if user doesn't have permission
+        if ( $form->logged_in && get_current_user_id() && isset($form->options['logged_in_role']) && $form->options['logged_in_role'] != '' && !FrmAppHelper::user_has_permission($form->options['logged_in_role']) ) {
+            return do_shortcode($frm_settings->login_msg);
+        }
+        
+        $form = self::get_form($form, $title, $description, $atts);
+        
+        // check for external shortcodes
+        $form = do_shortcode($form);
+        
+        return $form;
+    }
+    
+    public static function get_form($form, $title, $description, $atts = array()) {
+        global $frm_field, $frm_entry, $frm_entry_meta, $frm_settings, $frm_vars;
+        $form_name = $form->name;
+
+        $frm_form = new FrmForm();
+        $submit = isset($form->options['submit_value']) ? $form->options['submit_value'] : $frm_settings->submit_value;
+        $saved_message = isset($form->options['success_msg']) ? $form->options['success_msg'] : $frm_settings->success_msg;
+        
+        $user_ID = get_current_user_id();
+        
+        $params = FrmEntriesController::get_params($form);
+
+        $message = $errors = '';
+
+        FrmEntriesHelper::enqueue_scripts($params);
+        
+        if ( $params['posted_form_id'] == $form->id && $_POST ) {
+            $errors = isset($frm_vars['created_entries'][$form->id]) ? $frm_vars['created_entries'][$form->id]['errors'] : array();
+        }
+
+        $fields = FrmFieldsHelper::get_form_fields($form->id, (isset($errors) && !empty($errors)));
+        
+        $filename = FrmAppHelper::plugin_path() .'/classes/views/frm-entries/frm-entry.php';
+        
+        if ( is_file($filename) ) {
+            ob_start();
+            include $filename;
+            $contents = ob_get_contents();
+            ob_end_clean();
+            // check if minimizing is turned on
+            if ( isset($atts['minimize']) && !empty($atts['minimize']) ) {
+                $contents = str_replace(array("\r\n", "\r", "\n", "\t", "    "), '', $contents);
+            }
+            return $contents;
+        }
+        return false;
     }
 
 }

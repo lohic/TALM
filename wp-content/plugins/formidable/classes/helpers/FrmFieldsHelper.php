@@ -1,6 +1,6 @@
 <?php
 
-if(!defined('ABSPATH')) die(__('You are not allowed to call this page directly.', 'formidable'));
+if(!defined('ABSPATH')) die('You are not allowed to call this page directly.');
 
 if(class_exists('FrmFieldsHelper'))
     return;
@@ -207,7 +207,6 @@ DEFAULT_HTML;
     }
     
     public static function replace_shortcodes($html, $field, $errors=array(), $form=false){
-        $html = stripslashes($html);
         $html = apply_filters('frm_before_replace_shortcodes', $html, $field, $errors, $form);
         
         $field_name = 'item_meta['. $field['id'] .']';
@@ -224,7 +223,7 @@ DEFAULT_HTML;
         $required = ($field['required'] == '0') ? '' : $field['required_indicator'];
         if(!is_array($errors))
             $errors = array();
-        $error = (isset($errors['field'. $field['id']])) ? stripslashes($errors['field'. $field['id']]) : false; 
+        $error = isset($errors['field'. $field['id']]) ? $errors['field'. $field['id']] : false; 
         foreach (array('description' => $field['description'], 'required_label' => $required, 'error' => $error) as $code => $value){
             if (!$value or $value == '')
                 $html = preg_replace('/(\[if\s+'.$code.'\])(.*?)(\[\/if\s+'.$code.'\])/mis', '', $html);
@@ -308,7 +307,13 @@ DEFAULT_HTML;
         }
         $html .= "\n";
         
-        return apply_filters('frm_replace_shortcodes', $html, $field, array('errors' => $errors, 'form' => $form));
+        $html = apply_filters('frm_replace_shortcodes', $html, $field, array('errors' => $errors, 'form' => $form));
+        
+        // remove [collapse_this] when running the free version
+        if (preg_match('/\[(collapse_this)\]/s', $html))
+            $html = str_replace('[collapse_this]', '', $html);
+        
+        return $html;
     }
     
     public static function display_recaptcha($field, $error=null){
@@ -362,12 +367,11 @@ DEFAULT_HTML;
         
         $args = apply_filters('frm_dropdown_cat', $args, $field);
         
-        if(class_exists('FrmProForm')){
-            $post_type = FrmProForm::post_type($field['form_id']);
-            if(function_exists('get_object_taxonomies')){
-                $args['taxonomy'] = FrmProAppHelper::get_custom_taxonomy($post_type, $field);
-                if(!$args['taxonomy'])
-                    return;
+        if(class_exists('FrmProFormsHelper')){
+            $post_type = FrmProFormsHelper::post_type($field['form_id']);
+            $args['taxonomy'] = FrmProAppHelper::get_custom_taxonomy($post_type, $field);
+            if ( !$args['taxonomy'] ) {
+                return;
             }
         }
         
@@ -443,4 +447,34 @@ DEFAULT_HTML;
     <?php
     }
     
+    public static function switch_field_ids($val){
+        global $frm_duplicate_ids;
+        $replace = array();
+        $replace_with = array();
+        foreach((array)$frm_duplicate_ids as $old => $new){
+            $replace[] = '[if '. $old .']';
+            $replace_with[] = '[if '. $new .']';
+            $replace[] = '[if '. $old .' ';
+            $replace_with[] = '[if '. $new .' ';
+            $replace[] = '[/if '. $old .']';
+            $replace_with[] = '[/if '. $new .']';
+            $replace[] = '['. $old .']';
+            $replace_with[] = '['. $new .']';
+            $replace[] = '['. $old .' ';
+            $replace_with[] = '['. $new .' ';
+            unset($old);
+            unset($new);
+        }
+        if(is_array($val)){
+            foreach($val as $k => $v){
+                $val[$k] = str_replace($replace, $replace_with, $v);
+                unset($k);
+                unset($v);
+            }
+        }else{
+            $val = str_replace($replace, $replace_with, $val);
+        }
+        
+        return $val;
+    }
 }
